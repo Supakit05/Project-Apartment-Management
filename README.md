@@ -1,10 +1,10 @@
-# 🏢 Victory Apartment Management System (DevOps Semester Project)
+# Victory Apartment Management System (DevOps Semester Project)
 
 ระบบบริหารจัดการอพาร์ตเมนต์แบบครบวงจร (Full-Stack DevOps) ที่พัฒนาตรงตามข้อกำหนดรายวิชา **Real-World DevOps in Action (30% of Grade)** ด้วย **Spring Boot 3.2.5 (Backend)** + **React 18 / TypeScript (Frontend)** พร้อมระบบ **Docker Compose**, **Kubernetes (Minikube)**, **CI/CD (GitHub Actions)** และ **JUnit 5 Regression Tests**
 
 ---
 
-## 📊 ตารางสรุปความสอดคล้องกับ Requirement ของอาจารย์ (Requirement Compliance Table)
+## ตารางสรุปความสอดคล้องกับ Requirement ของอาจารย์ (Requirement Compliance Table)
 
 | ข้อกำหนดรายวิชา (Syllabus Requirement) | เทคโนโลยีที่ใช้ในโปรเจกต์ | สถานะการทำงาน |
 |---|---|:---:|
@@ -17,18 +17,18 @@
 
 ---
 
-## 🧭 ลำดับขั้นตอนการเตรียมเครื่องและการรันใช้งาน (Step-by-Step Execution Guide)
+## ลำดับขั้นตอนการเตรียมเครื่องและการรันใช้งาน (Step-by-Step Execution Guide)
 
 เพื่อความง่ายและไม่สับสน สามารถเลือกรันตามวัตถุประสงค์ได้ 3 รูปแบบตามลำดับก่อน-หลังดังนี้ครับ:
 
-### ⚙️ ขั้นตอนที่ 0: สิ่งที่ควรมีในเครื่อง (Prerequisites)
+### ขั้นตอนที่ 0: สิ่งที่ควรมีในเครื่อง (Prerequisites)
 1. **Docker Desktop** (จำเป็นสำหรับการรัน Container)
 2. **Node.js 20+** และ **Java 17 / Maven** (กรณีต้องการรันพัฒนาแบบ Manual)
 3. **Minikube** (กรณีต้องการสาธิตการรันบน Kubernetes ให้อาจารย์ดู)
 
 ---
 
-### 🐳 วิธีที่ 1: รันด้วย Docker Compose (แนะนำที่สุดสำหรับใช้งานทั่วไป & Showcase)
+### วิธีที่ 1: รันด้วย Docker Compose (แนะนำที่สุดสำหรับใช้งานทั่วไป & Showcase)
 วิธีนี้ง่ายและเสถียรที่สุด สั่งรันคำสั่งเดียวจะได้ทั้ง Frontend และ Backend พร้อมใช้งานทันที:
 
 ```powershell
@@ -45,7 +45,7 @@ docker compose stop
 
 ---
 
-### ☸️ วิธีที่ 2: รันบน Minikube / Kubernetes (เผื่อกรณีอาจารย์ต้องการดูการสาธิต K8s)
+### วิธีที่ 2: รันบน Minikube / Kubernetes (เผื่อกรณีอาจารย์ต้องการดูการสาธิต K8s)
 หากอาจารย์ต้องการให้สาธิตการทำงานบน **Minikube / Kubernetes Cluster** ให้ทำตามลำดับดังนี้:
 
 ```powershell
@@ -68,7 +68,7 @@ minikube service apartment-frontend-service
 
 ---
 
-### 💻 วิธีที่ 3: รันแยกพัฒนาเครื่อง (Manual Local Development)
+### วิธีที่ 3: รันแยกพัฒนาเครื่อง (Manual Local Development)
 ใช้สำหรับกรณีต้องการแก้ไขโค้ดพัฒนาในเครื่องเป็นหลัก:
 
 #### 1. Backend (Spring Boot API):
@@ -90,19 +90,19 @@ npm run dev   # รัน Frontend Dev Server (Port 3000 / 5173)
 
 ---
 
-## 🔑 ข้อมูลสำหรับทดสอบเข้าสู่ระบบ (System Credentials)
+## ข้อมูลสำหรับทดสอบเข้าสู่ระบบ (System Credentials)
 
-### 👑 บัญชีผู้ดูแลระบบ (Admin Access)
+### บัญชีผู้ดูแลระบบ (Admin Access)
 * **URL หน้า Login**: `http://localhost:3000/login` (หรือตาม URL ของ Minikube)
 * **Email / Username**: `admin` *(หรือ `admin@victoryapartment.com`)*
 * **Password**: `admin`
 
-### 👤 บัญชีลูกค้า (Customer Access)
+### บัญชีลูกค้า (Customer Access)
 * สามารถกดปุ่ม **Sign Up** หน้าเว็บเพื่อสมัครสมาชิกใหม่ด้วยอีเมลใดก็ได้ แล้วล็อกอินเข้าใช้งานระบบลูกค้าได้ทันที
 
 ---
 
-## 🧪 การทดสอบระบบและ CI/CD (Automated Testing & CI/CD)
+## การทดสอบระบบและ CI/CD (Automated Testing & CI/CD)
 
 1. **Automated Regression Tests (JUnit 5)**:
    ```powershell

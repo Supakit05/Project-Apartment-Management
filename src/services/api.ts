@@ -1,0 +1,324 @@
+import {
+  Room, Tenant, Lease, UtilityBill, BillStatus, MaintenanceTask, SupplyItem,
+  MaintenanceLog, ScheduledReminder, AppNotification, ActivityLog, Booking
+} from '../types';
+
+const API_BASE = '/api';
+
+async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(error.error || error.message || res.statusText);
+  }
+  return res.json();
+}
+
+// ----------------------------------------------------
+// ROOMS / APARTMENT UNITS API
+// ----------------------------------------------------
+export const getRooms = async (): Promise<Room[]> => {
+  return fetchJson<Room[]>(`${API_BASE}/rooms`);
+};
+
+export const getRoomById = async (id: string): Promise<Room | null> => {
+  try {
+    return await fetchJson<Room>(`${API_BASE}/rooms/${id}`);
+  } catch {
+    return null;
+  }
+};
+
+export const saveRoom = async (roomData: Partial<Room>): Promise<Room> => {
+  if (roomData.id) {
+    return fetchJson<Room>(`${API_BASE}/rooms/${roomData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(roomData),
+    });
+  }
+  return fetchJson<Room>(`${API_BASE}/rooms`, {
+    method: 'POST',
+    body: JSON.stringify(roomData),
+  });
+};
+
+export const deleteRoom = async (id: string): Promise<void> => {
+  await fetch(`${API_BASE}/rooms/${id}`, { method: 'DELETE' });
+};
+
+// ----------------------------------------------------
+// TENANTS API
+// ----------------------------------------------------
+export const getTenants = async (): Promise<Tenant[]> => {
+  return fetchJson<Tenant[]>(`${API_BASE}/tenants`);
+};
+
+export const saveTenant = async (tenantData: Partial<Tenant>): Promise<Tenant> => {
+  if (tenantData.id) {
+    return fetchJson<Tenant>(`${API_BASE}/tenants/${tenantData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(tenantData),
+    });
+  }
+  return fetchJson<Tenant>(`${API_BASE}/tenants`, {
+    method: 'POST',
+    body: JSON.stringify(tenantData),
+  });
+};
+
+export const deleteTenant = async (id: string): Promise<void> => {
+  await fetch(`${API_BASE}/tenants/${id}`, { method: 'DELETE' });
+};
+
+// ----------------------------------------------------
+// LEASES & OCCUPANCY CONFLICT PREVENTION API
+// ----------------------------------------------------
+export const getLeases = async (): Promise<Lease[]> => {
+  return fetchJson<Lease[]>(`${API_BASE}/leases`);
+};
+
+export const checkLeaseConflict = async (
+  roomId: string,
+  startDate: string,
+  endDate: string,
+  excludeLeaseId?: string
+): Promise<{ hasConflict: boolean; conflictingLease?: Lease }> => {
+  return fetchJson(`${API_BASE}/leases/check-conflict`, {
+    method: 'POST',
+    body: JSON.stringify({ roomId, startDate, endDate, excludeLeaseId }),
+  });
+};
+
+export const saveLease = async (leaseData: Partial<Lease>): Promise<{ success: boolean; lease?: Lease; message?: string }> => {
+  const method = leaseData.id ? 'PUT' : 'POST';
+  const url = leaseData.id ? `${API_BASE}/leases/${leaseData.id}` : `${API_BASE}/leases`;
+
+  try {
+    const result = await fetchJson<{ success: boolean; lease?: Lease; message?: string }>(url, {
+      method,
+      body: JSON.stringify(leaseData),
+    });
+    return result;
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Failed to save lease' };
+  }
+};
+
+export const terminateLease = async (leaseId: string): Promise<void> => {
+  await fetch(`${API_BASE}/leases/${leaseId}/terminate`, { method: 'PUT' });
+};
+
+// ----------------------------------------------------
+// UTILITY BILLS & RECEIPT API
+// ----------------------------------------------------
+export const getUtilityBills = async (): Promise<UtilityBill[]> => {
+  return fetchJson<UtilityBill[]>(`${API_BASE}/utility-bills`);
+};
+
+export const saveUtilityBill = async (billData: Partial<UtilityBill>): Promise<UtilityBill> => {
+  if (billData.id) {
+    return fetchJson<UtilityBill>(`${API_BASE}/utility-bills/${billData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(billData),
+    });
+  }
+  return fetchJson<UtilityBill>(`${API_BASE}/utility-bills`, {
+    method: 'POST',
+    body: JSON.stringify(billData),
+  });
+};
+
+export const updateBillStatus = async (billId: string, status: BillStatus, slipImage?: string): Promise<UtilityBill | null> => {
+  try {
+    return await fetchJson<UtilityBill>(`${API_BASE}/utility-bills/${billId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, slipImage }),
+    });
+  } catch {
+    return null;
+  }
+};
+
+// ----------------------------------------------------
+// MAINTENANCE TASKS & SUPPLY USAGE API
+// ----------------------------------------------------
+export const getMaintenanceTasks = async (): Promise<MaintenanceTask[]> => {
+  return fetchJson<MaintenanceTask[]>(`${API_BASE}/maintenance-tasks`);
+};
+
+export const saveMaintenanceTask = async (taskData: Partial<MaintenanceTask>): Promise<MaintenanceTask> => {
+  if (taskData.id) {
+    return fetchJson<MaintenanceTask>(`${API_BASE}/maintenance-tasks/${taskData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(taskData),
+    });
+  }
+  return fetchJson<MaintenanceTask>(`${API_BASE}/maintenance-tasks`, {
+    method: 'POST',
+    body: JSON.stringify(taskData),
+  });
+};
+
+// ----------------------------------------------------
+// SUPPLIES API
+// ----------------------------------------------------
+export const getSupplies = async (): Promise<SupplyItem[]> => {
+  return fetchJson<SupplyItem[]>(`${API_BASE}/supplies`);
+};
+
+export const saveSupply = async (supplyData: Partial<SupplyItem>): Promise<SupplyItem> => {
+  if (supplyData.id) {
+    return fetchJson<SupplyItem>(`${API_BASE}/supplies/${supplyData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(supplyData),
+    });
+  }
+  return fetchJson<SupplyItem>(`${API_BASE}/supplies`, {
+    method: 'POST',
+    body: JSON.stringify(supplyData),
+  });
+};
+
+// ----------------------------------------------------
+// MAINTENANCE LOGS API (PER-UNIT HISTORY)
+// ----------------------------------------------------
+export const getMaintenanceLogs = async (roomId?: string): Promise<MaintenanceLog[]> => {
+  const url = roomId ? `${API_BASE}/maintenance-logs?roomId=${roomId}` : `${API_BASE}/maintenance-logs`;
+  return fetchJson<MaintenanceLog[]>(url);
+};
+
+// ----------------------------------------------------
+// SCHEDULED REMINDERS API
+// ----------------------------------------------------
+export const getReminders = async (): Promise<ScheduledReminder[]> => {
+  return fetchJson<ScheduledReminder[]>(`${API_BASE}/reminders`);
+};
+
+export const saveReminder = async (reminderData: Partial<ScheduledReminder>): Promise<ScheduledReminder> => {
+  if (reminderData.id) {
+    return fetchJson<ScheduledReminder>(`${API_BASE}/reminders/${reminderData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(reminderData),
+    });
+  }
+  return fetchJson<ScheduledReminder>(`${API_BASE}/reminders`, {
+    method: 'POST',
+    body: JSON.stringify(reminderData),
+  });
+};
+
+export const toggleReminder = async (id: string): Promise<ScheduledReminder | null> => {
+  try {
+    return await fetchJson<ScheduledReminder>(`${API_BASE}/reminders/${id}/toggle`, { method: 'PUT' });
+  } catch {
+    return null;
+  }
+};
+
+// ----------------------------------------------------
+// BOOKINGS API (PUBLIC BOOKING REQUESTS)
+// ----------------------------------------------------
+export const getBookings = async (): Promise<Booking[]> => {
+  return fetchJson<Booking[]>(`${API_BASE}/bookings`);
+};
+
+export const getUserBookings = async (email: string): Promise<Booking[]> => {
+  return fetchJson<Booking[]>(`${API_BASE}/bookings/user/${encodeURIComponent(email)}`);
+};
+
+export const createBooking = async (bookingData: Partial<Booking>): Promise<Booking> => {
+  return fetchJson<Booking>(`${API_BASE}/bookings`, {
+    method: 'POST',
+    body: JSON.stringify(bookingData),
+  });
+};
+
+export const updateBookingStatus = async (bookingId: string, status: string): Promise<Booking | null> => {
+  try {
+    return await fetchJson<Booking>(`${API_BASE}/bookings/${bookingId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  } catch {
+    return null;
+  }
+};
+
+export const cancelBooking = async (bookingId: string): Promise<Booking | null> => {
+  try {
+    return await fetchJson<Booking>(`${API_BASE}/bookings/${bookingId}/cancel`, {
+      method: 'PUT',
+    });
+  } catch {
+    return null;
+  }
+};
+
+export const trackBookings = async (query: string): Promise<Booking[]> => {
+  return fetchJson<Booking[]>(`${API_BASE}/bookings/track?query=${encodeURIComponent(query)}`);
+};
+
+
+// ----------------------------------------------------
+// NOTIFICATIONS API
+// ----------------------------------------------------
+export const getNotifications = async (): Promise<AppNotification[]> => {
+  return fetchJson<AppNotification[]>(`${API_BASE}/notifications`);
+};
+
+export const addNotification = async (notif: Partial<AppNotification>): Promise<AppNotification> => {
+  return fetchJson<AppNotification>(`${API_BASE}/notifications`, {
+    method: 'POST',
+    body: JSON.stringify(notif),
+  });
+};
+
+export const markNotificationsRead = async (): Promise<void> => {
+  await fetch(`${API_BASE}/notifications/mark-read`, { method: 'PUT' });
+};
+
+// ----------------------------------------------------
+// ACTIVITY LOGS API
+// ----------------------------------------------------
+export const getActivityLogs = async (): Promise<ActivityLog[]> => {
+  return fetchJson<ActivityLog[]>(`${API_BASE}/activity-logs`);
+};
+
+// ----------------------------------------------------
+// AUTH API
+// ----------------------------------------------------
+export const loginAdmin = async (email: string, password: string): Promise<{ success: boolean; user?: any; error?: string }> => {
+  try {
+    return await fetchJson(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Login failed' };
+  }
+};
+
+export const registerApiUser = async (fullname: string, email: string, password: string, phone?: string): Promise<{ success: boolean; user?: any; error?: string }> => {
+  try {
+    return await fetchJson(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      body: JSON.stringify({ fullname, email, password, phone }),
+    });
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Registration failed' };
+  }
+};
+
+export const updateUserProfile = async (fullname: string, email: string, phone?: string): Promise<{ success: boolean; user?: any; error?: string }> => {
+  try {
+    return await fetchJson(`${API_BASE}/auth/profile`, {
+      method: 'PUT',
+      body: JSON.stringify({ fullname, email, phone }),
+    });
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to update profile' };
+  }
+};

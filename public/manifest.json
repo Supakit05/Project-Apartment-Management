@@ -1,0 +1,15 @@
+{
+  "short_name": "Apartment System",
+  "name": "Apartment System - Urban Residences",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "display": "standalone"
+}

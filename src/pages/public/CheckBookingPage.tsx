@@ -1,0 +1,294 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation, Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { Booking } from '../../types';
+import { trackBookings, getUserBookings, cancelBooking } from '../../services/api';
+import { formatCurrency } from '../../utils/formatters';
+import {
+  Search, CalendarCheck, Clock, CheckCircle2, XCircle, Ban,
+  Phone, Mail, ArrowRight, RefreshCw, AlertCircle
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+export const CheckBookingPage: React.FC = () => {
+  const { user, isAuthenticated } = useAuth();
+  const { t } = useLanguage();
+  const location = useLocation();
+  const [query, setQuery] = useState('');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  // Auto-search if user is logged in
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      setQuery(user.email);
+      setLoading(true);
+      getUserBookings(user.email)
+        .then(data => {
+          setBookings(data);
+          setHasSearched(true);
+        })
+        .catch(err => console.error('Error fetching bookings:', err))
+        .finally(() => setLoading(false));
+    }
+  }, [isAuthenticated, user?.email]);
+
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const cleanQuery = query.trim();
+    if (!cleanQuery) {
+      toast.error(t('track.promptInput'));
+      return;
+    }
+
+    setLoading(true);
+    setHasSearched(true);
+    try {
+      const results = await trackBookings(cleanQuery);
+      setBookings(results);
+      if (results.length === 0) {
+        toast.info(t('track.noResults'));
+      }
+    } catch (err: any) {
+      toast.error('Error verifying booking records');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async (bookingId: string) => {
+    if (!window.confirm('Are you sure you want to cancel this booking request?')) return;
+    setCancellingId(bookingId);
+    try {
+      const res = await cancelBooking(bookingId);
+      if (res) {
+        toast.success('Cancelled booking successfully');
+        setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'Cancelled' } : b));
+      } else {
+        toast.error('Unable to cancel booking');
+      }
+    } catch {
+      toast.error('Error cancelling booking');
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'Approved':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-nike-success text-white shadow-xs">
+            <CheckCircle2 className="w-3.5 h-3.5" /> {t('track.status.approved')}
+          </span>
+        );
+      case 'Rejected':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-nike-sale text-white shadow-xs">
+            <XCircle className="w-3.5 h-3.5" /> {t('track.status.rejected')}
+          </span>
+        );
+      case 'Cancelled':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-neutral-500 text-white shadow-xs">
+            <Ban className="w-3.5 h-3.5" /> {t('track.status.cancelled')}
+          </span>
+        );
+      case 'Pending':
+      default:
+        return (
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-500 text-white shadow-xs animate-pulse">
+            <Clock className="w-3.5 h-3.5" /> {t('track.status.pending')}
+          </span>
+        );
+    }
+  };
+
+  return (
+    <div className="max-w-[1000px] mx-auto px-6 py-12 space-y-10">
+      
+      {/* HEADER SECTION */}
+      <div className="text-center space-y-3">
+        <span className="text-xs font-semibold text-nike-mute dark:text-nike-stone block">
+          {t('track.badge')}
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-bold text-nike-ink dark:text-white">
+          {t('track.title')}
+        </h1>
+        <p className="text-sm text-nike-mute dark:text-nike-stone max-w-lg mx-auto leading-relaxed">
+          {t('track.subtitle')}
+        </p>
+      </div>
+
+      {/* SEARCH CARD */}
+      <div className="bg-nike-soft-cloud dark:bg-nike-dark-elevated p-6 sm:p-8 rounded-3xl border border-nike-hairline dark:border-nike-dark-card shadow-sm">
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="relative flex-1 w-full">
+            <Search className="w-4 h-4 text-nike-mute dark:text-nike-stone absolute left-4 top-3.5" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t('track.placeholder')}
+              className="w-full pl-11 pr-4 py-3 text-sm font-medium rounded-full bg-white dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full sm:w-auto bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white font-semibold px-8 py-3 rounded-full text-sm transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 shrink-0"
+          >
+            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            <span>{t('track.button')}</span>
+          </button>
+        </form>
+      </div>
+
+      {/* SEARCH RESULTS / BOOKING CARDS */}
+      {loading ? (
+        <div className="text-center py-20 text-nike-mute font-medium flex items-center justify-center gap-2">
+          <RefreshCw className="w-5 h-5 animate-spin" /> {t('track.searching')}
+        </div>
+      ) : hasSearched && bookings.length === 0 ? (
+        <div className="text-center py-16 bg-nike-soft-cloud dark:bg-nike-dark-elevated rounded-3xl border border-nike-hairline dark:border-nike-dark-card space-y-3">
+          <AlertCircle className="w-10 h-10 text-nike-mute mx-auto" />
+          <h3 className="text-base font-bold text-nike-ink dark:text-white">{t('track.noResults')}</h3>
+          <p className="text-sm text-nike-mute max-w-sm mx-auto">
+            {t('track.noResultsDesc')}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {bookings.map((booking) => (
+            <div
+              key={booking.id}
+              className="bg-white dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm hover:shadow-md transition-shadow"
+            >
+              {/* TOP ROW: BOOKING REF & STATUS */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-nike-hairline dark:border-neutral-800 gap-4">
+                <div>
+                  <span className="text-xs font-semibold text-nike-mute dark:text-nike-stone block">
+                    {t('track.bookingRef')}
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-bold text-nike-ink dark:text-white">
+                    {booking.bookingNo || booking.id}
+                  </h3>
+                </div>
+                <div>
+                  {getStatusBadge(booking.status)}
+                </div>
+              </div>
+
+              {/* TIMELINE PROGRESS INDICATOR */}
+              <div className="py-2">
+                <div className="grid grid-cols-3 gap-2 text-center text-xs font-medium">
+                  
+                  {/* STEP 1 */}
+                  <div className="space-y-1.5">
+                    <div className="w-7 h-7 rounded-full bg-nike-ink dark:bg-white text-white dark:text-nike-ink font-bold flex items-center justify-center mx-auto text-xs">
+                      ✓
+                    </div>
+                    <span className="text-nike-ink dark:text-white font-semibold block">{t('track.step1.title')}</span>
+                    <span className="text-[11px] text-nike-mute block">{t('track.step1.desc')}</span>
+                  </div>
+
+                  {/* STEP 2 */}
+                  <div className="space-y-1.5">
+                    <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
+                      booking.status === 'Approved' ? 'bg-nike-ink dark:bg-white text-white dark:text-nike-ink' :
+                      booking.status === 'Pending' ? 'bg-amber-500 text-white animate-pulse' :
+                      'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
+                    }`}>
+                      2
+                    </div>
+                    <span className={`block font-semibold ${booking.status === 'Pending' ? 'text-amber-500 font-bold' : 'text-nike-ink dark:text-white'}`}>
+                      {t('track.step2.title')}
+                    </span>
+                    <span className="text-[11px] text-nike-mute block">
+                      {booking.status === 'Pending' ? t('track.step2.descPending') : t('track.step2.descDone')}
+                    </span>
+                  </div>
+
+                  {/* STEP 3 */}
+                  <div className="space-y-1.5">
+                    <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
+                      booking.status === 'Approved' ? 'bg-nike-success text-white' :
+                      booking.status === 'Rejected' || booking.status === 'Cancelled' ? 'bg-nike-sale text-white' :
+                      'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
+                    }`}>
+                      {booking.status === 'Approved' ? '✓' : '3'}
+                    </div>
+                    <span className={`block font-semibold ${booking.status === 'Approved' ? 'text-nike-success font-bold' : 'text-nike-mute'}`}>
+                      {t('track.step3.title')}
+                    </span>
+                    <span className="text-[11px] text-nike-mute block">
+                      {booking.status === 'Approved' ? t('track.step3.descApproved') : t('track.step3.descPending')}
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* DETAILS GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-5 bg-nike-soft-cloud dark:bg-nike-dark-card rounded-2xl border border-nike-hairline dark:border-neutral-800 text-xs">
+                <div>
+                  <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.unit')}</span>
+                  <span className="font-bold text-sm text-nike-ink dark:text-white">Unit {booking.roomNumber || 'TBD'}</span>
+                </div>
+                <div>
+                  <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.guest')}</span>
+                  <span className="font-bold text-sm text-nike-ink dark:text-white">{booking.guestName}</span>
+                </div>
+                <div>
+                  <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.moveIn')}</span>
+                  <span className="font-bold text-sm text-nike-ink dark:text-white">{booking.checkIn}</span>
+                </div>
+                <div>
+                  <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.rate')}</span>
+                  <span className="font-bold text-sm text-nike-ink dark:text-white">{formatCurrency(booking.totalPrice)} / {t('common.month')}</span>
+                </div>
+              </div>
+
+              {/* CONTACT & ACTION FOOTER */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+                <div className="flex items-center gap-4 text-xs text-nike-mute dark:text-nike-stone">
+                  <span className="flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5" /> {booking.guestPhone}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5" /> {booking.guestEmail}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {booking.status === 'Pending' && (
+                    <button
+                      onClick={() => handleCancel(booking.id)}
+                      disabled={cancellingId === booking.id}
+                      className="px-4 py-2 rounded-full text-xs font-semibold text-nike-sale hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition-all active:scale-95"
+                    >
+                      {cancellingId === booking.id ? t('track.cancelling') : t('track.cancelBtn')}
+                    </button>
+                  )}
+                  {booking.roomId && (
+                    <Link
+                      to={`/rooms/${booking.roomId}`}
+                      className="px-4 py-2 rounded-full text-xs font-semibold bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1"
+                    >
+                      {t('track.viewRoomBtn')} <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      )}
+
+    </div>
+  );
+};

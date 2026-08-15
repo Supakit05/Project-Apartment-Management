@@ -12,6 +12,7 @@ export const UtilityReceiptManagement: React.FC = () => {
   const [leases, setLeases] = useState<Lease[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Pending' | 'Paid'>('All');
+  const [monthFilter, setMonthFilter] = useState<string>('All');
 
   const [showBillModal, setShowBillModal] = useState(false);
   const [selectedBillForReceipt, setSelectedBillForReceipt] = useState<UtilityBill | null>(null);
@@ -103,10 +104,13 @@ export const UtilityReceiptManagement: React.FC = () => {
   const electricAmtPreview = electricUnitsPreview * (billFormData.electricRate || 7);
   const totalAmtPreview = (billFormData.rentAmount || 0) + waterAmtPreview + electricAmtPreview + (billFormData.commonFee || 0);
 
+  const availableMonths = Array.from(new Set(bills.map(b => b.billingMonth))).filter(Boolean);
+
   const filteredBills = bills.filter(b => {
     const matchesSearch = (b.roomNumber || '').includes(search) || (b.tenantName || '').toLowerCase().includes(search.toLowerCase()) || (b.invoiceNo || '').includes(search);
     const matchesStatus = statusFilter === 'All' || b.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesMonth = monthFilter === 'All' || b.billingMonth === monthFilter;
+    return matchesSearch && matchesStatus && matchesMonth;
   });
 
   return (
@@ -117,10 +121,10 @@ export const UtilityReceiptManagement: React.FC = () => {
         <div>
           <h1 className="text-[28px] font-bold text-nike-ink dark:text-white flex items-center gap-2.5">
             <FileText className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-            Utility Bills & Receipt Generator
+            ระบบออกบิลค่าน้ำไฟ & ใบเสร็จ (Utility Bills Management)
           </h1>
           <p className="text-[14px] text-nike-mute dark:text-nike-stone mt-0.5">
-            Record water and electric meter readings, calculate total rent + utilities, and print/download receipts
+            บันทึกมิเตอร์น้ำไฟ คำนวณยอดชำระประจำเดือน กรองดูตามงวดเดือน และพิมพ์ใบเสร็จ
           </p>
         </div>
 
@@ -128,28 +132,28 @@ export const UtilityReceiptManagement: React.FC = () => {
           onClick={handleOpenNewBillModal}
           className="px-4 py-2.5 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center gap-2 shadow-sm"
         >
-          <Plus className="w-4 h-4" /> + New Bill / Receipt
+          <Plus className="w-4 h-4" /> + ออกบิล/ใบเสร็จใหม่
         </button>
       </div>
 
       {/* METRICS SUMMARY */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">Paid Receipts</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">ชำระแล้ว (Paid Receipts)</span>
           <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 block mt-1">
-            {bills.filter(b => b.status === 'Paid').length} bills
+            {bills.filter(b => b.status === 'Paid').length} บิล
           </span>
         </div>
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">Pending Payments</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">ค้างชำระ (Pending Payments)</span>
           <span className="text-3xl font-bold text-amber-600 dark:text-amber-400 block mt-1">
-            {bills.filter(b => b.status === 'Pending').length} bills
+            {bills.filter(b => b.status === 'Pending').length} บิล
           </span>
         </div>
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">Standard Utility Rates</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">อัตราค่าน้ำค่าน้ำไฟมาตรฐาน</span>
           <span className="text-sm font-bold text-nike-ink dark:text-white block mt-1">
-            Water: 18 THB/unit | Electricity: 7 THB/unit
+            ค่าน้ำ: 18 บาท/หน่วย | ค่าไฟ: 7 บาท/หน่วย
           </span>
         </div>
       </div>
@@ -159,36 +163,51 @@ export const UtilityReceiptManagement: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h3 className="text-lg font-bold text-nike-ink dark:text-white flex items-center gap-2">
             <FileText className="w-5 h-5 text-emerald-600" />
-            Invoices & Receipts List
+            รายการบิลและใบเสร็จ
           </h3>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            {/* MONTH FILTER DROPDOWN */}
+            <select
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+              className="px-3 py-1.5 text-xs rounded-xl bg-nike-soft-cloud dark:bg-nike-dark-surface border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white font-semibold cursor-pointer focus:outline-none"
+            >
+              <option value="All">ทุกงวดเดือน (All Months)</option>
+              <option value="August 2026">สิงหาคม 2026 (August 2026)</option>
+              <option value="July 2026">กรกฎาคม 2026 (July 2026)</option>
+              <option value="June 2026">มิถุนายน 2026 (June 2026)</option>
+              {availableMonths.map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+
             <div className="flex bg-nike-soft-cloud dark:bg-nike-dark-surface p-1 rounded-xl border border-nike-hairline dark:border-nike-dark-card text-xs">
               <button
                 onClick={() => setStatusFilter('All')}
                 className={`px-3 py-1 rounded-lg font-medium transition-all ${statusFilter === 'All' ? 'bg-nike-canvas dark:bg-nike-dark-elevated text-nike-ink dark:text-white shadow-xs' : 'text-nike-mute'}`}
               >
-                All
+                ทั้งหมด
               </button>
               <button
                 onClick={() => setStatusFilter('Pending')}
                 className={`px-3 py-1 rounded-lg font-medium transition-all ${statusFilter === 'Pending' ? 'bg-nike-canvas dark:bg-nike-dark-elevated text-amber-600 dark:text-amber-400 shadow-xs' : 'text-nike-mute'}`}
               >
-                Pending
+                ค้างชำระ
               </button>
               <button
                 onClick={() => setStatusFilter('Paid')}
                 className={`px-3 py-1 rounded-lg font-medium transition-all ${statusFilter === 'Paid' ? 'bg-nike-canvas dark:bg-nike-dark-elevated text-emerald-600 dark:text-emerald-400 shadow-xs' : 'text-nike-mute'}`}
               >
-                Paid
+                ชำระแล้ว
               </button>
             </div>
 
-            <div className="relative flex-1 sm:w-56">
+            <div className="relative flex-1 sm:w-48">
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-nike-mute" />
               <input
                 type="text"
-                placeholder="Search unit, name..."
+                placeholder="ค้นหาเลขห้อง/บิล..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-nike-soft-cloud dark:bg-nike-dark-surface border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white focus:outline-none"

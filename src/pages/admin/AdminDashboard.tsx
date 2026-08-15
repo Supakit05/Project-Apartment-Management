@@ -85,6 +85,12 @@ export const AdminDashboard: React.FC = () => {
             <span>{refreshing ? 'Refreshing...' : 'Refresh Data'}</span>
           </button>
           <Link
+            to="/admin/buildings"
+            className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all flex items-center gap-1.5 shadow-xs"
+          >
+            <Building2 className="w-4 h-4" /> ระบบจัดการอาคาร (Buildings)
+          </Link>
+          <Link
             to="/admin/tenants"
             className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all flex items-center gap-1.5 shadow-xs"
           >

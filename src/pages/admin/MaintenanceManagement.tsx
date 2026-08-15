@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 
 export const MaintenanceManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'tasks' | 'supplies' | 'logs' | 'reminders'>('tasks');
+  const [occupancyFilter, setOccupancyFilter] = useState<'All' | 'Occupied' | 'Vacant/Common'>('All');
   const [tasks, setTasks] = useState<MaintenanceTask[]>([]);
   const [supplies, setSupplies] = useState<SupplyItem[]>([]);
   const [logs, setLogs] = useState<MaintenanceLog[]>([]);
@@ -23,6 +24,7 @@ export const MaintenanceManagement: React.FC = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskFormData, setTaskFormData] = useState<Partial<MaintenanceTask>>({
     category: 'Light bulb replacement',
+    occupancyType: 'Occupied',
     priority: 'Medium',
     status: 'Pending',
     assignedWorker: 'In-house Technician',
@@ -145,25 +147,61 @@ export const MaintenanceManagement: React.FC = () => {
       {/* TAB 1: MAINTENANCE TASKS */}
       {activeTab === 'tasks' && (
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card rounded-2xl p-6 space-y-4 shadow-xs">
-          <div className="flex justify-between items-center">
-            <h3 className="text-base font-bold text-nike-ink dark:text-white">Maintenance Work Orders</h3>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-2 border-b border-nike-hairline dark:border-nike-dark-card">
+            <div>
+              <h3 className="text-base font-bold text-nike-ink dark:text-white">รายการแจ้งซ่อมบำรุง (Maintenance Work Orders)</h3>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => setOccupancyFilter('All')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    occupancyFilter === 'All'
+                      ? 'bg-rose-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                  }`}
+                >
+                  ทั้งหมด ({tasks.length})
+                </button>
+                <button
+                  onClick={() => setOccupancyFilter('Occupied')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    occupancyFilter === 'Occupied'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                  }`}
+                >
+                  ห้องมีคนเช่า ({tasks.filter(t => t.occupancyType === 'Occupied' || !t.occupancyType).length})
+                </button>
+                <button
+                  onClick={() => setOccupancyFilter('Vacant/Common')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    occupancyFilter === 'Vacant/Common'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                  }`}
+                >
+                  ห้องว่าง / พื้นที่ส่วนกลาง ({tasks.filter(t => t.occupancyType === 'Vacant/Common').length})
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={() => {
                 setTaskFormData({
                   roomId: rooms[0]?.id || '',
                   roomNumber: rooms[0]?.roomNumber || '101',
+                  occupancyType: occupancyFilter === 'Vacant/Common' ? 'Vacant/Common' : 'Occupied',
                   category: 'Light bulb replacement',
                   priority: 'Medium',
                   status: 'Pending',
-                  assignedWorker: 'Technician Wichian',
+                  assignedWorker: 'นายช่างวิเชียร',
                   laborCost: 150,
-                  description: 'Replace dim light bulb in bathroom',
+                  description: 'เปลี่ยนหลอดไฟในห้องพัก/พื้นที่ส่วนกลาง',
                 });
                 setShowTaskModal(true);
               }}
-              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-rose-600 text-white hover:bg-rose-700 flex items-center gap-1.5"
+              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-rose-600 text-white hover:bg-rose-700 flex items-center gap-1.5 shrink-0"
             >
-              <Plus className="w-4 h-4" /> Report Maintenance Task
+              <Plus className="w-4 h-4" /> แจ้งซ่อมบำรุงใหม่
             </button>
           </div>
 
@@ -171,21 +209,37 @@ export const MaintenanceManagement: React.FC = () => {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-nike-hairline dark:border-nike-dark-card text-nike-mute dark:text-nike-stone font-semibold">
-                  <th className="p-3">Task No / Unit</th>
-                  <th className="p-3">Category</th>
-                  <th className="p-3">Description</th>
-                  <th className="p-3">Assigned Worker</th>
-                  <th className="p-3">Total Cost</th>
-                  <th className="p-3">Priority</th>
-                  <th className="p-3">Status</th>
+                  <th className="p-3">เลขห้อง / รหัสงาน</th>
+                  <th className="p-3">ประเภทการเช่า/พื้นที่</th>
+                  <th className="p-3">หมวดหมู่</th>
+                  <th className="p-3">รายละเอียด</th>
+                  <th className="p-3">ช่างผู้ดูแล</th>
+                  <th className="p-3">ค่าใช้จ่ายรวม</th>
+                  <th className="p-3">ความสำคัญ</th>
+                  <th className="p-3">สถานะ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-nike-hairline/60 dark:divide-nike-dark-card/60">
-                {tasks.map(task => (
+                {tasks
+                  .filter(task => {
+                    if (occupancyFilter === 'Occupied') return task.occupancyType === 'Occupied' || !task.occupancyType;
+                    if (occupancyFilter === 'Vacant/Common') return task.occupancyType === 'Vacant/Common';
+                    return true;
+                  })
+                  .map(task => (
                   <tr key={task.id} className="hover:bg-nike-soft-cloud/50 dark:hover:bg-nike-dark-card/30">
                     <td className="p-3">
-                      <span className="font-bold text-nike-ink dark:text-white block">Unit {task.roomNumber}</span>
+                      <span className="font-bold text-nike-ink dark:text-white block">ห้อง {task.roomNumber}</span>
                       <span className="text-[11px] text-nike-stone">{task.taskNo}</span>
+                    </td>
+                    <td className="p-3">
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                        task.occupancyType === 'Vacant/Common'
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                      }`}>
+                        {task.occupancyType === 'Vacant/Common' ? 'ห้องว่าง / ส่วนกลาง' : 'ห้องมีคนเช่า'}
+                      </span>
                     </td>
                     <td className="p-3 font-semibold text-nike-ink dark:text-white">
                       {task.category}
@@ -352,7 +406,18 @@ export const MaintenanceManagement: React.FC = () => {
             <h3 className="text-lg font-bold text-nike-ink dark:text-white">Report Maintenance Task</h3>
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-nike-mute mb-1 font-medium">Select Unit *</label>
+                <label className="block text-nike-mute mb-1 font-medium">ประเภทพื้นที่/ผู้เช่า *</label>
+                <select
+                  value={taskFormData.occupancyType || 'Occupied'}
+                  onChange={(e) => setTaskFormData({ ...taskFormData, occupancyType: e.target.value as any })}
+                  className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none transition-all font-semibold text-rose-600 dark:text-rose-400"
+                >
+                  <option value="Occupied">ห้องมีคนเช่า (Occupied Room)</option>
+                  <option value="Vacant/Common">ห้องว่าง / พื้นที่ส่วนกลาง (Vacant / Common Area)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-nike-mute mb-1 font-medium">เลือกห้องพัก / พื้นที่ *</label>
                 <select
                   value={taskFormData.roomId}
                   onChange={(e) => {
@@ -362,7 +427,7 @@ export const MaintenanceManagement: React.FC = () => {
                   className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none transition-all"
                 >
                   {rooms.map(r => (
-                    <option key={r.id} value={r.id}>Unit {r.roomNumber}</option>
+                    <option key={r.id} value={r.id}>ห้อง {r.roomNumber} ({r.status})</option>
                   ))}
                 </select>
               </div>

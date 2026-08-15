@@ -34,6 +34,7 @@ export const AdminSidebar: React.FC = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Building Management', path: '/admin/buildings', icon: Building2 },
     { name: 'Tenants & Contracts', path: '/admin/tenants', icon: FileSignature },
     { name: 'Utility Bills & Receipts', path: '/admin/utility-bills', icon: FileText },
     { name: 'Maintenance & Supplies', path: '/admin/maintenance', icon: Wrench },

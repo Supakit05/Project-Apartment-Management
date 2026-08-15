@@ -14,6 +14,18 @@ export interface User {
 export type RoomType = 'Studio (Single Bed)' | 'Studio (Double Bed)' | '1-Bedroom' | 'Corner Room' | 'Standard Studio' | 'Deluxe Studio' | '1-Bedroom Suite' | 'Corner Suite';
 export type RoomStatus = 'Available' | 'Reserved' | 'Occupied' | 'Maintenance';
 
+export interface Building {
+  id: string;
+  name: string;
+  code: string;
+  floors: number;
+  totalRooms: number;
+  description?: string;
+  coverImage?: string;
+  address?: string;
+  createdAt?: string;
+}
+
 export interface Room {
   id: string;
   roomNumber: string;
@@ -29,6 +41,8 @@ export interface Room {
   bedType: string;
   coverImage?: string;
   gallery?: string;
+  buildingId?: string;
+  buildingName?: string;
   currentTenantId?: string;
   currentTenantName?: string;
   prevWaterMeter?: number;
@@ -83,7 +97,8 @@ export interface UtilityBill {
   leaseId: string;
   roomId: string;
   roomNumber: string;
-  tenantName: string;
+  buildingName?: string;
+  tenantName?: string;
   billingMonth: string;
   rentAmount: number;
   prevWaterMeter: number;
@@ -106,6 +121,7 @@ export type MaintenanceCategory = 'Light bulb replacement' | 'Air-con servicing'
 export type MaintenancePriority = 'Low' | 'Medium' | 'High';
 export type MaintenanceTaskStatus = 'Pending' | 'In Progress' | 'Completed';
 export type ReminderFrequency = 'None' | 'Monthly' | 'Quarterly' | 'Every 6 Months' | 'Yearly';
+export type OccupancyMaintenanceType = 'Occupied' | 'Vacant/Common';
 
 export interface SupplyUsage {
   supply_id: string;
@@ -128,6 +144,8 @@ export interface MaintenanceTask {
   taskNo: string;
   roomId: string;
   roomNumber: string;
+  buildingName?: string;
+  occupancyType: OccupancyMaintenanceType;
   category: MaintenanceCategory;
   description: string;
   reportedDate: string;

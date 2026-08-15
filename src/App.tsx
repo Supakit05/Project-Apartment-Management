@@ -25,8 +25,8 @@ import { ProfilePage } from './pages/public/ProfilePage';
 
 
 
-// Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { BuildingManagement } from './pages/admin/BuildingManagement';
 import { TenantManagement } from './pages/admin/TenantManagement';
 import { UtilityReceiptManagement } from './pages/admin/UtilityReceiptManagement';
 import { MaintenanceManagement } from './pages/admin/MaintenanceManagement';
@@ -99,6 +99,7 @@ export const AppContent: React.FC = () => {
 
         {/* ADMIN PROTECTED ROUTES */}
         <Route path="/admin/dashboard" element={<ProtectedAdminRoute><AdminLayout><AdminDashboard /></AdminLayout></ProtectedAdminRoute>} />
+        <Route path="/admin/buildings" element={<ProtectedAdminRoute><AdminLayout><BuildingManagement /></AdminLayout></ProtectedAdminRoute>} />
         <Route path="/admin/tenants" element={<ProtectedAdminRoute><AdminLayout><TenantManagement /></AdminLayout></ProtectedAdminRoute>} />
         <Route path="/admin/utility-bills" element={<ProtectedAdminRoute><AdminLayout><UtilityReceiptManagement /></AdminLayout></ProtectedAdminRoute>} />
         <Route path="/admin/maintenance" element={<ProtectedAdminRoute><AdminLayout><MaintenanceManagement /></AdminLayout></ProtectedAdminRoute>} />

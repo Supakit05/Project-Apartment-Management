@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { Room, RoomType, RoomStatus } from '../../types';
+import { Room, RoomType, RoomStatus, Building } from '../../types';
+import { getBuildings } from '../../services/api';
 
 interface RoomModalProps {
   room?: Room | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (roomData: Partial<Room>) => void;
+  defaultBuildingId?: string;
 }
 
 const ALL_AMENITIES = [
@@ -14,11 +16,12 @@ const ALL_AMENITIES = [
   'Keycard Access', 'Refrigerator', 'Parking', 'CCTV'
 ];
 
-export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onSave }) => {
+export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onSave, defaultBuildingId }) => {
   if (!isOpen) return null;
 
+  const [buildings, setBuildings] = useState<Building[]>([]);
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>(room?.buildingId || defaultBuildingId || '');
   const [roomNumber, setRoomNumber] = useState(room?.roomNumber || '');
-  const [roomName, setRoomName] = useState(room?.roomName || '');
   const [roomType, setRoomType] = useState<RoomType>(room?.roomType || 'Standard Studio');
   const [price, setPrice] = useState(room?.price || 5500);
   const [capacity, setCapacity] = useState(room?.capacity || 2);
@@ -26,7 +29,16 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
   const [bedType, setBedType] = useState(room?.bedType || 'King Bed');
   const [status, setStatus] = useState<RoomStatus>(room?.status || 'Available');
   const [description, setDescription] = useState(room?.description || '');
-  const [coverImage, setCoverImage] = useState(room?.coverImage || '/rooms/room_standard.png');
+  const [coverImage, setCoverImage] = useState(room?.coverImage || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80');
+
+  useEffect(() => {
+    getBuildings().then(data => {
+      setBuildings(data);
+      if (!selectedBuildingId && data.length > 0) {
+        setSelectedBuildingId(data[0].id);
+      }
+    });
+  }, []);
 
   const parsedAmenities = typeof room?.amenities === 'string'
     ? JSON.parse(room.amenities || '[]')
@@ -42,11 +54,14 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const bld = buildings.find(b => b.id === selectedBuildingId);
     onSave({
       id: room?.id,
       roomNumber,
-      roomName,
+      roomName: `ห้อง ${roomNumber} (${bld?.name || ''})`,
       roomType,
+      buildingId: selectedBuildingId,
+      buildingName: bld?.name || bld?.code || 'A',
       price: Number(price),
       capacity: Number(capacity),
       sizeSqm: Number(sizeSqm),
@@ -67,7 +82,7 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
 
         <div className="flex items-center justify-between border-b border-nike-hairline-soft dark:border-nike-dark-card pb-3">
           <h3 className="text-[18px] font-bold text-nike-ink dark:text-white">
-            {room ? `Edit Unit ${room.roomNumber}` : 'Add New Unit'}
+            {room ? `แก้ไขข้อมูลห้อง ${room.roomNumber}` : 'เพิ่มห้องพักใหม่ (Add New Room)'}
           </h3>
           <button onClick={onClose} className="text-nike-mute hover:text-nike-ink dark:hover:text-white">
             <X className="w-5 h-5" />
@@ -76,34 +91,48 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
 
         <form onSubmit={handleSubmit} className="space-y-5 text-[14px]">
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Unit Number</label>
-              <input type="text" required value={roomNumber} onChange={e => setRoomNumber(e.target.value)} className={inputClass} placeholder="101" />
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">ตึก / อาคาร (Building)</label>
+              <select
+                value={selectedBuildingId}
+                onChange={e => setSelectedBuildingId(e.target.value)}
+                className={inputClass + " appearance-none cursor-pointer font-bold"}
+              >
+                {buildings.map(b => (
+                  <option key={b.id} value={b.id}>{b.name} (รหัส {b.code})</option>
+                ))}
+              </select>
             </div>
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Room Type</label>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">เลขห้อง (Room Number)</label>
+              <input type="text" required value={roomNumber} onChange={e => setRoomNumber(e.target.value)} className={inputClass} placeholder="เช่น 101, 202" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">ประเภทห้อง (Room Type)</label>
               <select value={roomType} onChange={e => setRoomType(e.target.value as RoomType)} className={inputClass + " appearance-none cursor-pointer"}>
                 <option value="Studio (Single Bed)">Studio (Single Bed)</option>
                 <option value="Studio (Double Bed)">Studio (Double Bed)</option>
                 <option value="1-Bedroom">1-Bedroom</option>
                 <option value="Corner Room">Corner Room</option>
+                <option value="Standard Studio">Standard Studio</option>
+                <option value="Deluxe Studio">Deluxe Studio</option>
+                <option value="1-Bedroom Suite">1-Bedroom Suite</option>
+                <option value="Corner Suite">Corner Suite</option>
               </select>
             </div>
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Status</label>
-              <select value={status} onChange={e => setStatus(e.target.value as RoomStatus)} className={inputClass + " appearance-none cursor-pointer"}>
-                <option value="Available">Available</option>
-                <option value="Reserved">Reserved</option>
-                <option value="Occupied">Occupied</option>
-                <option value="Maintenance">Maintenance</option>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">สถานะห้อง (Status)</label>
+              <select value={status} onChange={e => setStatus(e.target.value as RoomStatus)} className={inputClass + " appearance-none cursor-pointer font-bold"}>
+                <option value="Available">ว่าง (Available)</option>
+                <option value="Reserved">จองแล้ว (Reserved)</option>
+                <option value="Occupied">มีคนเช่า (Occupied)</option>
+                <option value="Maintenance">ซ่อมบำรุง (Maintenance)</option>
               </select>
             </div>
-          </div>
-
-          <div>
-            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Unit Name</label>
-            <input type="text" required value={roomName} onChange={e => setRoomName(e.target.value)} className={inputClass} placeholder="e.g. Unit 101 (Studio - Single Bed)" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

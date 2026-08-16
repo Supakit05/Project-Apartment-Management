@@ -30,6 +30,8 @@ public class Room {
 
     private String currentTenantId;
     private String currentTenantName;
+    private String buildingId;
+    private String buildingName;
     private Double prevWaterMeter;
     private Double currWaterMeter;
     private Double prevElectricMeter;
@@ -87,6 +89,12 @@ public class Room {
 
     public String getCurrentTenantName() { return currentTenantName; }
     public void setCurrentTenantName(String currentTenantName) { this.currentTenantName = currentTenantName; }
+
+    public String getBuildingId() { return buildingId; }
+    public void setBuildingId(String buildingId) { this.buildingId = buildingId; }
+
+    public String getBuildingName() { return buildingName; }
+    public void setBuildingName(String buildingName) { this.buildingName = buildingName; }
 
     public Double getPrevWaterMeter() { return prevWaterMeter; }
     public void setPrevWaterMeter(Double prevWaterMeter) { this.prevWaterMeter = prevWaterMeter; }

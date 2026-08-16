@@ -4,9 +4,11 @@ import { getUtilityBills, saveUtilityBill, updateBillStatus, getRooms, getLeases
 import { formatCurrency } from '../../utils/formatters';
 import { FileText, Plus, Printer, Droplets, Zap, Search } from 'lucide-react';
 import { ReceiptModal } from '../../components/admin/ReceiptModal';
+import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const UtilityReceiptManagement: React.FC = () => {
+  const { t } = useLanguage();
   const [bills, setBills] = useState<UtilityBill[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [leases, setLeases] = useState<Lease[]>([]);
@@ -221,7 +223,6 @@ export const UtilityReceiptManagement: React.FC = () => {
             <thead>
               <tr className="border-b border-nike-hairline dark:border-nike-dark-card text-nike-mute dark:text-nike-stone font-semibold">
                 <th className="p-3">Invoice No / Unit</th>
-                <th className="p-3">Tenant Name</th>
                 <th className="p-3">Billing Month</th>
                 <th className="p-3">Water (Units / Amt)</th>
                 <th className="p-3">Electric (Units / Amt)</th>
@@ -239,9 +240,6 @@ export const UtilityReceiptManagement: React.FC = () => {
                     <td className="p-3">
                       <span className="font-bold text-nike-ink dark:text-white text-sm block">Unit {bill.roomNumber}</span>
                       <span className="text-[11px] text-nike-stone">{bill.invoiceNo}</span>
-                    </td>
-                    <td className="p-3 font-medium text-nike-ink dark:text-white">
-                      {bill.tenantName}
                     </td>
                     <td className="p-3 text-nike-mute dark:text-nike-stone">
                       {bill.billingMonth}

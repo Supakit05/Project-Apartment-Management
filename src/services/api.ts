@@ -250,6 +250,10 @@ export const getMaintenanceTasks = async (): Promise<MaintenanceTask[]> => {
   return fetchJson<MaintenanceTask[]>(`${API_BASE}/maintenance-tasks`);
 };
 
+export const getUserMaintenanceTasks = async (email: string): Promise<MaintenanceTask[]> => {
+  return fetchJson<MaintenanceTask[]>(`${API_BASE}/maintenance-tasks/user/${encodeURIComponent(email)}`);
+};
+
 export const saveMaintenanceTask = async (taskData: Partial<MaintenanceTask>): Promise<MaintenanceTask> => {
   if (taskData.id) {
     return fetchJson<MaintenanceTask>(`${API_BASE}/maintenance-tasks/${taskData.id}`, {
@@ -260,6 +264,12 @@ export const saveMaintenanceTask = async (taskData: Partial<MaintenanceTask>): P
   return fetchJson<MaintenanceTask>(`${API_BASE}/maintenance-tasks`, {
     method: 'POST',
     body: JSON.stringify(taskData),
+  });
+};
+
+export const deleteMaintenanceTask = async (id: string): Promise<void> => {
+  await fetchJson<void>(`${API_BASE}/maintenance-tasks/${id}`, {
+    method: 'DELETE',
   });
 };
 
@@ -289,6 +299,25 @@ export const saveSupply = async (supplyData: Partial<SupplyItem>): Promise<Suppl
 export const getMaintenanceLogs = async (roomId?: string): Promise<MaintenanceLog[]> => {
   const url = roomId ? `${API_BASE}/maintenance-logs?roomId=${roomId}` : `${API_BASE}/maintenance-logs`;
   return fetchJson<MaintenanceLog[]>(url);
+};
+
+export const saveMaintenanceLog = async (logData: Partial<MaintenanceLog>): Promise<MaintenanceLog> => {
+  if (logData.id) {
+    return fetchJson<MaintenanceLog>(`${API_BASE}/maintenance-logs/${logData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(logData),
+    });
+  }
+  return fetchJson<MaintenanceLog>(`${API_BASE}/maintenance-logs`, {
+    method: 'POST',
+    body: JSON.stringify(logData),
+  });
+};
+
+export const deleteMaintenanceLog = async (id: string): Promise<void> => {
+  await fetchJson<void>(`${API_BASE}/maintenance-logs/${id}`, {
+    method: 'DELETE',
+  });
 };
 
 // ----------------------------------------------------

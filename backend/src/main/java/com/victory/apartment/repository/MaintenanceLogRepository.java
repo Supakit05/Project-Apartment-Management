@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface MaintenanceLogRepository extends JpaRepository<MaintenanceLog, String> {
     List<MaintenanceLog> findByRoomIdOrderByDateDesc(String roomId);
+    List<MaintenanceLog> findByTaskNo(String taskNo);
 }

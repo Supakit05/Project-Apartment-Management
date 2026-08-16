@@ -8,4 +8,5 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     List<Room> findAllByOrderByRoomNumberAsc();
     List<Room> findByStatus(String status);
     List<Room> findByFloor(Integer floor);
+    java.util.Optional<Room> findByRoomNumber(String roomNumber);
 }

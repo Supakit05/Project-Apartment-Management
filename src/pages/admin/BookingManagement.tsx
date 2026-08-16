@@ -3,9 +3,11 @@ import { Search } from 'lucide-react';
 import { Booking } from '../../types';
 import { getBookings, updateBookingStatus } from '../../services/api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
+import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const BookingManagement: React.FC = () => {
+  const { t } = useLanguage();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,10 +50,10 @@ export const BookingManagement: React.FC = () => {
       {/* HEADER */}
       <div className="border-b border-nike-hairline dark:border-nike-dark-card pb-4">
         <h1 className="text-[28px] font-bold text-nike-ink dark:text-white">
-          Rental Booking Requests
+          {t('bkg.title')}
         </h1>
         <p className="text-[14px] text-nike-mute dark:text-nike-stone mt-0.5">
-          Review public rental applications and manage reservation statuses
+          {t('bkg.sub')}
         </p>
       </div>
 

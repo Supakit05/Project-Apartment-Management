@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Sun, Moon, Shield, Menu, X, Building2, LogOut, User, UserPlus,
-  CalendarCheck, ChevronDown, Settings, AlertTriangle, Globe
+  Sun, Moon, Shield, Menu, X, Building2, LogOut, User, LogIn,
+  CalendarCheck, ChevronDown, Settings, AlertTriangle, Globe, Wrench
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -90,6 +90,16 @@ export const Navbar: React.FC = () => {
           {/* RIGHT CONTROLS */}
           <div className="hidden md:flex items-center gap-3">
 
+            {/* LANGUAGE SWITCHER */}
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-nike-soft-cloud hover:bg-neutral-200 dark:bg-nike-dark-elevated dark:hover:bg-neutral-800 text-nike-ink dark:text-white text-xs font-bold transition-all active:scale-95 border border-nike-hairline dark:border-nike-dark-card"
+              title={language === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-500" />
+              <span>{language === 'th' ? 'TH' : 'EN'}</span>
+            </button>
+
             {/* THEME TOGGLE BUTTON */}
             <button
               onClick={toggleTheme}
@@ -164,6 +174,15 @@ export const Navbar: React.FC = () => {
                         <span className="truncate">{t('nav.myBookings')}</span>
                       </Link>
 
+                      <Link
+                        to="/my-maintenance"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 hover:bg-nike-soft-cloud dark:hover:bg-neutral-800 transition-colors rounded-lg mx-1 text-rose-600 dark:text-rose-400"
+                      >
+                        <Wrench className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{t('nav.myMaintenance')}</span>
+                      </Link>
+
                       {user?.role === 'admin' && (
                         <Link
                           to="/admin/dashboard"
@@ -194,25 +213,26 @@ export const Navbar: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-xs font-bold rounded-full bg-nike-soft-cloud hover:bg-neutral-200 dark:bg-nike-dark-elevated dark:hover:bg-neutral-800 text-nike-ink dark:text-white transition-all active:scale-95"
-                >
-                  {t('nav.signIn')}
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all flex items-center gap-1.5 shadow-xs shrink-0 active:scale-95"
-                >
-                  <UserPlus className="w-3.5 h-3.5" /> {t('nav.signUp')}
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all flex items-center gap-1.5 shadow-xs shrink-0 active:scale-95"
+              >
+                <LogIn className="w-3.5 h-3.5" /> {t('nav.signIn')}
+              </Link>
             )}
           </div>
 
           {/* MOBILE MENU CONTROLS */}
           <div className="flex items-center gap-2 md:hidden">
+
+            <button
+              onClick={toggleLanguage}
+              className="px-2.5 py-1.5 rounded-full bg-nike-soft-cloud dark:bg-nike-dark-elevated text-[11px] font-bold text-nike-ink dark:text-white active:scale-95 transition-all flex items-center gap-1 border border-nike-hairline dark:border-nike-dark-card"
+              title="Toggle Language"
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-500" />
+              <span>{language.toUpperCase()}</span>
+            </button>
 
             <button
               onClick={toggleTheme}
@@ -260,20 +280,27 @@ export const Navbar: React.FC = () => {
                       <span className="text-xs font-bold text-nike-ink dark:text-white">{user?.fullname}</span>
                       <span className="text-[10px] text-nike-mute">{user?.email}</span>
                     </div>
-                    <div className="flex gap-2 pt-1">
+                    <div className="grid grid-cols-3 gap-2 pt-1">
                       <Link
                         to="/profile"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 text-center py-2 text-xs font-semibold bg-white dark:bg-nike-dark-card rounded-xl border border-nike-hairline dark:border-neutral-700"
+                        className="text-center py-2 text-xs font-semibold bg-white dark:bg-nike-dark-card rounded-xl border border-nike-hairline dark:border-neutral-700"
                       >
                         {t('nav.myProfile')}
                       </Link>
                       <Link
                         to="/my-bookings"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 text-center py-2 text-xs font-semibold bg-white dark:bg-nike-dark-card rounded-xl border border-nike-hairline dark:border-neutral-700"
+                        className="text-center py-2 text-xs font-semibold bg-white dark:bg-nike-dark-card rounded-xl border border-nike-hairline dark:border-neutral-700"
                       >
                         {t('nav.myBookings')}
+                      </Link>
+                      <Link
+                        to="/my-maintenance"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-center py-2 text-xs font-semibold bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 rounded-xl border border-rose-200 dark:border-rose-900"
+                      >
+                        {t('nav.myMaintenance')}
                       </Link>
                     </div>
                   </div>
@@ -299,20 +326,13 @@ export const Navbar: React.FC = () => {
                   </button>
                 </>
               ) : (
-                <div className="space-y-2">
+                <div className="pt-1">
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center bg-nike-soft-cloud dark:bg-nike-dark-elevated text-nike-ink dark:text-white py-3 font-bold text-xs rounded-full uppercase tracking-wider"
+                    className="flex items-center justify-center gap-2 w-full bg-nike-ink dark:bg-white text-white dark:text-nike-ink py-3 font-bold text-xs rounded-full shadow-xs uppercase tracking-wider active:scale-95 transition-transform"
                   >
-                    {t('nav.signIn')}
-                  </Link>
-                  <Link
-                    to="/register"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center bg-nike-ink dark:bg-white text-white dark:text-nike-ink py-3 font-bold text-xs rounded-full shadow-xs uppercase tracking-wider"
-                  >
-                    {t('nav.signUp')}
+                    <LogIn className="w-4 h-4" /> {t('nav.signIn')}
                   </Link>
                 </div>
               )}

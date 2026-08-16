@@ -1,9 +1,10 @@
-export const formatCurrency = (amount: number): string => {
+export const formatCurrency = (amount?: number | null): string => {
+  const num = (amount !== undefined && amount !== null && !isNaN(Number(amount))) ? Number(amount) : 0;
   return new Intl.NumberFormat('th-TH', {
     style: 'currency',
     currency: 'THB',
     maximumFractionDigits: 0,
-  }).format(amount).replace('THB', '฿');
+  }).format(num).replace('THB', '฿');
 };
 
 export const formatDate = (dateString: string): string => {

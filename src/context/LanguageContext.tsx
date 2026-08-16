@@ -19,6 +19,7 @@ const translations: Record<string, Record<Language, string>> = {
   'nav.adminPanel': { th: 'ระบบแอดมิน', en: 'Admin Panel' },
   'nav.myProfile': { th: 'โปรไฟล์ของฉัน', en: 'My Profile' },
   'nav.myBookings': { th: 'การจองของฉัน', en: 'My Bookings' },
+  'nav.myMaintenance': { th: 'แจ้งซ่อมห้องพัก', en: 'In-Room Repair' },
   'nav.signOut': { th: 'ออกจากระบบ', en: 'Sign Out' },
 
   // Profile Modal & Page
@@ -141,6 +142,100 @@ const translations: Record<string, Record<Language, string>> = {
   'footer.tagline': { th: 'อาคารพักอาศัยพรีเมียม 24 ยูนิต ใจกลางกรุงเทพฯ บริหารจัดการด้วยระบบดิจิทัลทันสมัย', en: 'Premium 24-unit residential building in Bangkok with digital management.' },
   'footer.rights': { th: 'สงวนลิขสิทธิ์ทุกประการ', en: 'All rights reserved.' },
 
+  // Admin Sidebar & Navigation
+  'admin.nav.dashboard': { th: 'แดชบอร์ดภาพรวม', en: 'Dashboard' },
+  'admin.nav.buildings': { th: 'ระบบจัดการอาคาร', en: 'Building Management' },
+  'admin.nav.tenants': { th: 'สัญญาและผู้เช่า', en: 'Tenants & Contracts' },
+  'admin.nav.utilityBills': { th: 'ค่าน้ำไฟและใบเสร็จ', en: 'Utility Bills & Receipts' },
+  'admin.nav.maintenance': { th: 'งานซ่อมและสต็อก', en: 'Maintenance & Supplies' },
+  'admin.nav.rooms': { th: 'จัดการห้องพัก', en: 'Apartment Units' },
+  'admin.nav.bookings': { th: 'คำขอจองห้องพัก', en: 'Booking Requests' },
+  'admin.nav.activityLog': { th: 'ประวัติกิจกรรมระบบ', en: 'Activity Log' },
+  'admin.nav.notifications': { th: 'การแจ้งเตือน', en: 'Notifications' },
+  'admin.nav.backToPublic': { th: 'กลับสู่หน้าเว็บไซต์', en: 'Back to Public Site' },
+  'admin.nav.controlPanel': { th: 'แผงควบคุมระบบ', en: 'Control Panel' },
+
+  // Admin Dashboard
+  'dashboard.title': { th: 'แดชบอร์ดระบบบริหารจัดการอพาร์ตเมนต์', en: 'Apartment Operations Command Center' },
+  'dashboard.sub': { th: 'ภาพรวม 24 ยูนิต (ชั้น 1 และ ชั้น 2) อัตราการเข้าพัก และรายได้ประจำเดือน', en: '24-Unit Overview (Floor 1 & Floor 2), Real-Time Occupancy & Monthly Revenue' },
+  'dashboard.totalUnits': { th: 'ห้องพักทั้งหมด', en: 'Total Units' },
+  'dashboard.occupiedUnits': { th: 'มีผู้เช่าแล้ว', en: 'Occupied Units' },
+  'dashboard.availableUnits': { th: 'ห้องว่างพร้อมอยู่', en: 'Available Units' },
+  'dashboard.maintenanceUnits': { th: 'กำลังซ่อมบำรุง', en: 'Under Maintenance' },
+  'dashboard.occupancyRate': { th: 'อัตราการเข้าพัก', en: 'Occupancy Rate' },
+  'dashboard.estimatedRevenue': { th: 'ประมาณการรายรับเดือนนี้', en: 'Est. Monthly Revenue' },
+  'dashboard.floorPlan': { th: 'ผังห้องพักประจำชั้น', en: 'Floor Plan Map' },
+  'dashboard.quickActions': { th: 'เมนูด่วน', en: 'Quick Actions' },
+
+  // Building Management
+  'bld.title': { th: 'ระบบจัดการอาคาร (Building Management)', en: 'Building Management' },
+  'bld.sub': { th: 'รวมตึกและอาคารพักอาศัยทั้งหมด สามารถจัดการข้อมูล เพิ่มตึกใหม่ และดูภาพรวมการเข้าพักรายตึกได้ที่นี่', en: 'Manage all apartment buildings, add new towers, and monitor building occupancy rates.' },
+  'bld.addBtn': { th: 'เพิ่มตึกใหม่', en: 'Add New Building' },
+  'bld.editBtn': { th: 'แก้ไขข้อมูลตึก', en: 'Edit Building' },
+  'bld.deleteBtn': { th: 'ลบตึก', en: 'Delete Building' },
+  'bld.totalRooms': { th: 'ห้องทั้งหมด', en: 'Total Rooms' },
+  'bld.available': { th: 'ห้องว่าง', en: 'Available' },
+  'bld.occupied': { th: 'มีคนเช่า', en: 'Occupied' },
+  'bld.manageRooms': { th: 'จัดการห้องในตึกนี้', en: 'Manage Units in Building' },
+  'bld.code': { th: 'รหัสตึก', en: 'Building Code' },
+  'bld.name': { th: 'ชื่ออาคาร', en: 'Building Name' },
+  'bld.address': { th: 'ที่อยู่ / ทำเล', en: 'Address / Location' },
+
+  // Room Management / Directory
+  'roomMgmt.title': { th: 'ระบบจัดการห้องพัก (Room Directory)', en: 'Room Directory' },
+  'roomMgmt.sub': { th: 'จัดการข้อมูลห้องพัก รายราคา สถานะห้อง และแยกดูรายอาคาร', en: 'Manage room directory, pricing, status, and filter by building.' },
+  'roomMgmt.addRoom': { th: 'เพิ่มห้องพัก (Add Room)', en: 'Add Room' },
+  'roomMgmt.search': { th: 'ค้นหาด้วยเลขห้อง หรือประเภทห้อง...', en: 'Search unit number or type...' },
+  'roomMgmt.allBuildings': { th: 'ทุกอาคาร (All Buildings)', en: 'All Buildings' },
+  'roomMgmt.allStatuses': { th: 'ทุกสถานะห้อง (All Statuses)', en: 'All Statuses' },
+  'roomMgmt.unitNo': { th: 'เลขห้อง (Room No.)', en: 'Room No.' },
+  'roomMgmt.building': { th: 'อาคาร (Building)', en: 'Building' },
+  'roomMgmt.type': { th: 'ประเภทห้อง (Room Type)', en: 'Room Type' },
+  'roomMgmt.rent': { th: 'ค่าเช่ารายเดือน', en: 'Monthly Rent' },
+  'roomMgmt.size': { th: 'ขนาด & ผู้เข้าพัก', en: 'Size & Capacity' },
+  'roomMgmt.status': { th: 'สถานะ', en: 'Status' },
+  'roomMgmt.actions': { th: 'การจัดการ', en: 'Actions' },
+
+  // Utility Bills
+  'util.title': { th: 'ระบบออกบิลค่าน้ำไฟ & ใบเสร็จ (Utility Bills Management)', en: 'Utility Bills & Receipts' },
+  'util.sub': { th: 'บันทึกมิเตอร์น้ำไฟ คำนวณยอดชำระประจำเดือน กรองดูตามงวดเดือน และพิมพ์ใบเสร็จ', en: 'Meter reading, monthly billing calculation, filtering, and receipt printing.' },
+  'util.newBill': { th: '+ ออกบิล/ใบเสร็จใหม่', en: '+ New Utility Bill' },
+  'util.paid': { th: 'ชำระแล้ว (Paid Receipts)', en: 'Paid Receipts' },
+  'util.pending': { th: 'ค้างชำระ (Pending Payments)', en: 'Pending Payments' },
+  'util.rates': { th: 'อัตราค่าน้ำ: 18 บาท/หน่วย | ค่าไฟ: 7 บาท/หน่วย', en: 'Water: ฿18/unit | Electric: ฿7/unit' },
+  'util.invoiceNo': { th: 'Invoice No / Unit', en: 'Invoice No / Unit' },
+  'util.month': { th: 'Billing Month', en: 'Billing Month' },
+  'util.water': { th: 'Water (Units / Amt)', en: 'Water (Units / Amt)' },
+  'util.electric': { th: 'Electric (Units / Amt)', en: 'Electric (Units / Amt)' },
+  'util.grandTotal': { th: 'Grand Total', en: 'Grand Total' },
+  'util.printReceipt': { th: 'พิมพ์ใบเสร็จ', en: 'Print Receipt' },
+
+  // Maintenance
+  'mnt.title': { th: 'ระบบงานซ่อมบำรุงและสต็อกอะไหล่ (Maintenance & Supplies)', en: 'Maintenance & Supplies' },
+  'mnt.sub': { th: 'ติดตามงานซ่อมบำรุง สต็อกอะไหล่ แยกประเภทห้องมีคนเช่า/ห้องว่าง และตั้งเตือนรอบบำรุงรักษา', en: 'Track repairs, manage spare parts inventory, per-unit logs, and reminders.' },
+  'mnt.activeTasks': { th: 'รายการแจ้งซ่อมบำรุง', en: 'Active Tasks' },
+  'mnt.supplies': { th: 'สต็อกอะไหล่', en: 'Supply Stock' },
+  'mnt.logs': { th: 'ประวัติซ่อมรายห้อง', en: 'Per-Unit Logs' },
+  'mnt.reminders': { th: 'การตั้งเตือนรอบบำรุงรักษา', en: 'Scheduled Reminders' },
+  'mnt.all': { th: 'ทั้งหมด', en: 'All' },
+  'mnt.occupied': { th: 'ห้องมีคนเช่า', en: 'Occupied Units' },
+  'mnt.vacant': { th: 'ห้องว่าง', en: 'Vacant Units' },
+  'mnt.newTask': { th: 'แจ้งซ่อมบำรุงใหม่', en: 'New Maintenance Task' },
+
+  // Tenant & Lease Management
+  'tnt.title': { th: 'ระบบจัดการสัญญาเช่าและผู้เช่า (Tenants & Leases)', en: 'Tenants & Lease Agreements' },
+  'tnt.sub': { th: 'บันทึกข้อมูลผู้เช่า จัดทำสัญญาเช่า ป้องกันการจองซ้ำซ้อน และติดตามการหมดสัญญา', en: 'Manage tenant profiles, lease contracts, prevent occupancy conflicts, and track expirations.' },
+  'tnt.newLease': { th: '+ ทำสัญญาเช่าใหม่', en: '+ Create New Lease' },
+  'tnt.newTenant': { th: '+ เพิ่มผู้เช่าใหม่', en: '+ Add Tenant' },
+  'tnt.activeLeases': { th: 'สัญญาเช่าที่ใช้งานอยู่', en: 'Active Leases' },
+  'tnt.tenantList': { th: 'รายชื่อผู้พักอาศัย', en: 'Tenant Directory' },
+
+  // Bookings Admin
+  'bkg.title': { th: 'ระบบจัดการคำขอจองห้องพัก (Booking Requests)', en: 'Booking Requests Management' },
+  'bkg.sub': { th: 'พิจารณาอนุมัติหรือปฏิเสธคำขอเช่าห้องพักที่ส่งมาจากหน้าเว็บไซต์แบบ Real-Time', en: 'Review, approve, or reject public rental applications in real time.' },
+  'bkg.approve': { th: 'อนุมัติการจอง', en: 'Approve Booking' },
+  'bkg.reject': { th: 'ปฏิเสธ', en: 'Reject' },
+
   // Common Statuses & Words
   'common.month': { th: 'เดือน', en: 'mo' },
   'common.baht': { th: 'บาท', en: 'THB' },
@@ -148,8 +243,17 @@ const translations: Record<string, Record<Language, string>> = {
   'common.available': { th: 'ห้องว่าง', en: 'Available' },
   'common.occupied': { th: 'มีผู้เช่าแล้ว', en: 'Occupied' },
   'common.reserved': { th: 'ติดจอง', en: 'Reserved' },
+  'common.maintenance': { th: 'ซ่อมบำรุง', en: 'Maintenance' },
   'common.floor': { th: 'ชั้น', en: 'Floor' },
   'common.unit': { th: 'ยูนิต', en: 'Unit' },
+  'common.save': { th: 'บันทึก', en: 'Save' },
+  'common.cancel': { th: 'ยกเลิก', en: 'Cancel' },
+  'common.edit': { th: 'แก้ไข', en: 'Edit' },
+  'common.delete': { th: 'ลบ', en: 'Delete' },
+  'common.search': { th: 'ค้นหา', en: 'Search' },
+  'common.all': { th: 'ทั้งหมด', en: 'All' },
+  'common.langSwitch': { th: 'เปลี่ยนภาษา', en: 'Switch Language' },
+  'common.loginRequiredBooking': { th: 'หากต้องการจอง/เช่าห้อง กรุณาเข้าสู่ระบบก่อน', en: 'Please sign in before booking or applying for a room' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

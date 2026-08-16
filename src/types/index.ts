@@ -150,6 +150,10 @@ export interface MaintenanceTask {
   description: string;
   reportedDate: string;
   dueDate: string;
+  preferredTime?: string;
+  reporterName?: string;
+  reporterPhone?: string;
+  reporterEmail?: string;
   priority: MaintenancePriority;
   status: MaintenanceTaskStatus;
   assignedWorker: string;

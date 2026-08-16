@@ -14,6 +14,7 @@ public class SupplyItem {
 
     private String category;
     private Integer stockQuantity;
+    private Integer baseStockQuantity;
     private Double unitCost;
     private String unitName;
 
@@ -27,6 +28,8 @@ public class SupplyItem {
     public void setCategory(String category) { this.category = category; }
     public Integer getStockQuantity() { return stockQuantity; }
     public void setStockQuantity(Integer stockQuantity) { this.stockQuantity = stockQuantity; }
+    public Integer getBaseStockQuantity() { return baseStockQuantity; }
+    public void setBaseStockQuantity(Integer baseStockQuantity) { this.baseStockQuantity = baseStockQuantity; }
     public Double getUnitCost() { return unitCost; }
     public void setUnitCost(Double unitCost) { this.unitCost = unitCost; }
     public String getUnitName() { return unitName; }

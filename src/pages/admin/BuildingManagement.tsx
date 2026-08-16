@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Building, Room } from '../../types';
 import { getBuildings, saveBuilding, deleteBuilding, getRooms } from '../../services/api';
 import { Building2, Plus, Edit2, Trash2, Home, Users, Search, ArrowRight, X } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const BuildingManagement: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,9 +89,17 @@ export const BuildingManagement: React.FC = () => {
 
   // Helper to calculate stats per building
   const getBuildingStats = (buildingId: string, buildingCode: string) => {
-    const buildingRooms = rooms.filter(
-      r => r.buildingId === buildingId || r.buildingName === buildingCode || r.roomNumber.startsWith(buildingCode)
-    );
+    const bCode = (buildingCode || '').toLowerCase();
+    const buildingRooms = rooms.filter(r => {
+      if (r.buildingId && r.buildingId === buildingId) return true;
+      if (r.buildingName && (r.buildingName.toLowerCase().includes(bCode) || r.buildingName.toLowerCase() === bCode)) return true;
+      if (bCode && r.roomNumber.toLowerCase().startsWith(bCode)) return true;
+      if (!r.buildingId && !r.buildingName) {
+        if (buildingId === 'bld-1' || bCode === 'a') return r.floor === 1 || r.roomNumber.startsWith('1');
+        if (buildingId === 'bld-2' || bCode === 'b') return r.floor === 2 || r.roomNumber.startsWith('2');
+      }
+      return false;
+    });
     const total = buildingRooms.length;
     const occupied = buildingRooms.filter(r => r.status === 'Occupied').length;
     const available = buildingRooms.filter(r => r.status === 'Available').length;
@@ -105,10 +115,10 @@ export const BuildingManagement: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
             <Building2 className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
-            ระบบจัดการอาคาร (Building Management)
+            {t('bld.title')}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-            รวมตึกและอาคารพักอาศัยทั้งหมด สามารถจัดการข้อมูล เพิ่มตึกใหม่ และดูภาพรวมการเข้าพักรายตึกได้ที่นี่
+            {t('bld.sub')}
           </p>
         </div>
         <button
@@ -116,7 +126,7 @@ export const BuildingManagement: React.FC = () => {
           className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-sm transition-all duration-200"
         >
           <Plus className="w-5 h-5" />
-          เพิ่มตึกใหม่
+          {t('bld.addBtn')}
         </button>
       </div>
 
@@ -209,11 +219,7 @@ export const BuildingManagement: React.FC = () => {
                       {building.description || 'ไม่มีคำอธิบายเพิ่มเติมสำหรับอาคารนี้'}
                     </p>
 
-                    <div className="grid grid-cols-4 gap-2 mt-4 text-center">
-                      <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <span className="block text-xs text-slate-400">ชั้น</span>
-                        <span className="text-base font-bold text-slate-800 dark:text-slate-100">{building.floors}</span>
-                      </div>
+                    <div className="grid grid-cols-3 gap-2 mt-4 text-center">
                       <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
                         <span className="block text-xs text-slate-400">ห้องทั้งหมด</span>
                         <span className="text-base font-bold text-indigo-600 dark:text-indigo-400">{stats.total || building.totalRooms}</span>

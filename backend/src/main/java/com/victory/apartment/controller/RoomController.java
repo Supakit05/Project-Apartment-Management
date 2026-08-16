@@ -62,6 +62,8 @@ public class RoomController {
             if (incoming.getGallery() != null) existing.setGallery(incoming.getGallery());
             if (incoming.getCurrentTenantId() != null) existing.setCurrentTenantId(incoming.getCurrentTenantId());
             if (incoming.getCurrentTenantName() != null) existing.setCurrentTenantName(incoming.getCurrentTenantName());
+            if (incoming.getBuildingId() != null) existing.setBuildingId(incoming.getBuildingId());
+            if (incoming.getBuildingName() != null) existing.setBuildingName(incoming.getBuildingName());
             if (incoming.getPrevWaterMeter() != null) existing.setPrevWaterMeter(incoming.getPrevWaterMeter());
             if (incoming.getCurrWaterMeter() != null) existing.setCurrWaterMeter(incoming.getCurrWaterMeter());
             if (incoming.getPrevElectricMeter() != null) existing.setPrevElectricMeter(incoming.getPrevElectricMeter());

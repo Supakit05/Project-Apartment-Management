@@ -4,9 +4,11 @@ import { getTenants, saveTenant, deleteTenant, getLeases, saveLease, terminateLe
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { Users, UserPlus, FileSignature, Phone, Mail, CheckCircle2, Printer, Plus, Trash2, Edit3, Home, Search } from 'lucide-react';
 import { ContractModal } from '../../components/admin/ContractModal';
+import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const TenantManagement: React.FC = () => {
+  const { t } = useLanguage();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [leases, setLeases] = useState<Lease[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);

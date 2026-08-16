@@ -5,9 +5,11 @@ import { Room, RoomStatus, Building } from '../../types';
 import { getRooms, saveRoom, deleteRoom as apiDeleteRoom, getBuildings } from '../../services/api';
 import { formatCurrency } from '../../utils/formatters';
 import { RoomModal } from '../../components/admin/RoomModal';
+import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const RoomManagement: React.FC = () => {
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const initialBuildingId = searchParams.get('buildingId') || 'All';
 
@@ -40,15 +42,47 @@ export const RoomManagement: React.FC = () => {
     let result = [...list];
     if (query.trim()) {
       const q = query.toLowerCase();
-      result = result.filter(r => (r.roomNumber || '').includes(q) || (r.roomType || '').toLowerCase().includes(q));
+      result = result.filter(r => (r.roomNumber || '').toLowerCase().includes(q) || (r.roomType || '').toLowerCase().includes(q));
     }
     if (status !== 'All') {
       result = result.filter(r => r.status === status);
     }
     if (bldId !== 'All') {
-      result = result.filter(r => r.buildingId === bldId || r.roomNumber.startsWith(bldId));
+      const selectedBuilding = buildings.find(b => b.id === bldId);
+      const bldCode = selectedBuilding?.code?.toLowerCase();
+      const bldName = selectedBuilding?.name?.toLowerCase();
+
+      result = result.filter(r => {
+        if (r.buildingId && r.buildingId === bldId) return true;
+        if (r.buildingName) {
+          if (bldName && r.buildingName.toLowerCase().includes(bldName)) return true;
+          if (bldCode && r.buildingName.toLowerCase().includes(bldCode)) return true;
+        }
+        if (bldCode && r.roomNumber.toLowerCase().startsWith(bldCode)) return true;
+        if (!r.buildingId && !r.buildingName) {
+          if (bldId === 'bld-1' || bldCode === 'a') {
+            return r.floor === 1 || r.roomNumber.startsWith('1');
+          }
+          if (bldId === 'bld-2' || bldCode === 'b') {
+            return r.floor === 2 || r.roomNumber.startsWith('2');
+          }
+        }
+        return false;
+      });
     }
     setFilteredRooms(result);
+  };
+
+  const getRoomBuildingName = (room: Room) => {
+    if (room.buildingName) return room.buildingName;
+    if (room.buildingId) {
+      const b = buildings.find(bld => bld.id === room.buildingId);
+      if (b) return b.name;
+    }
+    if (room.roomNumber.toLowerCase().startsWith('b') || room.floor === 2 || room.roomNumber.startsWith('2')) {
+      return 'อาคาร B (Victory Residence B)';
+    }
+    return 'อาคาร A (Victory Tower A)';
   };
 
   const handleSearchChange = (q: string) => {
@@ -93,10 +127,10 @@ export const RoomManagement: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-nike-hairline dark:border-nike-dark-card pb-4">
         <div>
           <h1 className="text-[28px] font-bold text-nike-ink dark:text-white flex items-center gap-2">
-            <Building2 className="w-7 h-7 text-blue-600" /> ระบบจัดการห้องพัก (Room Directory)
+            <Building2 className="w-7 h-7 text-blue-600" /> {t('roomMgmt.title')}
           </h1>
           <p className="text-[14px] text-nike-mute dark:text-nike-stone mt-0.5">
-            จัดการข้อมูลห้องพัก รายราคา สถานะห้อง และแยกดูรายอาคาร
+            {t('roomMgmt.sub')}
           </p>
         </div>
 
@@ -104,7 +138,7 @@ export const RoomManagement: React.FC = () => {
           onClick={() => { setSelectedRoom(null); setModalOpen(true); }}
           className="bg-blue-600 text-white text-[14px] font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-xs"
         >
-          <Plus className="w-4 h-4" /> เพิ่มห้องพัก (Add Room)
+          <Plus className="w-4 h-4" /> {t('roomMgmt.addRoom')}
         </button>
       </div>
 
@@ -116,7 +150,7 @@ export const RoomManagement: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={e => handleSearchChange(e.target.value)}
-            placeholder="ค้นหาด้วยเลขห้อง หรือประเภทห้อง..."
+            placeholder={t('roomMgmt.search')}
             className="w-full pl-10 p-3 bg-nike-soft-cloud dark:bg-nike-dark-card border-0 text-nike-ink dark:text-white text-[14px] rounded-[24px] focus:outline-none"
           />
         </div>
@@ -127,7 +161,7 @@ export const RoomManagement: React.FC = () => {
             onChange={e => handleBuildingFilterChange(e.target.value)}
             className="w-full p-3 bg-nike-soft-cloud dark:bg-nike-dark-card border-0 text-nike-ink dark:text-white text-[14px] rounded-[24px] focus:outline-none cursor-pointer font-medium"
           >
-            <option value="All">ทุกอาคาร (All Buildings)</option>
+            <option value="All">{t('roomMgmt.allBuildings')}</option>
             {buildings.map(b => (
               <option key={b.id} value={b.id}>{b.name}</option>
             ))}
@@ -140,11 +174,11 @@ export const RoomManagement: React.FC = () => {
             onChange={e => handleStatusFilterChange(e.target.value)}
             className="w-full p-3 bg-nike-soft-cloud dark:bg-nike-dark-card border-0 text-nike-ink dark:text-white text-[14px] rounded-[24px] focus:outline-none cursor-pointer font-medium"
           >
-            <option value="All">ทุกสถานะห้อง (All Statuses)</option>
-            <option value="Available">ว่าง (Available)</option>
-            <option value="Reserved">จองแล้ว (Reserved)</option>
-            <option value="Occupied">มีคนเช่า (Occupied)</option>
-            <option value="Maintenance">ซ่อมบำรุง (Maintenance)</option>
+            <option value="All">{t('roomMgmt.allStatuses')}</option>
+            <option value="Available">{t('common.available')}</option>
+            <option value="Reserved">{t('common.reserved')}</option>
+            <option value="Occupied">{t('common.occupied')}</option>
+            <option value="Maintenance">{t('common.maintenance')}</option>
           </select>
         </div>
       </div>
@@ -154,13 +188,13 @@ export const RoomManagement: React.FC = () => {
         <table className="w-full text-left border-collapse text-[14px]">
           <thead>
             <tr className="border-b border-nike-hairline-soft dark:border-nike-dark-card text-nike-mute dark:text-nike-stone font-medium text-[13px]">
-              <th className="p-4">เลขห้อง (Room No.)</th>
-              <th className="p-4">อาคาร (Building)</th>
-              <th className="p-4">ประเภทห้อง (Room Type)</th>
-              <th className="p-4">ค่าเช่ารายเดือน</th>
-              <th className="p-4">ขนาด & ผู้เข้าพัก</th>
-              <th className="p-4">สถานะ</th>
-              <th className="p-4 text-right">การจัดการ</th>
+              <th className="p-4">{t('roomMgmt.unitNo')}</th>
+              <th className="p-4">{t('roomMgmt.building')}</th>
+              <th className="p-4">{t('roomMgmt.type')}</th>
+              <th className="p-4">{t('roomMgmt.rent')}</th>
+              <th className="p-4">{t('roomMgmt.size')}</th>
+              <th className="p-4">{t('roomMgmt.status')}</th>
+              <th className="p-4 text-right">{t('roomMgmt.actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-nike-hairline-soft dark:divide-nike-dark-card">
@@ -177,7 +211,7 @@ export const RoomManagement: React.FC = () => {
                     ห้อง {room.roomNumber}
                   </td>
                   <td className="p-4 font-medium text-slate-700 dark:text-slate-300">
-                    {room.buildingName || buildings.find(b => b.id === room.buildingId)?.name || 'อาคาร A'}
+                    {getRoomBuildingName(room)}
                   </td>
                   <td className="p-4 text-nike-mute dark:text-nike-stone font-medium">{room.roomType}</td>
                   <td className="p-4 font-bold text-blue-600 dark:text-blue-400">

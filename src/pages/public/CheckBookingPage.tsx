@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { Booking } from '../../types';
-import { trackBookings, getUserBookings, cancelBooking } from '../../services/api';
+import { Booking, Room } from '../../types';
+import { trackBookings, getUserBookings, cancelBooking, getRooms } from '../../services/api';
 import { formatCurrency } from '../../utils/formatters';
 import {
   Search, CalendarCheck, Clock, CheckCircle2, XCircle, Ban,
-  Phone, Mail, ArrowRight, RefreshCw, AlertCircle
+  Phone, Mail, ArrowRight, RefreshCw, AlertCircle, BedDouble,
+  CreditCard, DoorOpen, ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -17,9 +18,15 @@ export const CheckBookingPage: React.FC = () => {
   const location = useLocation();
   const [query, setQuery] = useState('');
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  // Load rooms data for matching unit photo and details
+  useEffect(() => {
+    getRooms().then(setRooms).catch(err => console.error('Failed to load rooms:', err));
+  }, []);
 
   // Auto-search if user is logged in
   useEffect(() => {
@@ -60,18 +67,18 @@ export const CheckBookingPage: React.FC = () => {
   };
 
   const handleCancel = async (bookingId: string) => {
-    if (!window.confirm('Are you sure you want to cancel this booking request?')) return;
+    if (!window.confirm('คุณต้องการยกเลิกคำขอจองห้องพักนี้ใช่หรือไม่?')) return;
     setCancellingId(bookingId);
     try {
       const res = await cancelBooking(bookingId);
       if (res) {
-        toast.success('Cancelled booking successfully');
+        toast.success('ยกเลิกคำขอจองเรียบร้อยแล้ว');
         setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'Cancelled' } : b));
       } else {
-        toast.error('Unable to cancel booking');
+        toast.error('ไม่สามารถยกเลิกคำขอจองได้');
       }
     } catch {
-      toast.error('Error cancelling booking');
+      toast.error('เกิดข้อผิดพลาดในการยกเลิกคำขอจอง');
     } finally {
       setCancellingId(null);
     }
@@ -107,23 +114,33 @@ export const CheckBookingPage: React.FC = () => {
     }
   };
 
+  const getRoomForBooking = (booking: Booking): Room | undefined => {
+    if (booking.roomId) {
+      const found = rooms.find(r => r.id === booking.roomId);
+      if (found) return found;
+    }
+    if (booking.roomNumber) {
+      return rooms.find(r => r.roomNumber === booking.roomNumber);
+    }
+    return undefined;
+  };
+
   return (
     <div className="max-w-[1000px] mx-auto px-6 py-12 space-y-10">
       
       {/* HEADER SECTION */}
       <div className="text-center space-y-3">
-        <span className="text-xs font-semibold text-nike-mute dark:text-nike-stone block">
-          {t('track.badge')}
-        </span>
         <h1 className="text-3xl sm:text-4xl font-bold text-nike-ink dark:text-white">
-          {t('track.title')}
+          {isAuthenticated ? t('nav.myBookings') : t('track.title')}
         </h1>
         <p className="text-sm text-nike-mute dark:text-nike-stone max-w-lg mx-auto leading-relaxed">
-          {t('track.subtitle')}
+          {isAuthenticated 
+            ? 'รายการห้องพักที่คุณได้ส่งคำขอจองไว้ สามารถติดตามสถานะการอนุมัติและชำระเงินมัดจำได้ที่นี่'
+            : t('track.subtitle')}
         </p>
       </div>
 
-      {/* SEARCH CARD */}
+      {/* SEARCH CARD (SHOWN FOR GUEST OR EXTRA SEARCH) */}
       <div className="bg-nike-soft-cloud dark:bg-nike-dark-elevated p-6 sm:p-8 rounded-3xl border border-nike-hairline dark:border-nike-dark-card shadow-sm">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
@@ -153,139 +170,200 @@ export const CheckBookingPage: React.FC = () => {
           <RefreshCw className="w-5 h-5 animate-spin" /> {t('track.searching')}
         </div>
       ) : hasSearched && bookings.length === 0 ? (
-        <div className="text-center py-16 bg-nike-soft-cloud dark:bg-nike-dark-elevated rounded-3xl border border-nike-hairline dark:border-nike-dark-card space-y-3">
-          <AlertCircle className="w-10 h-10 text-nike-mute mx-auto" />
-          <h3 className="text-base font-bold text-nike-ink dark:text-white">{t('track.noResults')}</h3>
-          <p className="text-sm text-nike-mute max-w-sm mx-auto">
-            {t('track.noResultsDesc')}
+        <div className="text-center py-16 bg-white dark:bg-nike-dark-elevated rounded-3xl border border-nike-hairline dark:border-nike-dark-card space-y-4 shadow-sm p-8">
+          <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
+            <DoorOpen className="w-8 h-8" />
+          </div>
+          <h3 className="text-lg font-bold text-nike-ink dark:text-white">
+            {isAuthenticated ? 'คุณยังไม่มีประวัติการจองห้องพัก' : t('track.noResults')}
+          </h3>
+          <p className="text-sm text-nike-mute dark:text-nike-stone max-w-md mx-auto">
+            {isAuthenticated 
+              ? 'คุณสามารถเลือกดูห้องพักว่างที่ท่านสนใจ และกดส่งคำขอจองพร้อมระบุวันที่ต้องการเข้าพักได้ทันที'
+              : t('track.noResultsDesc')}
           </p>
+          <div className="pt-2">
+            <Link
+              to="/rooms"
+              className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-full shadow-md transition-all active:scale-95"
+            >
+              ดูห้องพักทั้งหมดและเริ่มจอง
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-6">
-          {bookings.map((booking) => (
-            <div
-              key={booking.id}
-              className="bg-white dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm hover:shadow-md transition-shadow"
-            >
-              {/* TOP ROW: BOOKING REF & STATUS */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-nike-hairline dark:border-neutral-800 gap-4">
-                <div>
-                  <span className="text-xs font-semibold text-nike-mute dark:text-nike-stone block">
-                    {t('track.bookingRef')}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-nike-ink dark:text-white">
-                    {booking.bookingNo || booking.id}
-                  </h3>
-                </div>
-                <div>
-                  {getStatusBadge(booking.status)}
-                </div>
-              </div>
-
-              {/* TIMELINE PROGRESS INDICATOR */}
-              <div className="py-2">
-                <div className="grid grid-cols-3 gap-2 text-center text-xs font-medium">
-                  
-                  {/* STEP 1 */}
-                  <div className="space-y-1.5">
-                    <div className="w-7 h-7 rounded-full bg-nike-ink dark:bg-white text-white dark:text-nike-ink font-bold flex items-center justify-center mx-auto text-xs">
-                      ✓
+          {bookings.map((booking) => {
+            const matchedRoom = getRoomForBooking(booking);
+            return (
+              <div
+                key={booking.id}
+                className="bg-white dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+              >
+                {/* ROOM & UNIT PHOTO HEADER */}
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 border-b border-nike-hairline dark:border-neutral-800 gap-4">
+                  <div className="flex items-center gap-4">
+                    {matchedRoom?.coverImage ? (
+                      <img
+                        src={matchedRoom.coverImage}
+                        alt={`Room ${booking.roomNumber}`}
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-nike-hairline dark:border-nike-dark-card shadow-2xs shrink-0"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800">
+                        <DoorOpen className="w-10 h-10" />
+                      </div>
+                    )}
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="bg-blue-600 text-white text-[11px] font-extrabold px-3 py-0.5 rounded-full">
+                          ห้อง {booking.roomNumber || matchedRoom?.roomNumber || 'TBD'}
+                        </span>
+                        {matchedRoom?.floor && (
+                          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">
+                            ชั้น {matchedRoom.floor}
+                          </span>
+                        )}
+                        {matchedRoom?.roomType && (
+                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            · {matchedRoom.roomType}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-nike-ink dark:text-white">
+                        {matchedRoom?.roomName || `ยูนิตห้องพัก ${booking.roomNumber}`}
+                      </h3>
+                      <span className="text-xs text-nike-mute dark:text-nike-stone font-mono block">
+                        Ref: {booking.bookingNo || booking.id}
+                      </span>
                     </div>
-                    <span className="text-nike-ink dark:text-white font-semibold block">{t('track.step1.title')}</span>
-                    <span className="text-[11px] text-nike-mute block">{t('track.step1.desc')}</span>
                   </div>
 
-                  {/* STEP 2 */}
-                  <div className="space-y-1.5">
-                    <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
-                      booking.status === 'Approved' ? 'bg-nike-ink dark:bg-white text-white dark:text-nike-ink' :
-                      booking.status === 'Pending' ? 'bg-amber-500 text-white animate-pulse' :
-                      'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
-                    }`}>
-                      2
+                  <div className="self-start md:self-center">
+                    {getStatusBadge(booking.status)}
+                  </div>
+                </div>
+
+                {/* TIMELINE PROGRESS INDICATOR */}
+                <div className="py-2">
+                  <div className="grid grid-cols-3 gap-2 text-center text-xs font-medium">
+                    
+                    {/* STEP 1 */}
+                    <div className="space-y-1.5">
+                      <div className="w-7 h-7 rounded-full bg-nike-ink dark:bg-white text-white dark:text-nike-ink font-bold flex items-center justify-center mx-auto text-xs">
+                        ✓
+                      </div>
+                      <span className="text-nike-ink dark:text-white font-semibold block">{t('track.step1.title')}</span>
+                      <span className="text-[11px] text-nike-mute block">{t('track.step1.desc')}</span>
                     </div>
-                    <span className={`block font-semibold ${booking.status === 'Pending' ? 'text-amber-500 font-bold' : 'text-nike-ink dark:text-white'}`}>
-                      {t('track.step2.title')}
+
+                    {/* STEP 2 */}
+                    <div className="space-y-1.5">
+                      <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
+                        booking.status === 'Approved' ? 'bg-nike-ink dark:bg-white text-white dark:text-nike-ink' :
+                        booking.status === 'Pending' ? 'bg-amber-500 text-white animate-pulse' :
+                        'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
+                      }`}>
+                        {booking.status === 'Approved' ? '✓' : '2'}
+                      </div>
+                      <span className={`block font-semibold ${booking.status === 'Pending' ? 'text-amber-500 font-bold' : 'text-nike-ink dark:text-white'}`}>
+                        {t('track.step2.title')}
+                      </span>
+                      <span className="text-[11px] text-nike-mute block">
+                        {booking.status === 'Pending' ? t('track.step2.descPending') : t('track.step2.descDone')}
+                      </span>
+                    </div>
+
+                    {/* STEP 3 */}
+                    <div className="space-y-1.5">
+                      <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
+                        booking.status === 'Approved' ? 'bg-nike-success text-white' :
+                        booking.status === 'Rejected' || booking.status === 'Cancelled' ? 'bg-nike-sale text-white' :
+                        'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
+                      }`}>
+                        {booking.status === 'Approved' ? '✓' : '3'}
+                      </div>
+                      <span className={`block font-semibold ${booking.status === 'Approved' ? 'text-nike-success font-bold' : 'text-nike-mute'}`}>
+                        {t('track.step3.title')}
+                      </span>
+                      <span className="text-[11px] text-nike-mute block">
+                        {booking.status === 'Approved' ? t('track.step3.descApproved') : t('track.step3.descPending')}
+                      </span>
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* DETAILS GRID */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-5 bg-nike-soft-cloud dark:bg-nike-dark-card rounded-2xl border border-nike-hairline dark:border-neutral-800 text-xs">
+                  <div>
+                    <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.unit')}</span>
+                    <span className="font-bold text-sm text-nike-ink dark:text-white">
+                      ห้อง {booking.roomNumber || matchedRoom?.roomNumber || 'TBD'}
                     </span>
-                    <span className="text-[11px] text-nike-mute block">
-                      {booking.status === 'Pending' ? t('track.step2.descPending') : t('track.step2.descDone')}
+                  </div>
+                  <div>
+                    <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.guest')}</span>
+                    <span className="font-bold text-sm text-nike-ink dark:text-white">{booking.guestName}</span>
+                  </div>
+                  <div>
+                    <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.moveIn')}</span>
+                    <span className="font-bold text-sm text-nike-ink dark:text-white">{booking.checkIn}</span>
+                  </div>
+                  <div>
+                    <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.rate')}</span>
+                    <span className="font-bold text-sm text-blue-600 dark:text-blue-400">
+                      {formatCurrency(booking.totalPrice || matchedRoom?.price || 0)} / {t('common.month')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* CONTACT & ACTION FOOTER */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-nike-mute dark:text-nike-stone">
+                    <span className="flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5" /> {booking.guestPhone}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5" /> {booking.guestEmail}
                     </span>
                   </div>
 
-                  {/* STEP 3 */}
-                  <div className="space-y-1.5">
-                    <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
-                      booking.status === 'Approved' ? 'bg-nike-success text-white' :
-                      booking.status === 'Rejected' || booking.status === 'Cancelled' ? 'bg-nike-sale text-white' :
-                      'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
-                    }`}>
-                      {booking.status === 'Approved' ? '✓' : '3'}
-                    </div>
-                    <span className={`block font-semibold ${booking.status === 'Approved' ? 'text-nike-success font-bold' : 'text-nike-mute'}`}>
-                      {t('track.step3.title')}
-                    </span>
-                    <span className="text-[11px] text-nike-mute block">
-                      {booking.status === 'Approved' ? t('track.step3.descApproved') : t('track.step3.descPending')}
-                    </span>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* DETAILS GRID */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-5 bg-nike-soft-cloud dark:bg-nike-dark-card rounded-2xl border border-nike-hairline dark:border-neutral-800 text-xs">
-                <div>
-                  <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.unit')}</span>
-                  <span className="font-bold text-sm text-nike-ink dark:text-white">Unit {booking.roomNumber || 'TBD'}</span>
-                </div>
-                <div>
-                  <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.guest')}</span>
-                  <span className="font-bold text-sm text-nike-ink dark:text-white">{booking.guestName}</span>
-                </div>
-                <div>
-                  <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.moveIn')}</span>
-                  <span className="font-bold text-sm text-nike-ink dark:text-white">{booking.checkIn}</span>
-                </div>
-                <div>
-                  <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.rate')}</span>
-                  <span className="font-bold text-sm text-nike-ink dark:text-white">{formatCurrency(booking.totalPrice)} / {t('common.month')}</span>
-                </div>
-              </div>
-
-              {/* CONTACT & ACTION FOOTER */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-                <div className="flex items-center gap-4 text-xs text-nike-mute dark:text-nike-stone">
-                  <span className="flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5" /> {booking.guestPhone}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5" /> {booking.guestEmail}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {booking.status === 'Pending' && (
-                    <button
-                      onClick={() => handleCancel(booking.id)}
-                      disabled={cancellingId === booking.id}
-                      className="px-4 py-2 rounded-full text-xs font-semibold text-nike-sale hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition-all active:scale-95"
-                    >
-                      {cancellingId === booking.id ? t('track.cancelling') : t('track.cancelBtn')}
-                    </button>
-                  )}
-                  {booking.roomId && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* DIRECT PAYMENT / SLIP UPLOAD BUTTON */}
                     <Link
-                      to={`/rooms/${booking.roomId}`}
-                      className="px-4 py-2 rounded-full text-xs font-semibold bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1"
+                      to={`/payment/${booking.id}`}
+                      className="px-4 py-2 rounded-full text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5"
                     >
-                      {t('track.viewRoomBtn')} <ArrowRight className="w-3 h-3" />
+                      <CreditCard className="w-3.5 h-3.5" /> ชำระเงินมัดจำ / แนบสลิป
                     </Link>
-                  )}
-                </div>
-              </div>
 
-            </div>
-          ))}
+                    {/* VIEW ROOM DETAILS */}
+                    {(booking.roomId || matchedRoom?.id) && (
+                      <Link
+                        to={`/rooms/${booking.roomId || matchedRoom?.id}`}
+                        className="px-4 py-2 rounded-full text-xs font-semibold bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5"
+                      >
+                        <DoorOpen className="w-3.5 h-3.5" /> {t('track.viewRoomBtn')}
+                      </Link>
+                    )}
+
+                    {/* CANCEL BUTTON */}
+                    {booking.status === 'Pending' && (
+                      <button
+                        onClick={() => handleCancel(booking.id)}
+                        disabled={cancellingId === booking.id}
+                        className="px-4 py-2 rounded-full text-xs font-semibold text-nike-sale hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition-all active:scale-95"
+                      >
+                        {cancellingId === booking.id ? t('track.cancelling') : t('track.cancelBtn')}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            );
+          })}
         </div>
       )}
 

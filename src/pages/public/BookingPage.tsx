@@ -29,7 +29,7 @@ export const BookingPage: React.FC = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      toast.info('สำหรับ Guest เข้าชมได้อย่างเดียว หากต้องการจอง/เช่าห้อง กรุณาเข้าสู่ระบบก่อนครับ', { duration: 5000 });
+      toast.info('หากต้องการจอง/เช่าห้อง กรุณาเข้าสู่ระบบก่อน', { duration: 5000 });
       navigate('/login');
       return;
     }

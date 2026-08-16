@@ -83,6 +83,13 @@ public class DataSeeder {
             r.setRoomType(type);
             r.setRoomName(String.format("Unit %s (%s)", roomNum, type));
             r.setDescription(String.format("Floor %d %s with private balcony, fully furnished interior, premium bedding, inverter AC, hot water shower, and high-speed fiber Wi-Fi.", r.getFloor(), type));
+            if (r.getFloor() == 1 || roomNum.startsWith("1")) {
+                r.setBuildingId("bld-1");
+                r.setBuildingName("อาคาร A (Victory Tower A)");
+            } else {
+                r.setBuildingId("bld-2");
+                r.setBuildingName("อาคาร B (Victory Residence B)");
+            }
             assignImagesForRoom(r, roomNum, type);
             roomRepo.save(r);
         }
@@ -217,6 +224,13 @@ public class DataSeeder {
                 room.setSizeSqm(size);
                 room.setBedType(bedType);
                 assignImagesForRoom(room, roomNum, type);
+                if (floor == 1 || roomNum.startsWith("1")) {
+                    room.setBuildingId("bld-1");
+                    room.setBuildingName("อาคาร A (Victory Tower A)");
+                } else {
+                    room.setBuildingId("bld-2");
+                    room.setBuildingName("อาคาร B (Victory Residence B)");
+                }
                 room.setCurrentTenantId(a != null && !a[1].isEmpty() ? a[1] : null);
                 room.setCurrentTenantName(a != null && !a[0].equals("-") ? a[0] : null);
                 room.setPrevWaterMeter(120.0 + i * 5);
@@ -316,7 +330,9 @@ public class DataSeeder {
         for (String[] d : data) {
             SupplyItem s = new SupplyItem();
             s.setId(d[0]); s.setName(d[1]); s.setCategory(d[2]);
-            s.setStockQuantity(Integer.parseInt(d[3]));
+            int initialStock = Integer.parseInt(d[3]);
+            s.setStockQuantity(initialStock);
+            s.setBaseStockQuantity(initialStock);
             s.setUnitCost(Double.parseDouble(d[4])); s.setUnitName(d[5]);
             supplyRepo.save(s);
         }
@@ -325,6 +341,7 @@ public class DataSeeder {
     private void seedMaintenanceTasks() {
         MaintenanceTask t1 = new MaintenanceTask();
         t1.setId("mt-101"); t1.setTaskNo("MNT-202608-01"); t1.setRoomId("rm-105"); t1.setRoomNumber("105");
+        t1.setOccupancyType("Vacant/Common");
         t1.setCategory("Plumbing"); t1.setDescription("Basin drain pipe leak and 1 bathroom light bulb out");
         t1.setReportedDate("2026-08-05"); t1.setDueDate("2026-08-09"); t1.setPriority("High");
         t1.setStatus("In Progress"); t1.setAssignedWorker("Technician Wichian");
@@ -335,6 +352,7 @@ public class DataSeeder {
 
         MaintenanceTask t2 = new MaintenanceTask();
         t2.setId("mt-102"); t2.setTaskNo("MNT-202608-02"); t2.setRoomId("rm-102"); t2.setRoomNumber("102");
+        t2.setOccupancyType("Occupied");
         t2.setCategory("Air-con servicing"); t2.setDescription("6-month scheduled air-con deep clean + refrigerant check");
         t2.setReportedDate("2026-08-01"); t2.setDueDate("2026-08-10"); t2.setPriority("Medium");
         t2.setStatus("Pending"); t2.setAssignedWorker("Technician Prasert (Air Service)");
@@ -345,6 +363,7 @@ public class DataSeeder {
 
         MaintenanceTask t3 = new MaintenanceTask();
         t3.setId("mt-103"); t3.setTaskNo("MNT-202607-05"); t3.setRoomId("rm-201"); t3.setRoomNumber("201");
+        t3.setOccupancyType("Occupied");
         t3.setCategory("Light bulb replacement"); t3.setDescription("Replace 2 balcony light bulbs");
         t3.setReportedDate("2026-07-20"); t3.setDueDate("2026-07-21"); t3.setPriority("Low");
         t3.setStatus("Completed"); t3.setAssignedWorker("Technician Wichian");

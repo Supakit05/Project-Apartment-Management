@@ -22,6 +22,7 @@ import { Register } from './pages/public/Register';
 import { PaymentPage } from './pages/public/PaymentPage';
 import { CheckBookingPage } from './pages/public/CheckBookingPage';
 import { ProfilePage } from './pages/public/ProfilePage';
+import { ResidentMaintenancePage } from './pages/public/ResidentMaintenancePage';
 
 
 
@@ -76,7 +77,20 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 export const AppContent: React.FC = () => {
   return (
     <Router>
-      <Toaster position="top-right" richColors />
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        toastOptions={{
+          style: {
+            borderRadius: '16px',
+            padding: '14px 18px',
+            fontSize: '13px',
+            fontWeight: '600',
+            boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.15)',
+          },
+        }}
+      />
       <Routes>
 
         {/* PUBLIC ROUTES */}
@@ -90,6 +104,8 @@ export const AppContent: React.FC = () => {
         <Route path="/check-booking" element={<PublicLayout><CheckBookingPage /></PublicLayout>} />
         <Route path="/track-booking" element={<PublicLayout><CheckBookingPage /></PublicLayout>} />
         <Route path="/my-bookings" element={<PublicLayout><CheckBookingPage /></PublicLayout>} />
+        <Route path="/my-maintenance" element={<PublicLayout><ResidentMaintenancePage /></PublicLayout>} />
+        <Route path="/resident/maintenance" element={<PublicLayout><ResidentMaintenancePage /></PublicLayout>} />
         <Route path="/profile" element={<PublicLayout><ProfilePage /></PublicLayout>} />
 
         <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />

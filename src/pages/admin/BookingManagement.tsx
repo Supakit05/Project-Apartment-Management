@@ -65,7 +65,7 @@ export const BookingManagement: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); applyFilter(bookings, e.target.value, statusFilter); }}
-            placeholder="Search by booking no, applicant name, or phone..."
+            placeholder={t('bkg.searchPlaceholder')}
             className="w-full pl-10 p-3 bg-nike-soft-cloud dark:bg-nike-dark-card border-0 text-nike-ink dark:text-white text-[14px] rounded-[24px] focus:outline-none"
           />
         </div>
@@ -76,12 +76,12 @@ export const BookingManagement: React.FC = () => {
             onChange={e => { setStatusFilter(e.target.value); applyFilter(bookings, searchQuery, e.target.value); }}
             className="w-full p-3 bg-nike-soft-cloud dark:bg-nike-dark-card border-0 text-nike-ink dark:text-white text-[14px] rounded-[24px] focus:outline-none cursor-pointer"
           >
-            <option value="All">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Rejected">Rejected</option>
+            <option value="All">{t('filter.allStatus')}</option>
+            <option value="Pending">{t('status.pending')}</option>
+            <option value="Approved">{t('status.approved')}</option>
+            <option value="Completed">{t('status.completed')}</option>
+            <option value="Cancelled">{t('status.cancelled')}</option>
+            <option value="Rejected">{t('status.rejected')}</option>
           </select>
         </div>
       </div>
@@ -91,19 +91,19 @@ export const BookingManagement: React.FC = () => {
         <table className="w-full text-left border-collapse text-[14px]">
           <thead>
             <tr className="border-b border-nike-hairline-soft dark:border-nike-dark-card text-nike-mute dark:text-nike-stone font-medium text-[13px]">
-              <th className="p-4">Booking No</th>
-              <th className="p-4">Applicant Info</th>
-              <th className="p-4">Unit</th>
-              <th className="p-4">Move-in / Out</th>
-              <th className="p-4">Monthly Rent</th>
-              <th className="p-4">Status</th>
+              <th className="p-4">{t('bkg.colNo')}</th>
+              <th className="p-4">{t('bkg.colGuest')}</th>
+              <th className="p-4">{t('bkg.colUnit')}</th>
+              <th className="p-4">{t('bkg.colDates')}</th>
+              <th className="p-4">{t('bkg.colRent')}</th>
+              <th className="p-4">{t('bkg.colStatus')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-nike-hairline-soft dark:divide-nike-dark-card">
             {filteredBookings.length === 0 ? (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-nike-mute">
-                  No rental booking requests found
+                  {t('bkg.empty')}
                 </td>
               </tr>
             ) : (
@@ -118,8 +118,8 @@ export const BookingManagement: React.FC = () => {
                       <span className="text-[12px] text-nike-mute">{b.guestPhone} · {b.guestEmail}</span>
                     </div>
                   </td>
-                  <td className="p-4 font-medium text-blue-600 dark:text-blue-400">
-                    Unit {b.roomNumber || '-'}
+                  <td className="p-4 font-bold text-nike-ink dark:text-white">
+                    {t('common.unit')} {b.roomNumber || '-'}
                   </td>
                   <td className="p-4 text-nike-mute dark:text-nike-stone text-xs">
                     {formatDate(b.checkIn)} – {formatDate(b.checkOut)}
@@ -137,11 +137,11 @@ export const BookingManagement: React.FC = () => {
                         'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
                       }`}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
-                      <option value="Rejected">Rejected</option>
+                      <option value="Pending">{t('status.pending')}</option>
+                      <option value="Approved">{t('status.approved')}</option>
+                      <option value="Completed">{t('status.completed')}</option>
+                      <option value="Cancelled">{t('status.cancelled')}</option>
+                      <option value="Rejected">{t('status.rejected')}</option>
                     </select>
                   </td>
                 </tr>

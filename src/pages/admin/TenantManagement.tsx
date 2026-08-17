@@ -8,7 +8,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const TenantManagement: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [leases, setLeases] = useState<Lease[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -128,10 +128,10 @@ export const TenantManagement: React.FC = () => {
         <div>
           <h1 className="text-[28px] font-bold text-nike-ink dark:text-white flex items-center gap-2.5">
             <Users className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            Tenants & Lease Agreements
+            {t('tnt.title')}
           </h1>
           <p className="text-[14px] text-nike-mute dark:text-nike-stone mt-0.5">
-            Assign tenants to units, set lease start/end dates, billing cycles, and generate rental contracts
+            {t('tnt.sub')}
           </p>
         </div>
 
@@ -140,13 +140,13 @@ export const TenantManagement: React.FC = () => {
             onClick={() => handleOpenTenantModal()}
             className="px-4 py-2.5 text-xs font-semibold rounded-xl bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card hover:bg-nike-hairline text-nike-ink dark:text-white transition-all flex items-center gap-2"
           >
-            <UserPlus className="w-4 h-4" /> Add Tenant Profile
+            <UserPlus className="w-4 h-4" /> {t('tnt.addProfile')}
           </button>
           <button
             onClick={() => handleOpenLeaseModal()}
             className="px-4 py-2.5 text-xs font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all flex items-center gap-2 shadow-sm"
           >
-            <FileSignature className="w-4 h-4" /> + Create Lease Agreement
+            <FileSignature className="w-4 h-4" /> {t('tnt.newLease')}
           </button>
         </div>
       </div>
@@ -154,21 +154,21 @@ export const TenantManagement: React.FC = () => {
       {/* ACTIVE LEASES SUMMARY CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">Active Leases</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">{t('tnt.activeLeasesCard')}</span>
           <span className="text-3xl font-bold text-nike-ink dark:text-white block mt-1">
-            {leases.filter(l => l.status === 'Active').length} active
+            {leases.filter(l => l.status === 'Active').length} {t('tnt.activeLeasesCard')}
           </span>
         </div>
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">Registered Tenants</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">{t('tnt.registeredTenantsCard')}</span>
           <span className="text-3xl font-bold text-blue-600 dark:text-blue-400 block mt-1">
-            {tenants.length} tenants
+            {tenants.length} {language === 'th' ? 'ราย' : 'tenants'}
           </span>
         </div>
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">Occupancy Conflict Protection</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">{t('tnt.conflictProtectionCard')}</span>
           <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-2">
-            <CheckCircle2 className="w-4 h-4" /> Active (prevents double booking)
+            <CheckCircle2 className="w-4 h-4" /> {t('tnt.conflictActive')}
           </span>
         </div>
       </div>
@@ -178,7 +178,7 @@ export const TenantManagement: React.FC = () => {
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-nike-ink dark:text-white flex items-center gap-2">
             <FileSignature className="w-5 h-5 text-blue-600" />
-            Active Lease Agreements & Occupancy
+            {t('tnt.activeAgreementSection')}
           </h3>
         </div>
 
@@ -186,20 +186,20 @@ export const TenantManagement: React.FC = () => {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-nike-hairline dark:border-nike-dark-card text-nike-mute dark:text-nike-stone font-semibold">
-                <th className="p-3">Unit</th>
-                <th className="p-3">Tenant Name</th>
-                <th className="p-3">Lease Start & End</th>
-                <th className="p-3">Rent / Cycle</th>
-                <th className="p-3">Deposit Amount</th>
-                <th className="p-3">Lease Status</th>
-                <th className="p-3 text-right">Actions</th>
+                <th className="p-3">{t('tnt.colUnit')}</th>
+                <th className="p-3">{t('tnt.colTenant')}</th>
+                <th className="p-3">{t('tnt.colPeriod')}</th>
+                <th className="p-3">{t('tnt.colRentCycle')}</th>
+                <th className="p-3">{t('tnt.colDeposit')}</th>
+                <th className="p-3">{t('tnt.colStatus')}</th>
+                <th className="p-3 text-right">{t('tnt.colActions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-nike-hairline/60 dark:divide-nike-dark-card/60">
               {leases.map((lease) => (
                 <tr key={lease.id} className="hover:bg-nike-soft-cloud/50 dark:hover:bg-nike-dark-card/30">
                   <td className="p-3 font-bold text-nike-ink dark:text-white text-sm">
-                    Unit {lease.roomNumber}
+                    {t('common.unit')} {lease.roomNumber}
                   </td>
                   <td className="p-3 font-medium text-nike-ink dark:text-white">
                     {lease.tenantName}
@@ -223,7 +223,7 @@ export const TenantManagement: React.FC = () => {
                         ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                         : 'bg-gray-500/10 text-gray-500 border-gray-500/20'
                     }`}>
-                      {lease.status}
+                      {lease.status === 'Active' ? t('status.active') : lease.status === 'Terminated' ? t('status.terminated') : lease.status === 'Expired' ? t('status.expired') : lease.status}
                     </span>
                   </td>
                   <td className="p-3 text-right space-x-2">
@@ -254,7 +254,7 @@ export const TenantManagement: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h3 className="text-lg font-bold text-nike-ink dark:text-white flex items-center gap-2">
             <Users className="w-5 h-5 text-blue-600" />
-            Tenant Directory Records
+            {t('tnt.tenantList')}
           </h3>
           <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 absolute left-3 top-2.5 text-nike-mute" />

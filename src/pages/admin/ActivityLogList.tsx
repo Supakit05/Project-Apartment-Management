@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { ActivityLog } from '../../types';
 import { getActivityLogs } from '../../services/api';
 import { History } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const ActivityLogList: React.FC = () => {
+  const { t } = useLanguage();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
 
   useEffect(() => {
@@ -22,10 +24,10 @@ export const ActivityLogList: React.FC = () => {
 
       <div className="border-b border-nike-hairline dark:border-nike-dark-card pb-4">
         <h1 className="text-[28px] font-bold text-nike-ink dark:text-white flex items-center gap-2">
-          <History className="w-6 h-6 text-blue-600" /> System Activity Log
+          <History className="w-6 h-6 text-blue-600" /> {t('log.title')}
         </h1>
         <p className="text-[14px] text-nike-mute dark:text-nike-stone mt-0.5">
-          Audit trail of administrative actions, lease creations, bill generation, and unit status updates
+          {t('log.sub')}
         </p>
       </div>
 
@@ -33,16 +35,16 @@ export const ActivityLogList: React.FC = () => {
         <table className="w-full text-left border-collapse text-[14px]">
           <thead>
             <tr className="border-b border-nike-hairline-soft dark:border-nike-dark-card text-nike-mute dark:text-nike-stone font-medium text-[13px]">
-              <th className="p-4">Timestamp</th>
-              <th className="p-4">User</th>
-              <th className="p-4">Action</th>
-              <th className="p-4">Details</th>
+              <th className="p-4">{t('log.timestamp')}</th>
+              <th className="p-4">{t('log.user')}</th>
+              <th className="p-4">{t('log.action')}</th>
+              <th className="p-4">{t('log.details')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-nike-hairline-soft dark:divide-nike-dark-card">
             {logs.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-nike-mute">No activity logs recorded yet</td>
+                <td colSpan={4} className="p-8 text-center text-nike-mute">{t('log.empty')}</td>
               </tr>
             ) : (
               logs.map(log => (

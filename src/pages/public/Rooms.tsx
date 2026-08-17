@@ -9,9 +9,11 @@ export const Rooms: React.FC = () => {
   const { t } = useLanguage();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
+  const [buildingFilter, setBuildingFilter] = useState<string>('all');
   const [floorFilter, setFloorFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -28,9 +30,31 @@ export const Rooms: React.FC = () => {
   }, []);
 
   const filteredRooms = rooms.filter(room => {
+    // Search query filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const numMatch = (room.roomNumber || '').toLowerCase().includes(q);
+      const nameMatch = (room.roomName || '').toLowerCase().includes(q);
+      const typeMatch = (room.roomType || '').toLowerCase().includes(q);
+      if (!numMatch && !nameMatch && !typeMatch) return false;
+    }
+
+    // Building filter
+    if (buildingFilter !== 'all') {
+      const isBld2 = room.buildingId === 'bld-2' || room.roomNumber.startsWith('B');
+      if (buildingFilter === 'bld-2' && !isBld2) return false;
+      if (buildingFilter === 'bld-1' && isBld2) return false;
+    }
+
+    // Floor filter
     if (floorFilter !== 'all' && room.floor.toString() !== floorFilter) return false;
+    
+    // Status filter
     if (statusFilter !== 'all' && room.status !== statusFilter) return false;
+    
+    // Type filter
     if (typeFilter !== 'all' && room.roomType !== typeFilter) return false;
+    
     return true;
   });
 
@@ -57,8 +81,28 @@ export const Rooms: React.FC = () => {
           </p>
         </div>
 
-        {/* PILL FILTER CHIPS */}
+        {/* SEARCH INPUT & PILL FILTER CHIPS */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Search box */}
+          <input
+            type="text"
+            placeholder={t('filter.searchPlaceholder')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="px-4 py-2 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all w-full sm:w-56"
+          />
+
+          {/* Building selector */}
+          <select
+            value={buildingFilter}
+            onChange={(e) => setBuildingFilter(e.target.value)}
+            className="px-4 py-2 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all cursor-pointer font-bold text-blue-600 dark:text-blue-400"
+          >
+            <option value="all">{t('filter.allBuildings')}</option>
+            <option value="bld-1">{t('filter.buildingA')}</option>
+            <option value="bld-2">{t('filter.buildingB')}</option>
+          </select>
+
           {/* Floor selector */}
           <select
             value={floorFilter}
@@ -80,6 +124,7 @@ export const Rooms: React.FC = () => {
             <option value="Studio (Single Bed)">Studio (Single Bed)</option>
             <option value="Studio (Double Bed)">Studio (Double Bed)</option>
             <option value="1-Bedroom">1-Bedroom</option>
+            <option value="1-Bedroom Suite">1-Bedroom Suite</option>
             <option value="Corner Room">Corner Room</option>
           </select>
 
@@ -104,7 +149,7 @@ export const Rooms: React.FC = () => {
         <div className="text-center py-24 bg-nike-soft-cloud dark:bg-nike-dark-elevated rounded-3xl border border-nike-hairline dark:border-nike-dark-card space-y-3">
           <p className="text-sm font-bold text-nike-ink dark:text-white">{t('filter.noResults')}</p>
           <button
-            onClick={() => { setFloorFilter('all'); setStatusFilter('all'); setTypeFilter('all'); }}
+            onClick={() => { setBuildingFilter('all'); setFloorFilter('all'); setStatusFilter('all'); setTypeFilter('all'); setSearchQuery(''); }}
             className="text-xs font-bold text-nike-ink dark:text-white hover:underline"
           >
             {t('filter.reset')} &rarr;

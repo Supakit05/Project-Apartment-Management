@@ -47,10 +47,10 @@ export const PaymentPage: React.FC = () => {
 
       <div className="space-y-2">
         <span className="text-[11px] font-semibold text-nike-success">
-          Reservation Request Confirmed
+          {t('payment.badge')}
         </span>
         <h1 className="text-3xl sm:text-4xl font-bold text-nike-ink dark:text-white">
-          Application Received
+          {t('payment.title')}
         </h1>
         <p className="text-xs text-nike-mute dark:text-nike-stone">
           {t('track.bookingRef')}: <strong className="text-nike-ink dark:text-white">{booking.bookingNo}</strong>
@@ -70,7 +70,7 @@ export const PaymentPage: React.FC = () => {
           </div>
           <div className="space-y-1">
             <span className="text-nike-mute dark:text-nike-stone block text-[10px] font-medium">{t('track.field.unit')}</span>
-            <span className="font-bold text-nike-ink dark:text-white">Unit {booking.roomNumber || 'Assigned'}</span>
+            <span className="font-bold text-nike-ink dark:text-white">{t('common.unit')} {booking.roomNumber || '-'}</span>
           </div>
           <div className="space-y-1">
             <span className="text-nike-mute dark:text-nike-stone block text-[10px] font-medium">{t('booking.guestPhone')}</span>
@@ -92,7 +92,7 @@ export const PaymentPage: React.FC = () => {
       </div>
 
       <p className="text-xs text-nike-mute dark:text-nike-stone max-w-md mx-auto leading-relaxed">
-        Our building administration team will review your application and contact you via phone or email for contract execution and keycard pickup.
+        {t('payment.desc')}
       </p>
 
       <div className="pt-2">

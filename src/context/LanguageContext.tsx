@@ -19,6 +19,7 @@ const translations: Record<string, Record<Language, string>> = {
   'nav.adminPanel': { th: 'ระบบแอดมิน', en: 'Admin Panel' },
   'nav.myProfile': { th: 'โปรไฟล์ของฉัน', en: 'My Profile' },
   'nav.myBookings': { th: 'การจองของฉัน', en: 'My Bookings' },
+  'nav.myApartment': { th: 'ห้องพักของฉัน', en: 'My Unit' },
   'nav.myMaintenance': { th: 'แจ้งซ่อมห้องพัก', en: 'In-Room Repair' },
   'nav.signOut': { th: 'ออกจากระบบ', en: 'Sign Out' },
 
@@ -43,21 +44,25 @@ const translations: Record<string, Record<Language, string>> = {
   'logout.success': { th: 'ออกจากระบบเรียบร้อยแล้ว', en: 'Signed out successfully' },
 
   // Home Hero & Sections
-  'hero.tag': { th: '24 ยูนิตทันสมัย · ราชเทวี กรุงเทพฯ', en: '24 Modern Units · Ratchathewi, Bangkok' },
+  'hero.tag': { th: '24 ห้องพักทันสมัย · ราชเทวี กรุงเทพฯ', en: '24 Modern Units · Ratchathewi, Bangkok' },
   'hero.title': { th: 'POONTAN APARTMENT', en: 'POONTAN APARTMENT' },
-  'hero.sub': { th: 'ออกแบบมาเพื่อชีวิตคนเมือง 2 ชั้น 24 ยูนิต พร้อมเฟอร์นิเจอร์ครบครัน ระเบียงส่วนตัว อินเทอร์เน็ตความเร็วสูง และระบบดูแลความปลอดภัยตลอด 24 ชม.', en: 'Engineered for urban living. 2 floors, 24 fully furnished residences featuring private balconies, high-speed fiber Wi-Fi, digital access control, and 24/7 building management.' },
-  'hero.cta': { th: 'ดูห้องพักทั้งหมด (24 ยูนิต)', en: 'Explore All 24 Units' },
+  'hero.sub': { th: 'ออกแบบมาเพื่อชีวิตคนเมือง 2 ชั้น 24 ห้องพัก พร้อมเฟอร์นิเจอร์ครบครัน ระเบียงส่วนตัว อินเทอร์เน็ตความเร็วสูง และระบบดูแลความปลอดภัยตลอด 24 ชม.', en: 'Engineered for urban living. 2 floors, 24 fully furnished residences featuring private balconies, high-speed fiber Wi-Fi, digital access control, and 24/7 building management.' },
+  'hero.cta': { th: 'ดูห้องพักทั้งหมด (24 ห้อง)', en: 'Explore All 24 Units' },
   'hero.filterBtn': { th: 'กรองห้องว่าง', en: 'Filter Available' },
   'hero.featuredTitle': { th: 'คอลเลกชันห้องพักไฮไลท์', en: 'Featured Residences' },
   'hero.featuredSub': { th: 'สัมผัสประสบการณ์การพักอาศัยที่เหนือระดับ พร้อมเข้าอยู่ได้ทันที', en: 'Curated living spaces engineered for modern comfort.' },
 
   // Filters
-  'filter.title': { th: 'ค้นหาและกรองยูนิตห้องพัก', en: 'Filter Residences' },
+  'filter.title': { th: 'ค้นหาและกรองห้องพัก', en: 'Filter Residences' },
   'filter.searchPlaceholder': { th: 'ค้นหาเลขห้อง (เช่น 101, 204) หรือประเภทห้อง...', en: 'Search unit number (e.g. 101, 204) or type...' },
+  'filter.building': { th: 'อาคาร/ตึก', en: 'Building/Tower' },
+  'filter.allBuildings': { th: 'ทุกอาคาร (ตึก A & B)', en: 'All Buildings (A & B)' },
+  'filter.buildingA': { th: 'อาคาร A (Victory Tower A - 24 ห้องหลัก)', en: 'Building A (Victory Tower A - 24 Main Units)' },
+  'filter.buildingB': { th: 'อาคาร B (Victory Residence B)', en: 'Building B (Victory Residence B - Extension)' },
   'filter.floor': { th: 'ชั้น', en: 'Floor' },
   'filter.allFloors': { th: 'ทุกชั้น (ชั้น 1-2)', en: 'All Floors (1-2)' },
-  'filter.floor1': { th: 'ชั้น 1 (Unit 101-112)', en: '1st Floor (Unit 101-112)' },
-  'filter.floor2': { th: 'ชั้น 2 (Unit 201-212)', en: '2nd Floor (Unit 201-212)' },
+  'filter.floor1': { th: 'ชั้น 1', en: '1st Floor' },
+  'filter.floor2': { th: 'ชั้น 2', en: '2nd Floor' },
   'filter.unitType': { th: 'ประเภทห้อง', en: 'Unit Type' },
   'filter.allTypes': { th: 'ทุกประเภทห้อง', en: 'All Room Types' },
   'filter.status': { th: 'สถานะห้องพัก', en: 'Availability' },
@@ -68,7 +73,7 @@ const translations: Record<string, Record<Language, string>> = {
   'filter.6kTo7k': { th: '฿6,000 - ฿7,000 / เดือน', en: '฿6,000 - ฿7,000 / mo' },
   'filter.above7k': { th: 'มากกว่า ฿7,000 / เดือน', en: 'Above ฿7,000 / mo' },
   'filter.reset': { th: 'ล้างตัวกรอง', en: 'Reset Filters' },
-  'filter.unitsFound': { th: 'ยูนิตที่ตรงเงื่อนไข', en: 'Units matching' },
+  'filter.unitsFound': { th: 'ห้องพักที่ตรงเงื่อนไข', en: 'Units matching' },
   'filter.noResults': { th: 'ไม่พบห้องพักตามเงื่อนไขที่ค้นหา', en: 'No units match your selected filters' },
   'filter.noResultsDesc': { th: 'ลองปรับเปลี่ยนเงื่อนไขการค้นหาหรือกดปุ่มล้างตัวกรอง', en: 'Try adjusting your search criteria or reset filters.' },
 
@@ -85,6 +90,22 @@ const translations: Record<string, Record<Language, string>> = {
   'room.description': { th: 'รายละเอียดและข้อกำหนด', en: 'Description & Features' },
   'room.depositNote': { th: 'เงินมัดจำล่วงหน้า 1 เดือน + ค่าเช่าเดือนแรก', en: '1 Month Security Deposit + 1st Month Rent' },
   'room.applyNow': { th: 'ส่งคำขอเช่าห้องนี้ทันที', en: 'Apply For This Unit' },
+  'room.bedLabel': { th: 'ประเภทเตียง', en: 'Bed' },
+  'room.guestsLabel': { th: 'ผู้เข้าพัก', en: 'Guests' },
+  'room.termsTitle': { th: 'เงื่อนไขและข้อตกลงการเช่า', en: 'Terms & Conditions' },
+  'room.termsLease': { th: 'ระยะเวลาสัญญา:', en: 'Lease Term:' },
+  'room.termsLeaseVal': { th: 'สัญญาขั้นต่ำ 1 เดือน / ต่ออายุรายปี', en: 'Monthly / Yearly renewable' },
+  'room.termsDeposit': { th: 'เงินมัดจำล่วงหน้า:', en: 'Security Deposit:' },
+  'room.termsDepositVal': { th: '1 เดือน + ค่าเช่าเดือนแรก', en: '1 Month Security Deposit' },
+  'room.termsCam': { th: 'ค่าบริการส่วนกลาง:', en: 'Common Area Maintenance:' },
+  'room.termsCamVal': { th: '300 บาท / เดือน', en: '฿300 / month' },
+  'room.utilsTitle': { th: 'อัตราค่าน้ำไฟและอินเทอร์เน็ต', en: 'Utilities & Metering' },
+  'room.utilsWater': { th: 'ค่าน้ำประปา:', en: 'Water:' },
+  'room.utilsWaterVal': { th: '18 บาท / หน่วย ', en: '18 THB / Unit (m³)' },
+  'room.utilsElec': { th: 'ค่าไฟฟ้า:', en: 'Electricity:' },
+  'room.utilsElecVal': { th: '7 บาท / หน่วย ', en: '7 THB / Unit (kWh)' },
+  'room.utilsWifi': { th: 'อินเทอร์เน็ต:', en: 'Internet:' },
+  'room.utilsWifiVal': { th: 'ฟรี Wi-Fi ความเร็วสูง', en: 'Free Wi-Fi' },
 
   // Booking Verification & Tracking Page
   'track.badge': { th: 'ระบบตรวจสอบและติดตามสถานะการจอง', en: 'RESIDENT VERIFICATION & TRACKING SYSTEM' },
@@ -106,7 +127,7 @@ const translations: Record<string, Record<Language, string>> = {
   'track.step3.title': { th: 'อนุมัติ / พร้อมเข้าพัก', en: 'Contract & Keycard' },
   'track.step3.descApproved': { th: 'ติดต่อรับกุญแจห้อง', en: 'Ready for move-in' },
   'track.step3.descPending': { th: 'รอการอนุมัติ', en: 'Awaiting approval' },
-  'track.field.unit': { th: 'ยูนิตห้องพัก', en: 'Residence Unit' },
+  'track.field.unit': { th: 'ห้องพัก', en: 'Residence Unit' },
   'track.field.guest': { th: 'ผู้จองห้องพัก', en: 'Resident Name' },
   'track.field.moveIn': { th: 'วันย้ายเข้า (Move-in)', en: 'Move-in Date' },
   'track.field.rate': { th: 'อัตราค่าเช่ารายเดือน', en: 'Monthly Rate' },
@@ -125,8 +146,16 @@ const translations: Record<string, Record<Language, string>> = {
   'booking.guestPhone': { th: 'เบอร์โทรศัพท์ติดต่อ', en: 'Contact Phone Number' },
   'booking.guestEmail': { th: 'อีเมล', en: 'Email Address' },
   'booking.checkInDate': { th: 'วันที่ต้องการย้ายเข้า (Move-in Date)', en: 'Desired Move-in Date' },
+  'booking.checkOutDate': { th: 'วันที่สิ้นสุดสัญญา (Move-Out Date)', en: 'Move-Out Date' },
+  'booking.specialRequests': { th: 'หมายเหตุและคำขอเพิ่มเติม', en: 'Special Requests & Notes' },
+  'booking.specialRequestsPlaceholder': { th: 'เช่น ขอสิทธิ์จอดรถยนต์ 1 คัน, สัญญาเช่าระยะยาว 1 ปี', en: 'e.g. Request car parking stall, 1-year contract preferred' },
   'booking.submitBtn': { th: 'ยืนยันการส่งคำขอจอง', en: 'Submit Application' },
   'booking.submitting': { th: 'กำลังส่งข้อมูล...', en: 'Submitting...' },
+
+  // Payment Confirmation Page
+  'payment.title': { th: 'ส่งคำขอเช่าห้องพักสำเร็จ', en: 'Application Received' },
+  'payment.badge': { th: 'บันทึกคำขอจองห้องพักเรียบร้อยแล้ว', en: 'Reservation Request Confirmed' },
+  'payment.desc': { th: 'เจ้าหน้าที่ฝ่ายบริหารอพาร์ตเมนต์จะทำการตรวจสอบคำขอจองของคุณ และติดต่อกลับทางเบอร์โทรศัพท์หรืออีเมลเพื่อทำสัญญาเช่าและรับกุญแจห้องพัก', en: 'Our building administration team will review your application and contact you via phone or email for contract execution and keycard pickup.' },
 
   // Auth: Login & Register
   'auth.loginTitle': { th: 'เข้าสู่ระบบ', en: 'Sign In' },
@@ -139,7 +168,7 @@ const translations: Record<string, Record<Language, string>> = {
   'auth.hasAccount': { th: 'มีบัญชีผู้ใช้แล้ว?', en: 'Already have an account?' },
 
   // Footer
-  'footer.tagline': { th: 'อาคารพักอาศัยพรีเมียม 24 ยูนิต ใจกลางกรุงเทพฯ บริหารจัดการด้วยระบบดิจิทัลทันสมัย', en: 'Premium 24-unit residential building in Bangkok with digital management.' },
+  'footer.tagline': { th: 'อาคารพักอาศัยพรีเมียม 24 ห้อง ใจกลางกรุงเทพฯ บริหารจัดการด้วยระบบดิจิทัลทันสมัย', en: 'Premium 24-unit residential building in Bangkok with digital management.' },
   'footer.rights': { th: 'สงวนลิขสิทธิ์ทุกประการ', en: 'All rights reserved.' },
 
   // Admin Sidebar & Navigation
@@ -157,7 +186,7 @@ const translations: Record<string, Record<Language, string>> = {
 
   // Admin Dashboard
   'dashboard.title': { th: 'แดชบอร์ดระบบบริหารจัดการอพาร์ตเมนต์', en: 'Apartment Operations Command Center' },
-  'dashboard.sub': { th: 'ภาพรวม 24 ยูนิต (ชั้น 1 และ ชั้น 2) อัตราการเข้าพัก และรายได้ประจำเดือน', en: '24-Unit Overview (Floor 1 & Floor 2), Real-Time Occupancy & Monthly Revenue' },
+  'dashboard.sub': { th: 'ภาพรวม 24 ห้อง (ชั้น 1 และ ชั้น 2) อัตราการเข้าพัก และรายได้ประจำเดือน', en: '24-Unit Overview (Floor 1 & Floor 2), Real-Time Occupancy & Monthly Revenue' },
   'dashboard.totalUnits': { th: 'ห้องพักทั้งหมด', en: 'Total Units' },
   'dashboard.occupiedUnits': { th: 'มีผู้เช่าแล้ว', en: 'Occupied Units' },
   'dashboard.availableUnits': { th: 'ห้องว่างพร้อมอยู่', en: 'Available Units' },
@@ -235,6 +264,48 @@ const translations: Record<string, Record<Language, string>> = {
   'bkg.sub': { th: 'พิจารณาอนุมัติหรือปฏิเสธคำขอเช่าห้องพักที่ส่งมาจากหน้าเว็บไซต์แบบ Real-Time', en: 'Review, approve, or reject public rental applications in real time.' },
   'bkg.approve': { th: 'อนุมัติการจอง', en: 'Approve Booking' },
   'bkg.reject': { th: 'ปฏิเสธ', en: 'Reject' },
+  'bkg.searchPlaceholder': { th: 'ค้นหารหัสการจอง ชื่อผู้ยื่น หรือเบอร์โทร...', en: 'Search by booking no, applicant name, or phone...' },
+  'bkg.colNo': { th: 'รหัสการจอง', en: 'Booking No' },
+  'bkg.colGuest': { th: 'ข้อมูลผู้ยื่นคำขอ', en: 'Applicant Info' },
+  'bkg.colUnit': { th: 'ห้องพัก', en: 'Unit' },
+  'bkg.colDates': { th: 'วันย้ายเข้า - ย้ายออก', en: 'Move-in / Out' },
+  'bkg.colRent': { th: 'ค่าเช่ารายเดือน', en: 'Monthly Rent' },
+  'bkg.colStatus': { th: 'สถานะคำขอ', en: 'Status' },
+  'bkg.empty': { th: 'ไม่พบรายการคำขอจองห้องพักในขณะนี้', en: 'No rental booking requests found' },
+
+  // Activity Log
+  'log.title': { th: 'ประวัติกิจกรรมในระบบ (System Activity Log)', en: 'System Activity Log' },
+  'log.sub': { th: 'บันทึกประวัติการทำงานของแอดมิน การทำสัญญาเช่า ออกบิล และการอัปเดตสถานะห้องพัก', en: 'Audit trail of administrative actions, lease creations, bill generation, and unit status updates' },
+  'log.timestamp': { th: 'วัน-เวลา', en: 'Timestamp' },
+  'log.user': { th: 'ผู้ดำเนินการ', en: 'User' },
+  'log.action': { th: 'การทำงาน', en: 'Action' },
+  'log.details': { th: 'รายละเอียด', en: 'Details' },
+  'log.empty': { th: 'ยังไม่มีประวัติกิจกรรมในระบบ', en: 'No activity logs recorded yet' },
+
+  // Notifications Center
+  'notif.title': { th: 'ศูนย์แจ้งเตือนระบบ (System Notifications)', en: 'System Notifications' },
+  'notif.sub': { th: 'รายการแจ้งเตือนคำขอจองห้องพัก คำขอแจ้งซ่อม และรอบการบำรุงรักษา', en: 'Live alerts for new rental applications, maintenance work orders, and scheduled reminders' },
+  'notif.unread': { th: 'รายการยังไม่ได้อ่าน', en: 'Unread' },
+  'notif.markAllRead': { th: 'ทำเครื่องหมายอ่านแล้วทั้งหมด', en: 'Mark All as Read' },
+  'notif.emptyTitle': { th: 'อ่านครบทุกรายการแล้ว!', en: 'All caught up!' },
+  'notif.emptyDesc': { th: 'ไม่มีการแจ้งเตือนใหม่ในขณะนี้', en: 'No system notifications at this time.' },
+
+  // Tenant & Lease Management
+  'tnt.addProfile': { th: '+ เพิ่มข้อมูลผู้เช่า', en: '+ Add Tenant Profile' },
+  'tnt.activeLeasesCard': { th: 'สัญญาเช่าที่ใช้งานอยู่', en: 'Active Leases' },
+  'tnt.registeredTenantsCard': { th: 'ผู้เช่าที่ลงทะเบียนแล้ว', en: 'Registered Tenants' },
+  'tnt.conflictProtectionCard': { th: 'ระบบป้องกันการจองซ้ำซ้อน', en: 'Occupancy Conflict Protection' },
+  'tnt.conflictActive': { th: 'ทำงานอยู่ (ป้องกันห้องซ้อน)', en: 'Active (prevents double booking)' },
+  'tnt.activeAgreementSection': { th: 'รายการสัญญาเช่าที่ใช้งานอยู่', en: 'Active Lease Agreements & Occupancy' },
+  'tnt.colUnit': { th: 'ห้องพัก', en: 'Unit' },
+  'tnt.colTenant': { th: 'ชื่อผู้เช่า', en: 'Tenant Name' },
+  'tnt.colPeriod': { th: 'ระยะเวลาสัญญา', en: 'Lease Start & End' },
+  'tnt.colRentCycle': { th: 'ค่าเช่า / รอบชำระ', en: 'Rent / Cycle' },
+  'tnt.colDeposit': { th: 'เงินมัดจำ', en: 'Deposit Amount' },
+  'tnt.colStatus': { th: 'สถานะสัญญา', en: 'Lease Status' },
+  'tnt.colActions': { th: 'จัดการ', en: 'Actions' },
+  'tnt.printContract': { th: 'พิมพ์สัญญา', en: 'Print Contract' },
+  'tnt.terminateLease': { th: 'ยกเลิกสัญญา', en: 'Terminate Lease' },
 
   // Common Statuses & Words
   'common.month': { th: 'เดือน', en: 'mo' },
@@ -245,7 +316,7 @@ const translations: Record<string, Record<Language, string>> = {
   'common.reserved': { th: 'ติดจอง', en: 'Reserved' },
   'common.maintenance': { th: 'ซ่อมบำรุง', en: 'Maintenance' },
   'common.floor': { th: 'ชั้น', en: 'Floor' },
-  'common.unit': { th: 'ยูนิต', en: 'Unit' },
+  'common.unit': { th: 'ห้อง', en: 'Unit' },
   'common.save': { th: 'บันทึก', en: 'Save' },
   'common.cancel': { th: 'ยกเลิก', en: 'Cancel' },
   'common.edit': { th: 'แก้ไข', en: 'Edit' },
@@ -254,6 +325,19 @@ const translations: Record<string, Record<Language, string>> = {
   'common.all': { th: 'ทั้งหมด', en: 'All' },
   'common.langSwitch': { th: 'เปลี่ยนภาษา', en: 'Switch Language' },
   'common.loginRequiredBooking': { th: 'หากต้องการจอง/เช่าห้อง กรุณาเข้าสู่ระบบก่อน', en: 'Please sign in before booking or applying for a room' },
+
+  // Unified Status Keys
+  'status.pending': { th: 'รอการตรวจสอบ', en: 'Pending' },
+  'status.approved': { th: 'อนุมัติแล้ว', en: 'Approved' },
+  'status.completed': { th: 'เสร็จสมบูรณ์', en: 'Completed' },
+  'status.cancelled': { th: 'ยกเลิกแล้ว', en: 'Cancelled' },
+  'status.rejected': { th: 'ปฏิเสธคำขอ', en: 'Rejected' },
+  'status.active': { th: 'ใช้งานอยู่', en: 'Active' },
+  'status.terminated': { th: 'ยกเลิกสัญญาแล้ว', en: 'Terminated' },
+  'status.expired': { th: 'หมดสัญญาแล้ว', en: 'Expired' },
+  'status.paid': { th: 'ชำระแล้ว', en: 'Paid' },
+  'status.unpaid': { th: 'ค้างชำระ', en: 'Pending' },
+  'status.inProgress': { th: 'กำลังดำเนินการ', en: 'In Progress' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

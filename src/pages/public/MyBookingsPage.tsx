@@ -9,8 +9,10 @@ import {
   Phone, Mail, RefreshCw, ArrowRight, Ban, CreditCard
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const MyBookingsPage: React.FC = () => {
+  const { t } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -116,7 +118,7 @@ export const MyBookingsPage: React.FC = () => {
             สถานะและประวัติการจองห้องพัก
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-            ติดตามสถานะคำขอจองยูนิตแบบ Real-time (อัปเดตอัตโนมัติทันทีเมื่อแอดมินดำเนินการ)
+            ติดตามสถานะคำขอจองห้องพักแบบ Real-time (อัปเดตอัตโนมัติทันทีเมื่อแอดมินดำเนินการ)
           </p>
         </div>
 
@@ -138,14 +140,14 @@ export const MyBookingsPage: React.FC = () => {
           </div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">ยังไม่มีประวัติการจองห้องพัก</h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-            คุณยังไม่ได้ทำการส่งคำขอจองยูนิตใดๆ ในขณะนี้ สามารถเลือกดูห้องพัก 24 ห้องที่ว่างและทำการส่งคำขอจองได้ทันที
+            คุณยังไม่ได้ทำการส่งคำขอจองห้องพักใดๆ ในขณะนี้ สามารถเลือกดูห้องพัก 24 ห้องที่ว่างและทำการส่งคำขอจองได้ทันที
           </p>
           <div className="pt-2">
             <Link
               to="/rooms"
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full text-sm transition-all shadow-md"
             >
-              ดูห้องพักยูนิตทั้งหมด <ArrowRight className="w-4 h-4" />
+              ดูห้องพักทั้งหมด <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -168,7 +170,7 @@ export const MyBookingsPage: React.FC = () => {
                     </span>
                   </div>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-2">
-                    Unit {booking.roomNumber || '-'} (ยูนิตห้องพัก)
+                    {t('common.unit')} {booking.roomNumber || '-'}
                   </h2>
                 </div>
 
@@ -229,7 +231,7 @@ export const MyBookingsPage: React.FC = () => {
                   {booking.status === 'Rejected' && (
                     <>
                       <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                      <span>คำขอจองนี้ไม่ได้รับการอนุมัติ คุณสามารถลองเลือกจองยูนิตอื่นหรือช่วงเวลาอื่นได้</span>
+                      <span>คำขอจองนี้ไม่ได้รับการอนุมัติ คุณสามารถลองเลือกจองห้องอื่นหรือช่วงเวลาอื่นได้</span>
                     </>
                   )}
                   {booking.status === 'Cancelled' && (

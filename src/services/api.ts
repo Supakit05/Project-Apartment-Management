@@ -11,9 +11,8 @@ const MOCK_BUILDINGS: Building[] = [
     id: 'bld-1',
     name: 'อาคาร A (Victory Tower A)',
     code: 'A',
-    floors: 8,
-    totalRooms: 40,
-    description: 'อาคารพักอาศัยโมเดิร์น ติดถนนใหญ่ พร้อมสิ่งอำนวยความสะดวกครบครัน',
+    floors: 2,
+    totalRooms: 24,
     address: '123/1 ถนนสุขุมวิท กรุงเทพฯ',
     coverImage: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
     createdAt: '2026-01-01'
@@ -22,9 +21,8 @@ const MOCK_BUILDINGS: Building[] = [
     id: 'bld-2',
     name: 'อาคาร B (Victory Residence B)',
     code: 'B',
-    floors: 6,
-    totalRooms: 30,
-    description: 'อาคารบรรยากาศสงบ ร่มรื่น เหมาะสำหรับคนทำงานและนักศึกษา',
+    floors: 2,
+    totalRooms: 12,
     address: '123/2 ถนนสุขุมวิท กรุงเทพฯ',
     coverImage: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80',
     createdAt: '2026-02-15'

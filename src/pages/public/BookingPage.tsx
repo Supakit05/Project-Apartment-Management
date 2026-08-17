@@ -95,7 +95,7 @@ export const BookingPage: React.FC = () => {
       
       {/* BREADCRUMB */}
       <Link to={`/rooms/${room.id}`} className="inline-flex items-center gap-2 text-xs font-semibold text-nike-mute dark:text-nike-stone hover:text-nike-ink dark:hover:text-white transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to {room.roomName}
+        <ArrowLeft className="w-4 h-4" /> {t('room.backToUnits')}
       </Link>
 
       {/* UNIT OVERVIEW CARD */}
@@ -125,7 +125,7 @@ export const BookingPage: React.FC = () => {
             <BedDouble className="w-3.5 h-3.5" /> {room.bedType || 'Queen Bed'}
           </span>
           <span className="bg-white dark:bg-nike-dark-card text-nike-ink dark:text-white border border-nike-hairline dark:border-neutral-700 font-medium px-3.5 py-1.5 rounded-full flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5" /> Max {room.capacity} Guests
+            <Users className="w-3.5 h-3.5" /> {t('room.guestsLabel')}: {room.capacity}
           </span>
         </div>
       </div>
@@ -192,7 +192,7 @@ export const BookingPage: React.FC = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-semibold text-nike-ink dark:text-white">Move-Out Date *</label>
+              <label className="block text-[11px] font-semibold text-nike-ink dark:text-white">{t('booking.checkOutDate')} *</label>
               <input
                 type="date"
                 required
@@ -204,12 +204,12 @@ export const BookingPage: React.FC = () => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[11px] font-semibold text-nike-ink dark:text-white">Special Requests & Notes</label>
+            <label className="block text-[11px] font-semibold text-nike-ink dark:text-white">{t('booking.specialRequests')}</label>
             <textarea
               rows={3}
               value={formData.specialRequests}
               onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
-              placeholder="e.g. Request car parking stall, 1-year contract preferred"
+              placeholder={t('booking.specialRequestsPlaceholder')}
               className="w-full p-4 text-xs font-medium rounded-2xl bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
             />
           </div>

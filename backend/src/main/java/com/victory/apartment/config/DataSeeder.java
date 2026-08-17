@@ -67,9 +67,21 @@ public class DataSeeder {
     }
 
     private void updateRoomImages() {
+        boolean hasOldUnprefixedRooms = roomRepo.findAll().stream().anyMatch(r -> !r.getRoomNumber().startsWith("A") && !r.getRoomNumber().startsWith("B"));
+        if (hasOldUnprefixedRooms) {
+            roomRepo.deleteAll();
+            seedRooms();
+            return;
+        }
+
         for (Room r : roomRepo.findAll()) {
             String roomNum = r.getRoomNumber();
-            int i = Integer.parseInt(roomNum.substring(1));
+            String cleanNum = (roomNum.startsWith("A") || roomNum.startsWith("B")) ? roomNum.substring(1) : roomNum;
+            int i = 1;
+            try {
+                i = Integer.parseInt(cleanNum.substring(cleanNum.length() >= 2 ? cleanNum.length() - 2 : 0));
+            } catch (Exception ignored) {}
+
             String type;
             if (i <= 4) {
                 type = "Studio (Single Bed)";
@@ -82,16 +94,55 @@ public class DataSeeder {
             }
             r.setRoomType(type);
             r.setRoomName(String.format("Unit %s (%s)", roomNum, type));
-            r.setDescription(String.format("Floor %d %s with private balcony, fully furnished interior, premium bedding, inverter AC, hot water shower, and high-speed fiber Wi-Fi.", r.getFloor(), type));
-            if (r.getFloor() == 1 || roomNum.startsWith("1")) {
-                r.setBuildingId("bld-1");
-                r.setBuildingName("อาคาร A (Victory Tower A)");
-            } else {
+            r.setDescription(String.format("ห้องพักชั้น %d %s พร้อมระเบียงส่วนตัว ตกแต่งเฟอร์นิเจอร์คุณภาพครบครัน เครื่องปรับอากาศอินเวอร์เตอร์ เครื่องทำน้ำอุ่น และอินเทอร์เน็ต Wi-Fi ความเร็วสูง", r.getFloor(), type));
+
+            if (roomNum.startsWith("B")) {
                 r.setBuildingId("bld-2");
                 r.setBuildingName("อาคาร B (Victory Residence B)");
+            } else {
+                r.setBuildingId("bld-1");
+                r.setBuildingName("อาคาร A (Victory Tower A)");
             }
             assignImagesForRoom(r, roomNum, type);
             roomRepo.save(r);
+        }
+
+        // Ensure Building B bonus units exist even if DB was already seeded
+        seedBuildingBBonusRoomsIfMissing();
+    }
+
+    private void seedBuildingBBonusRoomsIfMissing() {
+        for (int floor = 1; floor <= 2; floor++) {
+            for (int i = 1; i <= 6; i++) {
+                String roomNum = String.format("B%d%02d", floor, i);
+                if (roomRepo.findById("rm-" + roomNum).isEmpty()) {
+                    String type = (i <= 2) ? "Studio (Single Bed)" : (i <= 4) ? "Studio (Double Bed)" : "1-Bedroom Suite";
+                    double rent = (floor == 1) ? 5800.0 : 6800.0;
+                    Room room = new Room();
+                    room.setId("rm-" + roomNum);
+                    room.setRoomNumber(roomNum);
+                    room.setFloor(floor);
+                    room.setRoomName(String.format("Unit %s (%s)", roomNum, type));
+                    room.setRoomType(type);
+                    room.setDescription(String.format("อาคารเสริม B ชั้น %d %s ตกแต่งสไตล์โมเดิร์น บรรยากาศสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน", floor, type));
+                    room.setCapacity(2);
+                    room.setPrice(rent);
+                    room.setStatus("Available");
+                    room.setAmenities("[\"High-Speed Wi-Fi\",\"Air Conditioner\",\"Water Heater\",\"Private Balcony\",\"Digital Keycard\"]");
+                    room.setSizeSqm(30.0 + i * 2);
+                    room.setBedType("Queen Bed (2 Guests)");
+                    room.setCoverImage("/rooms/dlx_1.jpg");
+                    room.setGallery("[\"/rooms/dlx_1.jpg\",\"/rooms/dlx_2.jpg\",\"/rooms/dlx_3.jpg\"]");
+                    room.setBuildingId("bld-2");
+                    room.setBuildingName("อาคาร B (Victory Residence B)");
+                    room.setPrevWaterMeter(100.0 + i * 3);
+                    room.setCurrWaterMeter(105.0 + i * 3);
+                    room.setPrevElectricMeter(300.0 + i * 15);
+                    room.setCurrElectricMeter(340.0 + i * 15);
+                    room.setCreatedAt(LocalDateTime.of(2026, 1, 1, 0, 0));
+                    roomRepo.save(room);
+                }
+            }
         }
     }
 
@@ -119,21 +170,21 @@ public class DataSeeder {
                 r.setGallery("[\"/rooms/room_deluxe.png\",\"/rooms/dlx_2.jpg\",\"/rooms/dlx_3.jpg\"]");
             }
         } else if ("1-Bedroom".equalsIgnoreCase(type) || "1-Bedroom Suite".equalsIgnoreCase(type)) {
-            if (roomNum.equals("109") || roomNum.equals("211")) {
+            if (roomNum.equals("A109") || roomNum.equals("A211")) {
                 r.setCoverImage("/rooms/ste_1.jpg");
                 r.setGallery("[\"/rooms/ste_1.jpg\",\"/rooms/ste_2.jpg\",\"/rooms/ste_3.jpg\"]");
-            } else if (roomNum.equals("110") || roomNum.equals("210")) {
+            } else if (roomNum.equals("A110") || roomNum.equals("A210")) {
                 r.setCoverImage("/rooms/ste_2.jpg");
                 r.setGallery("[\"/rooms/ste_2.jpg\",\"/rooms/ste_4.jpg\",\"/rooms/ste_3.jpg\"]");
-            } else { // 111, 209
+            } else {
                 r.setCoverImage("/rooms/ste_4.jpg");
                 r.setGallery("[\"/rooms/ste_4.jpg\",\"/rooms/ste_1.jpg\",\"/rooms/ste_3.jpg\"]");
             }
         } else if ("Corner Room".equalsIgnoreCase(type) || "Corner Suite".equalsIgnoreCase(type)) {
-            if (roomNum.equals("112")) {
+            if (roomNum.equals("A112")) {
                 r.setCoverImage("/rooms/crn_1.jpg");
                 r.setGallery("[\"/rooms/crn_1.jpg\",\"/rooms/crn_2.jpg\",\"/rooms/crn_3.jpg\"]");
-            } else { // 212
+            } else {
                 r.setCoverImage("/rooms/crn_2.jpg");
                 r.setGallery("[\"/rooms/crn_2.jpg\",\"/rooms/crn_1.jpg\",\"/rooms/crn_3.jpg\"]");
             }
@@ -152,18 +203,18 @@ public class DataSeeder {
     private void seedRooms() {
         // Assigned tenants map: roomNum -> [tenantName, tenantId, status, rent, type]
         Map<String, String[]> assigned = new HashMap<>();
-        assigned.put("101", new String[]{"Somchai Jaidee", "t-101", "Occupied", "5500", "Studio (Single Bed)"});
-        assigned.put("102", new String[]{"Malee Rattanaporn", "t-102", "Occupied", "5500", "Studio (Single Bed)"});
-        assigned.put("105", new String[]{"-", "", "Maintenance", "5500", "Studio (Double Bed)"});
-        assigned.put("108", new String[]{"David Miller", "t-108", "Occupied", "6000", "Studio (Double Bed)"});
-        assigned.put("201", new String[]{"Wichai Sirisuk", "t-201", "Occupied", "6200", "Studio (Single Bed)"});
-        assigned.put("204", new String[]{"Anan Suksawat", "t-204", "Occupied", "7500", "1-Bedroom"});
-        assigned.put("207", new String[]{"Napa Charoenwong", "t-207", "Reserved", "6500", "Studio (Double Bed)"});
-        assigned.put("210", new String[]{"Kittisak Meechai", "t-210", "Occupied", "8500", "Corner Room"});
+        assigned.put("A101", new String[]{"Somchai Jaidee", "t-101", "Occupied", "5500", "Studio (Single Bed)"});
+        assigned.put("A102", new String[]{"Malee Rattanaporn", "t-102", "Occupied", "5500", "Studio (Single Bed)"});
+        assigned.put("A105", new String[]{"-", "", "Maintenance", "5500", "Studio (Double Bed)"});
+        assigned.put("A108", new String[]{"David Miller", "t-108", "Occupied", "6000", "Studio (Double Bed)"});
+        assigned.put("A201", new String[]{"Wichai Sirisuk", "t-201", "Occupied", "6200", "Studio (Single Bed)"});
+        assigned.put("A204", new String[]{"Anan Suksawat", "t-204", "Occupied", "7500", "1-Bedroom"});
+        assigned.put("A207", new String[]{"Napa Charoenwong", "t-207", "Reserved", "6500", "Studio (Double Bed)"});
+        assigned.put("A210", new String[]{"Kittisak Meechai", "t-210", "Occupied", "8500", "Corner Room"});
 
         for (int floor = 1; floor <= 2; floor++) {
             for (int i = 1; i <= 12; i++) {
-                String roomNum = String.format("%d%02d", floor, i);
+                String roomNum = String.format("A%d%02d", floor, i);
                 String[] a = assigned.get(roomNum);
 
                 String type;
@@ -224,13 +275,8 @@ public class DataSeeder {
                 room.setSizeSqm(size);
                 room.setBedType(bedType);
                 assignImagesForRoom(room, roomNum, type);
-                if (floor == 1 || roomNum.startsWith("1")) {
-                    room.setBuildingId("bld-1");
-                    room.setBuildingName("อาคาร A (Victory Tower A)");
-                } else {
-                    room.setBuildingId("bld-2");
-                    room.setBuildingName("อาคาร B (Victory Residence B)");
-                }
+                room.setBuildingId("bld-1");
+                room.setBuildingName("อาคาร A (Victory Tower A)");
                 room.setCurrentTenantId(a != null && !a[1].isEmpty() ? a[1] : null);
                 room.setCurrentTenantName(a != null && !a[0].equals("-") ? a[0] : null);
                 room.setPrevWaterMeter(120.0 + i * 5);
@@ -241,16 +287,17 @@ public class DataSeeder {
                 roomRepo.save(room);
             }
         }
+        seedBuildingBBonusRoomsIfMissing();
     }
 
     private void seedTenants() {
         String[][] data = {
-            {"t-101", "Somchai Jaidee", "081-234-5678", "somchai.j@example.com", "1-1002-34567-89-0", "Sumalee Jaidee (Wife) - 081-222-3333", "rm-101", "101"},
-            {"t-102", "Malee Rattanaporn", "089-876-5432", "malee.r@example.com", "3-1005-98765-43-2", "Wichian Rattanaporn (Father) - 089-111-4444", "rm-102", "102"},
-            {"t-108", "David Miller", "095-123-9988", "david.m@example.com", "AB9876543 (Passport)", "Sarah Miller - +1 555 0192", "rm-108", "108"},
-            {"t-201", "Wichai Sirisuk", "082-345-6789", "wichai.s@example.com", "1-7099-00123-45-1", "Kamontip Sirisuk (Mother) - 082-999-0000", "rm-201", "201"},
-            {"t-204", "Anan Suksawat", "084-555-6677", "anan.s@example.com", "1-1008-77665-44-3", "Jiraporn Suksawat - 084-555-8899", "rm-204", "204"},
-            {"t-210", "Kittisak Meechai", "086-444-3322", "kittisak.m@example.com", "1-1020-55443-22-1", "Daranee Meechai - 086-444-1100", "rm-210", "210"},
+            {"t-101", "Somchai Jaidee", "081-234-5678", "somchai.j@example.com", "1-1002-34567-89-0", "Sumalee Jaidee (Wife) - 081-222-3333", "rm-A101", "A101"},
+            {"t-102", "Malee Rattanaporn", "089-876-5432", "malee.r@example.com", "3-1005-98765-43-2", "Wichian Rattanaporn (Father) - 089-111-4444", "rm-A102", "A102"},
+            {"t-108", "David Miller", "095-123-9988", "david.m@example.com", "AB9876543 (Passport)", "Sarah Miller - +1 555 0192", "rm-A108", "A108"},
+            {"t-201", "Wichai Sirisuk", "082-345-6789", "wichai.s@example.com", "1-7099-00123-45-1", "Kamontip Sirisuk (Mother) - 082-999-0000", "rm-A201", "A201"},
+            {"t-204", "Anan Suksawat", "084-555-6677", "anan.s@example.com", "1-1008-77665-44-3", "Jiraporn Suksawat - 084-555-8899", "rm-A204", "A204"},
+            {"t-210", "Kittisak Meechai", "086-444-3322", "kittisak.m@example.com", "1-1020-55443-22-1", "Daranee Meechai - 086-444-1100", "rm-A210", "A210"},
         };
 
         for (String[] d : data) {
@@ -265,12 +312,12 @@ public class DataSeeder {
 
     private void seedLeases() {
         Object[][] data = {
-            {"ls-101", "rm-101", "101", "t-101", "Somchai Jaidee", "Monthly", 5500.0, "2026-01-15", "2027-01-15", 11000.0, "Active"},
-            {"ls-102", "rm-102", "102", "t-102", "Malee Rattanaporn", "Yearly", 5500.0, "2026-02-01", "2027-02-01", 11000.0, "Active"},
-            {"ls-108", "rm-108", "108", "t-108", "David Miller", "Monthly", 6000.0, "2026-03-01", "2027-03-01", 12000.0, "Active"},
-            {"ls-201", "rm-201", "201", "t-201", "Wichai Sirisuk", "Yearly", 6200.0, "2026-01-01", "2027-01-01", 12400.0, "Active"},
-            {"ls-204", "rm-204", "204", "t-204", "Anan Suksawat", "Yearly", 7500.0, "2026-04-01", "2027-04-01", 15000.0, "Active"},
-            {"ls-210", "rm-210", "210", "t-210", "Kittisak Meechai", "Monthly", 8500.0, "2026-05-01", "2027-05-01", 17000.0, "Active"},
+            {"ls-101", "rm-A101", "A101", "t-101", "Somchai Jaidee", "Monthly", 5500.0, "2026-01-15", "2027-01-15", 11000.0, "Active"},
+            {"ls-102", "rm-A102", "A102", "t-102", "Malee Rattanaporn", "Yearly", 5500.0, "2026-02-01", "2027-02-01", 11000.0, "Active"},
+            {"ls-108", "rm-A108", "A108", "t-108", "David Miller", "Monthly", 6000.0, "2026-03-01", "2027-03-01", 12000.0, "Active"},
+            {"ls-201", "rm-A201", "A201", "t-201", "Wichai Sirisuk", "Yearly", 6200.0, "2026-01-01", "2027-01-01", 12400.0, "Active"},
+            {"ls-204", "rm-A204", "A204", "t-204", "Anan Suksawat", "Yearly", 7500.0, "2026-04-01", "2027-04-01", 15000.0, "Active"},
+            {"ls-210", "rm-A210", "A210", "t-210", "Kittisak Meechai", "Monthly", 8500.0, "2026-05-01", "2027-05-01", 17000.0, "Active"},
         };
 
         for (Object[] d : data) {
@@ -289,7 +336,7 @@ public class DataSeeder {
     private void seedUtilityBills() {
         UtilityBill b1 = new UtilityBill();
         b1.setId("bill-101"); b1.setInvoiceNo("INV-202608-101"); b1.setLeaseId("ls-101");
-        b1.setRoomId("rm-101"); b1.setRoomNumber("101"); b1.setTenantName("Somchai Jaidee");
+        b1.setRoomId("rm-A101"); b1.setRoomNumber("A101"); b1.setTenantName("Somchai Jaidee");
         b1.setBillingMonth("August 2026"); b1.setRentAmount(5500.0);
         b1.setPrevWaterMeter(125.0); b1.setCurrWaterMeter(133.0); b1.setWaterRate(18.0); b1.setWaterAmount(144.0);
         b1.setPrevElectricMeter(470.0); b1.setCurrElectricMeter(550.0); b1.setElectricRate(7.0); b1.setElectricAmount(560.0);
@@ -299,7 +346,7 @@ public class DataSeeder {
 
         UtilityBill b2 = new UtilityBill();
         b2.setId("bill-102"); b2.setInvoiceNo("INV-202608-102"); b2.setLeaseId("ls-102");
-        b2.setRoomId("rm-102"); b2.setRoomNumber("102"); b2.setTenantName("Malee Rattanaporn");
+        b2.setRoomId("rm-A102"); b2.setRoomNumber("A102"); b2.setTenantName("Malee Rattanaporn");
         b2.setBillingMonth("August 2026"); b2.setRentAmount(5500.0);
         b2.setPrevWaterMeter(130.0); b2.setCurrWaterMeter(138.0); b2.setWaterRate(18.0); b2.setWaterAmount(144.0);
         b2.setPrevElectricMeter(490.0); b2.setCurrElectricMeter(580.0); b2.setElectricRate(7.0); b2.setElectricAmount(630.0);
@@ -309,7 +356,7 @@ public class DataSeeder {
 
         UtilityBill b3 = new UtilityBill();
         b3.setId("bill-201"); b3.setInvoiceNo("INV-202608-201"); b3.setLeaseId("ls-201");
-        b3.setRoomId("rm-201"); b3.setRoomNumber("201"); b3.setTenantName("Wichai Sirisuk");
+        b3.setRoomId("rm-A201"); b3.setRoomNumber("A201"); b3.setTenantName("Wichai Sirisuk");
         b3.setBillingMonth("August 2026"); b3.setRentAmount(6200.0);
         b3.setPrevWaterMeter(140.0); b3.setCurrWaterMeter(152.0); b3.setWaterRate(18.0); b3.setWaterAmount(216.0);
         b3.setPrevElectricMeter(510.0); b3.setCurrElectricMeter(620.0); b3.setElectricRate(7.0); b3.setElectricAmount(770.0);

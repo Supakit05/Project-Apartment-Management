@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Plus, Edit3, Trash2, Search, Building2 } from 'lucide-react';
 import { Room, RoomStatus, Building } from '../../types';
 import { getRooms, saveRoom, deleteRoom as apiDeleteRoom, getBuildings } from '../../services/api';
@@ -9,7 +9,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const RoomManagement: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [searchParams] = useSearchParams();
   const initialBuildingId = searchParams.get('buildingId') || 'All';
 
@@ -23,22 +23,25 @@ export const RoomManagement: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
-  const fetchRooms = async () => {
+  const fetchRooms = async (targetBldId?: string) => {
+    const activeBldId = targetBldId !== undefined ? targetBldId : buildingFilter;
     try {
       const [roomList, bldList] = await Promise.all([getRooms(), getBuildings()]);
       setRooms(roomList);
       setBuildings(bldList);
-      applyFilters(roomList, searchQuery, statusFilter, buildingFilter);
+      applyFilters(roomList, searchQuery, statusFilter, activeBldId, bldList);
     } catch (err) {
       console.error('Failed to fetch rooms:', err);
     }
   };
 
   useEffect(() => {
-    fetchRooms();
-  }, []);
+    const bldParam = searchParams.get('buildingId') || 'All';
+    setBuildingFilter(bldParam);
+    fetchRooms(bldParam);
+  }, [searchParams]);
 
-  const applyFilters = (list: Room[], query: string, status: string, bldId: string) => {
+  const applyFilters = (list: Room[], query: string, status: string, bldId: string, bldList?: Building[]) => {
     let result = [...list];
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -48,41 +51,41 @@ export const RoomManagement: React.FC = () => {
       result = result.filter(r => r.status === status);
     }
     if (bldId !== 'All') {
-      const selectedBuilding = buildings.find(b => b.id === bldId);
-      const bldCode = selectedBuilding?.code?.toLowerCase();
-      const bldName = selectedBuilding?.name?.toLowerCase();
+      const allBlds = bldList || buildings;
+      const targetBld = allBlds.find(b => b.id === bldId || b.code === bldId);
 
       result = result.filter(r => {
-        if (r.buildingId && r.buildingId === bldId) return true;
-        if (r.buildingName) {
-          if (bldName && r.buildingName.toLowerCase().includes(bldName)) return true;
-          if (bldCode && r.buildingName.toLowerCase().includes(bldCode)) return true;
-        }
-        if (bldCode && r.roomNumber.toLowerCase().startsWith(bldCode)) return true;
-        if (!r.buildingId && !r.buildingName) {
-          if (bldId === 'bld-1' || bldCode === 'a') {
-            return r.floor === 1 || r.roomNumber.startsWith('1');
-          }
-          if (bldId === 'bld-2' || bldCode === 'b') {
-            return r.floor === 2 || r.roomNumber.startsWith('2');
-          }
-        }
-        return false;
+        // Direct ID match
+        if (targetBld && r.buildingId === targetBld.id) return true;
+        if (r.buildingId === bldId) return true;
+
+        // Building B identification (check code or explicit ID 'bld-2')
+        const isBldB = (targetBld && (targetBld.code === 'B' || targetBld.id === 'bld-2')) || bldId === 'bld-2';
+        const isBldA = (targetBld && (targetBld.code === 'A' || targetBld.id === 'bld-1')) || bldId === 'bld-1';
+
+        const roomIsB = r.buildingId === 'bld-2' || (r.roomNumber && r.roomNumber.toUpperCase().startsWith('B'));
+
+        if (isBldB) return roomIsB;
+        if (isBldA) return !roomIsB;
+
+        return r.buildingId === bldId;
       });
     }
     setFilteredRooms(result);
   };
 
   const getRoomBuildingName = (room: Room) => {
-    if (room.buildingName) return room.buildingName;
-    if (room.buildingId) {
-      const b = buildings.find(bld => bld.id === room.buildingId);
-      if (b) return b.name;
+    if (room.buildingName) {
+      if (language === 'en') {
+        if (room.buildingName.includes('อาคาร A') || room.buildingName.includes('Tower A')) return 'Building A (Victory Tower A)';
+        if (room.buildingName.includes('อาคาร B') || room.buildingName.includes('Residence B')) return 'Building B (Victory Residence B)';
+      }
+      return room.buildingName;
     }
-    if (room.roomNumber.toLowerCase().startsWith('b') || room.floor === 2 || room.roomNumber.startsWith('2')) {
-      return 'อาคาร B (Victory Residence B)';
+    if (room.buildingId === 'bld-2' || (room.roomNumber && room.roomNumber.toUpperCase().startsWith('B'))) {
+      return language === 'th' ? 'อาคาร B (Victory Residence B)' : 'Building B (Victory Residence B)';
     }
-    return 'อาคาร A (Victory Tower A)';
+    return language === 'th' ? 'อาคาร A (Victory Tower A)' : 'Building A (Victory Tower A)';
   };
 
   const handleSearchChange = (q: string) => {
@@ -120,6 +123,19 @@ export const RoomManagement: React.FC = () => {
     fetchRooms();
   };
 
+  const getBuildingDisplayName = (bldId: string) => {
+    const b = buildings.find(item => item.id === bldId || item.code === bldId);
+    if (b) {
+      if (language === 'en') {
+        if (b.name.includes('อาคาร A') || b.name.includes('Tower A')) return 'Building A (Victory Tower A)';
+        if (b.name.includes('อาคาร B') || b.name.includes('Residence B')) return 'Building B (Victory Residence B)';
+      }
+      return b.name;
+    }
+    if (bldId === 'bld-2') return language === 'th' ? 'อาคาร B (Victory Residence B)' : 'Building B (Victory Residence B)';
+    return language === 'th' ? 'อาคาร A (Victory Tower A)' : 'Building A (Victory Tower A)';
+  };
+
   return (
     <div className="space-y-8 pb-10">
 
@@ -142,9 +158,35 @@ export const RoomManagement: React.FC = () => {
         </button>
       </div>
 
+      {/* BUILDING CONTEXT BANNER */}
+      {buildingFilter !== 'All' && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs font-semibold text-blue-900 dark:text-blue-200 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span>
+              {language === 'th' ? 'กำลังจัดการห้องพักเฉพาะ: ' : 'Managing units in: '}{getBuildingDisplayName(buildingFilter)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/admin/buildings"
+              className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-slate-700 transition-colors"
+            >
+              {language === 'th' ? 'กลับหน้าจัดการอาคาร' : 'Back to Buildings'}
+            </Link>
+            <button
+              onClick={() => handleBuildingFilterChange('All')}
+              className="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors cursor-pointer"
+            >
+              {language === 'th' ? 'แสดงทุกอาคาร' : 'Show All Buildings'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* CONTROLS */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="sm:col-span-2 relative">
+        <div className={buildingFilter !== 'All' ? "sm:col-span-3 relative" : "sm:col-span-2 relative"}>
           <Search className="w-4 h-4 text-nike-mute absolute left-3.5 top-3.5" />
           <input
             type="text"
@@ -155,18 +197,22 @@ export const RoomManagement: React.FC = () => {
           />
         </div>
 
-        <div>
-          <select
-            value={buildingFilter}
-            onChange={e => handleBuildingFilterChange(e.target.value)}
-            className="w-full p-3 bg-nike-soft-cloud dark:bg-nike-dark-card border-0 text-nike-ink dark:text-white text-[14px] rounded-[24px] focus:outline-none cursor-pointer font-medium"
-          >
-            <option value="All">{t('roomMgmt.allBuildings')}</option>
-            {buildings.map(b => (
-              <option key={b.id} value={b.id}>{b.name}</option>
-            ))}
-          </select>
-        </div>
+        {buildingFilter === 'All' && (
+          <div>
+            <select
+              value={buildingFilter}
+              onChange={e => handleBuildingFilterChange(e.target.value)}
+              className="w-full p-3 bg-nike-soft-cloud dark:bg-nike-dark-card border-0 text-nike-ink dark:text-white text-[14px] rounded-[24px] focus:outline-none cursor-pointer font-medium"
+            >
+              <option value="All">{t('roomMgmt.allBuildings')}</option>
+              {buildings.map(b => (
+                <option key={b.id} value={b.id}>
+                  {language === 'en' ? (b.name.includes('อาคาร A') ? 'Building A (Victory Tower A)' : b.name.includes('อาคาร B') ? 'Building B (Victory Residence B)' : b.name) : b.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <select
@@ -201,14 +247,14 @@ export const RoomManagement: React.FC = () => {
             {filteredRooms.length === 0 ? (
               <tr>
                 <td colSpan={7} className="p-8 text-center text-nike-mute">
-                  No units found matching query
+                  {language === 'th' ? 'ไม่พบข้อมูลห้องพักที่ตรงกับเงื่อนไข' : 'No units found matching query'}
                 </td>
               </tr>
             ) : (
               filteredRooms.map(room => (
                 <tr key={room.id} className="hover:bg-nike-soft-cloud dark:hover:bg-nike-dark-card/50 transition-colors">
                   <td className="p-4 font-bold text-nike-ink dark:text-white">
-                    ห้อง {room.roomNumber}
+                    {t('common.unit')} {room.roomNumber}
                   </td>
                   <td className="p-4 font-medium text-slate-700 dark:text-slate-300">
                     {getRoomBuildingName(room)}
@@ -229,10 +275,10 @@ export const RoomManagement: React.FC = () => {
                         'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400'
                       }`}
                     >
-                      <option value="Available">Available</option>
-                      <option value="Reserved">Reserved</option>
-                      <option value="Occupied">Occupied</option>
-                      <option value="Maintenance">Maintenance</option>
+                      <option value="Available">{t('common.available')}</option>
+                      <option value="Reserved">{t('common.reserved')}</option>
+                      <option value="Occupied">{t('common.occupied')}</option>
+                      <option value="Maintenance">{t('common.maintenance')}</option>
                     </select>
                   </td>
                   <td className="p-4 text-right space-x-2">

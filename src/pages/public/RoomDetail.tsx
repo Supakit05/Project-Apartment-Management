@@ -2,13 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Room } from '../../types';
 import { getRoomById } from '../../services/api';
-import { formatCurrency } from '../../utils/formatters';
+import {
+  formatCurrency,
+  getTranslatedRoomType,
+  getTranslatedBedType,
+  getTranslatedRoomName,
+  getTranslatedRoomDescription
+} from '../../utils/formatters';
 import { useLanguage } from '../../context/LanguageContext';
 import { Check, CalendarCheck, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const RoomDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string>('');
@@ -128,7 +134,7 @@ export const RoomDetail: React.FC = () => {
           <div className="bg-nike-soft-cloud dark:bg-nike-dark-elevated p-6 rounded-3xl border border-nike-hairline dark:border-nike-dark-card space-y-2">
             <h4 className="text-xs font-bold text-nike-ink dark:text-white">{t('room.description')}</h4>
             <p className="text-xs text-nike-charcoal dark:text-nike-stone leading-relaxed">
-              {room.description}
+              {getTranslatedRoomDescription(room.description, room.floor, language)}
             </p>
           </div>
         </div>
@@ -138,11 +144,20 @@ export const RoomDetail: React.FC = () => {
           
           {/* HEADER BLOCK */}
           <div className="space-y-2 pb-6 border-b border-nike-hairline dark:border-nike-dark-card">
-            <span className="text-xs font-semibold text-nike-mute dark:text-nike-stone block">
-              {room.roomType} · {t('common.floor')} {room.floor}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${
+                room.buildingId === 'bld-2' || room.roomNumber.startsWith('B')
+                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+              }`}>
+                {room.buildingId === 'bld-2' || room.roomNumber.startsWith('B') ? 'อาคารเสริม B (Victory Residence B)' : 'อาคาร A (Victory Tower A)'}
+              </span>
+              <span className="text-xs font-semibold text-nike-mute dark:text-nike-stone">
+                {getTranslatedRoomType(room.roomType, language)} · {t('common.floor')} {room.floor}
+              </span>
+            </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-nike-ink dark:text-white">
-              {room.roomName}
+              {getTranslatedRoomName(room.roomName, room.roomNumber, language)}
             </h1>
             
             {/* PRICE DISPLAY */}
@@ -161,11 +176,11 @@ export const RoomDetail: React.FC = () => {
               <span className="font-bold text-sm text-nike-ink dark:text-white">{room.sizeSqm} m²</span>
             </div>
             <div className="space-y-1 border-l border-nike-hairline dark:border-neutral-700 pl-3">
-              <span className="text-[10px] font-medium text-nike-mute dark:text-nike-stone block">Bed</span>
-              <span className="font-bold text-sm text-nike-ink dark:text-white line-clamp-1">{room.bedType}</span>
+              <span className="text-[10px] font-medium text-nike-mute dark:text-nike-stone block">{t('room.bedLabel')}</span>
+              <span className="font-bold text-sm text-nike-ink dark:text-white line-clamp-1">{getTranslatedBedType(room.bedType, language)}</span>
             </div>
             <div className="space-y-1 border-l border-nike-hairline dark:border-neutral-700 pl-3">
-              <span className="text-[10px] font-medium text-nike-mute dark:text-nike-stone block">Guests</span>
+              <span className="text-[10px] font-medium text-nike-mute dark:text-nike-stone block">{t('room.guestsLabel')}</span>
               <span className="font-bold text-sm text-nike-ink dark:text-white">{room.capacity}</span>
             </div>
           </div>
@@ -215,22 +230,22 @@ export const RoomDetail: React.FC = () => {
                 onClick={() => setOpenAccordion(openAccordion === 'specs' ? null : 'specs')}
                 className="w-full flex items-center justify-between text-xs font-bold text-nike-ink dark:text-white text-left"
               >
-                <span>Terms & Conditions</span>
+                <span>{t('room.termsTitle')}</span>
                 {openAccordion === 'specs' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
               {openAccordion === 'specs' && (
                 <div className="pt-3 text-xs text-nike-mute dark:text-nike-stone space-y-2 leading-relaxed">
                   <div className="flex justify-between">
-                    <span>Lease Term:</span>
-                    <span className="font-semibold text-nike-ink dark:text-white">Monthly / Yearly renewable</span>
+                    <span>{t('room.termsLease')}</span>
+                    <span className="font-semibold text-nike-ink dark:text-white">{t('room.termsLeaseVal')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Security Deposit:</span>
-                    <span className="font-semibold text-nike-ink dark:text-white">2 Months rent</span>
+                    <span>{t('room.termsDeposit')}</span>
+                    <span className="font-semibold text-nike-ink dark:text-white">{t('room.termsDepositVal')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Common Area Maintenance:</span>
-                    <span className="font-semibold text-nike-ink dark:text-white">฿300 / month</span>
+                    <span>{t('room.termsCam')}</span>
+                    <span className="font-semibold text-nike-ink dark:text-white">{t('room.termsCamVal')}</span>
                   </div>
                 </div>
               )}
@@ -242,22 +257,22 @@ export const RoomDetail: React.FC = () => {
                 onClick={() => setOpenAccordion(openAccordion === 'rules' ? null : 'rules')}
                 className="w-full flex items-center justify-between text-xs font-bold text-nike-ink dark:text-white text-left"
               >
-                <span>Utilities & Metering</span>
+                <span>{t('room.utilsTitle')}</span>
                 {openAccordion === 'rules' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
               {openAccordion === 'rules' && (
                 <div className="pt-3 text-xs text-nike-mute dark:text-nike-stone space-y-2 leading-relaxed">
                   <div className="flex justify-between">
-                    <span>Water:</span>
-                    <span className="font-semibold text-nike-ink dark:text-white">18 THB / Unit (m³)</span>
+                    <span>{t('room.utilsWater')}</span>
+                    <span className="font-semibold text-nike-ink dark:text-white">{t('room.utilsWaterVal')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Electricity:</span>
-                    <span className="font-semibold text-nike-ink dark:text-white">7 THB / Unit (kWh)</span>
+                    <span>{t('room.utilsElec')}</span>
+                    <span className="font-semibold text-nike-ink dark:text-white">{t('room.utilsElecVal')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Internet:</span>
-                    <span className="font-semibold text-nike-success">Free Wi-Fi</span>
+                    <span>{t('room.utilsWifi')}</span>
+                    <span className="font-semibold text-nike-success">{t('room.utilsWifiVal')}</span>
                   </div>
                 </div>
               )}

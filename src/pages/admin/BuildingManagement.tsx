@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 export const BuildingManagement: React.FC = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,15 +90,11 @@ export const BuildingManagement: React.FC = () => {
   // Helper to calculate stats per building
   const getBuildingStats = (buildingId: string, buildingCode: string) => {
     const bCode = (buildingCode || '').toLowerCase();
+    const isBld2Id = buildingId === 'bld-2' || bCode === 'b';
     const buildingRooms = rooms.filter(r => {
-      if (r.buildingId && r.buildingId === buildingId) return true;
-      if (r.buildingName && (r.buildingName.toLowerCase().includes(bCode) || r.buildingName.toLowerCase() === bCode)) return true;
-      if (bCode && r.roomNumber.toLowerCase().startsWith(bCode)) return true;
-      if (!r.buildingId && !r.buildingName) {
-        if (buildingId === 'bld-1' || bCode === 'a') return r.floor === 1 || r.roomNumber.startsWith('1');
-        if (buildingId === 'bld-2' || bCode === 'b') return r.floor === 2 || r.roomNumber.startsWith('2');
-      }
-      return false;
+      const rIsBld2 = r.buildingId === 'bld-2' || r.roomNumber.toLowerCase().startsWith('b') || (r.buildingName && r.buildingName.toLowerCase().includes('b'));
+      if (isBld2Id) return rIsBld2;
+      return !rIsBld2;
     });
     const total = buildingRooms.length;
     const occupied = buildingRooms.filter(r => r.status === 'Occupied').length;
@@ -137,8 +133,8 @@ export const BuildingManagement: React.FC = () => {
             <Building2 className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">อาคารทั้งหมด</p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-white">{buildings.length} อาคาร</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{language === 'th' ? 'อาคารทั้งหมด' : 'Total Buildings'}</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white">{buildings.length} {language === 'th' ? 'อาคาร' : 'buildings'}</p>
           </div>
         </div>
 
@@ -147,8 +143,8 @@ export const BuildingManagement: React.FC = () => {
             <Home className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">ห้องพักในระบบรวม</p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-white">{rooms.length} ห้อง</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{language === 'th' ? 'ห้องพักในระบบรวม' : 'Total Units'}</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white">{rooms.length} {t('common.unit')}</p>
           </div>
         </div>
 
@@ -157,7 +153,7 @@ export const BuildingManagement: React.FC = () => {
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">อัตราการเข้าพักรวม</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{language === 'th' ? 'อัตราการเข้าพักรวม' : 'Overall Occupancy Rate'}</p>
             <p className="text-2xl font-bold text-slate-900 dark:text-white">
               {rooms.length > 0 ? Math.round((rooms.filter(r => r.status === 'Occupied').length / rooms.length) * 100) : 0}%
             </p>
@@ -170,7 +166,7 @@ export const BuildingManagement: React.FC = () => {
         <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="text"
-          placeholder="ค้นหาตามชื่อตึก หรือรหัสตึก..."
+          placeholder={language === 'th' ? 'ค้นหาตามชื่อตึก หรือรหัสตึก...' : 'Search by building name or code...'}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-nike-dark-card border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -179,17 +175,18 @@ export const BuildingManagement: React.FC = () => {
 
       {/* Building List Cards */}
       {loading ? (
-        <div className="text-center py-12 text-slate-500">กำลังโหลดข้อมูลอาคาร...</div>
+        <div className="text-center py-12 text-slate-500">{language === 'th' ? 'กำลังโหลดข้อมูลอาคาร...' : 'Loading buildings...'}</div>
       ) : filteredBuildings.length === 0 ? (
         <div className="bg-white dark:bg-nike-dark-card p-12 rounded-2xl text-center border border-slate-100 dark:border-slate-800">
           <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">ไม่พบข้อมูลอาคาร</h3>
-          <p className="text-slate-500 text-sm mt-1">กดปุ่ม "เพิ่มตึกใหม่" เพื่อสร้างข้อมูลอาคารแรกในระบบ</p>
+          <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">{language === 'th' ? 'ไม่พบข้อมูลอาคาร' : 'No Buildings Found'}</h3>
+          <p className="text-slate-500 text-sm mt-1">{language === 'th' ? 'กดปุ่ม "เพิ่มตึกใหม่" เพื่อสร้างข้อมูลอาคารแรกในระบบ' : 'Click "Add New Building" to create the first building.'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredBuildings.map((building) => {
             const stats = getBuildingStats(building.id, building.code);
+            const bName = language === 'en' ? (building.name.includes('อาคาร A') ? 'Building A (Victory Tower A)' : building.name.includes('อาคาร B') ? 'Building B (Victory Residence B)' : building.name) : building.name;
             return (
               <div
                 key={building.id}
@@ -199,37 +196,34 @@ export const BuildingManagement: React.FC = () => {
                 <div className="relative h-48 bg-slate-200 dark:bg-slate-800 overflow-hidden">
                   <img
                     src={building.coverImage || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80'}
-                    alt={building.name}
+                    alt={bName}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent" />
                   <div className="absolute top-3 left-3 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                    รหัสตึก: {building.code}
+                    {language === 'th' ? 'รหัสตึก' : 'Code'}: {building.code}
                   </div>
                   <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <h3 className="text-xl font-bold">{building.name}</h3>
-                    <p className="text-xs text-slate-200 opacity-90 line-clamp-1 mt-0.5">{building.address || 'ไม่มีที่อยู่ระบุ'}</p>
+                    <h3 className="text-xl font-bold text-white drop-shadow-xs">{bName}</h3>
+                    <p className="text-xs text-white opacity-90 line-clamp-1 mt-0.5">{building.address || (language === 'th' ? 'ไม่มีที่อยู่ระบุ' : 'No address specified')}</p>
                   </div>
                 </div>
 
                 {/* Content & Stats */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                   <div>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
-                      {building.description || 'ไม่มีคำอธิบายเพิ่มเติมสำหรับอาคารนี้'}
-                    </p>
 
                     <div className="grid grid-cols-3 gap-2 mt-4 text-center">
                       <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <span className="block text-xs text-slate-400">ห้องทั้งหมด</span>
+                        <span className="block text-xs text-slate-400">{language === 'th' ? 'ห้องทั้งหมด' : 'Total Units'}</span>
                         <span className="text-base font-bold text-indigo-600 dark:text-indigo-400">{stats.total || building.totalRooms}</span>
                       </div>
                       <div className="bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                        <span className="block text-xs text-emerald-600 dark:text-emerald-400">ห้องว่าง</span>
+                        <span className="block text-xs text-emerald-600 dark:text-emerald-400">{t('common.available')}</span>
                         <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">{stats.available}</span>
                       </div>
                       <div className="bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                        <span className="block text-xs text-blue-600 dark:text-blue-400">มีคนเช่า</span>
+                        <span className="block text-xs text-blue-600 dark:text-blue-400">{t('common.occupied')}</span>
                         <span className="text-base font-bold text-blue-600 dark:text-blue-400">{stats.occupied}</span>
                       </div>
                     </div>
@@ -241,14 +235,14 @@ export const BuildingManagement: React.FC = () => {
                       <button
                         onClick={() => handleOpenEditModal(building)}
                         className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        title="แก้ไขข้อมูลตึก"
+                        title={language === 'th' ? 'แก้ไขข้อมูลตึก' : 'Edit Building'}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteBuilding(building.id, building.name)}
                         className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg transition-colors"
-                        title="ลบตึก"
+                        title={language === 'th' ? 'ลบตึก' : 'Delete Building'}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -256,9 +250,9 @@ export const BuildingManagement: React.FC = () => {
 
                     <button
                       onClick={() => navigate(`/admin/rooms?buildingId=${building.id}`)}
-                      className="flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-600 dark:text-indigo-300 text-xs font-semibold px-4 py-2 rounded-xl transition-all"
+                      className="flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-600 dark:text-indigo-300 text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer"
                     >
-                      จัดการห้องในตึกนี้
+                      {language === 'th' ? 'จัดการห้องในตึกนี้' : 'Manage Units in Building'}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>

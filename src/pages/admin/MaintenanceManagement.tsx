@@ -12,7 +12,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const MaintenanceManagement: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'tasks' | 'supplies' | 'logs' | 'reminders'>('tasks');
   const [occupancyFilter, setOccupancyFilter] = useState<'All' | 'Occupied' | 'Vacant/Common'>('All');
   const [tasks, setTasks] = useState<MaintenanceTask[]>([]);
@@ -322,7 +322,9 @@ export const MaintenanceManagement: React.FC = () => {
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card rounded-2xl p-6 space-y-4 shadow-xs">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-2 border-b border-nike-hairline dark:border-nike-dark-card">
             <div>
-              <h3 className="text-base font-bold text-nike-ink dark:text-white">รายการแจ้งซ่อมบำรุง (Maintenance Work Orders)</h3>
+              <h3 className="text-base font-bold text-nike-ink dark:text-white">
+                {language === 'th' ? 'รายการแจ้งซ่อมบำรุง' : 'Maintenance Work Orders'}
+              </h3>
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => setOccupancyFilter('All')}
@@ -332,7 +334,7 @@ export const MaintenanceManagement: React.FC = () => {
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                   }`}
                 >
-                  ทั้งหมด ({tasks.length})
+                  {t('common.all')} ({tasks.length})
                 </button>
                 <button
                   onClick={() => setOccupancyFilter('Occupied')}
@@ -342,7 +344,7 @@ export const MaintenanceManagement: React.FC = () => {
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                   }`}
                 >
-                  ห้องมีคนเช่า ({tasks.filter(t => getTaskOccupancy(t) === 'Occupied').length})
+                  {language === 'th' ? 'ห้องมีคนเช่า' : 'Occupied Units'} ({tasks.filter(t => getTaskOccupancy(t) === 'Occupied').length})
                 </button>
                 <button
                   onClick={() => setOccupancyFilter('Vacant/Common')}
@@ -352,7 +354,7 @@ export const MaintenanceManagement: React.FC = () => {
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                   }`}
                 >
-                  ห้องว่าง ({tasks.filter(t => getTaskOccupancy(t) === 'Vacant/Common').length})
+                  {language === 'th' ? 'ห้องว่าง' : 'Vacant / Common'} ({tasks.filter(t => getTaskOccupancy(t) === 'Vacant/Common').length})
                 </button>
               </div>
             </div>
@@ -368,15 +370,15 @@ export const MaintenanceManagement: React.FC = () => {
                   category: 'Light bulb replacement',
                   priority: 'Medium',
                   status: 'Pending',
-                  assignedWorker: 'นายช่างวิเชียร',
+                  assignedWorker: language === 'th' ? 'นายช่างวิเชียร' : 'Wichian (Technician)',
                   laborCost: 150,
-                  description: 'เปลี่ยนหลอดไฟในห้องพัก',
+                  description: language === 'th' ? 'เปลี่ยนหลอดไฟในห้องพัก' : 'Light bulb replacement',
                 });
                 setShowTaskModal(true);
               }}
-              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-rose-600 text-white hover:bg-rose-700 flex items-center gap-1.5 shrink-0"
+              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-rose-600 text-white hover:bg-rose-700 flex items-center gap-1.5 shrink-0 cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> แจ้งซ่อมบำรุงใหม่
+              <Plus className="w-4 h-4" /> {language === 'th' ? 'แจ้งซ่อมบำรุงใหม่' : 'New Work Order'}
             </button>
           </div>
 
@@ -384,15 +386,15 @@ export const MaintenanceManagement: React.FC = () => {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-nike-hairline dark:border-nike-dark-card text-nike-mute dark:text-nike-stone font-semibold">
-                  <th className="p-3">เลขห้อง / รหัสงาน</th>
-                  <th className="p-3">ประเภทการเช่า</th>
-                  <th className="p-3">หมวดหมู่</th>
-                  <th className="p-3">รายละเอียด</th>
-                  <th className="p-3">ช่างผู้ดูแล</th>
-                  <th className="p-3">ค่าใช้จ่ายรวม</th>
-                  <th className="p-3">ความสำคัญ</th>
-                  <th className="p-3">สถานะ</th>
-                  <th className="p-3 text-right">การจัดการ</th>
+                  <th className="p-3">{language === 'th' ? 'เลขห้อง / รหัสงาน' : 'Unit / Task Ref'}</th>
+                  <th className="p-3">{language === 'th' ? 'ประเภทการเช่า' : 'Occupancy Type'}</th>
+                  <th className="p-3">{language === 'th' ? 'หมวดหมู่' : 'Category'}</th>
+                  <th className="p-3">{language === 'th' ? 'รายละเอียด' : 'Description'}</th>
+                  <th className="p-3">{language === 'th' ? 'ช่างผู้ดูแล' : 'Assigned Technician'}</th>
+                  <th className="p-3">{language === 'th' ? 'ค่าใช้จ่ายรวม' : 'Total Cost'}</th>
+                  <th className="p-3">{language === 'th' ? 'ความสำคัญ' : 'Priority'}</th>
+                  <th className="p-3">{language === 'th' ? 'สถานะ' : 'Status'}</th>
+                  <th className="p-3 text-right">{language === 'th' ? 'การจัดการ' : 'Actions'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-nike-hairline/60 dark:divide-nike-dark-card/60">
@@ -407,7 +409,7 @@ export const MaintenanceManagement: React.FC = () => {
                     return (
                   <tr key={task.id} className="hover:bg-nike-soft-cloud/50 dark:hover:bg-nike-dark-card/30">
                     <td className="p-3">
-                      <span className="font-bold text-nike-ink dark:text-white block">ห้อง {task.roomNumber}</span>
+                      <span className="font-bold text-nike-ink dark:text-white block">{t('common.unit')} {task.roomNumber}</span>
                       <span className="text-[11px] text-nike-stone">{task.taskNo}</span>
                     </td>
                     <td className="p-3">
@@ -416,7 +418,7 @@ export const MaintenanceManagement: React.FC = () => {
                           ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
                           : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                       }`}>
-                        {taskOccupancy === 'Vacant/Common' ? 'ห้องว่าง' : 'ห้องมีคนเช่า'}
+                        {taskOccupancy === 'Vacant/Common' ? (language === 'th' ? 'ห้องว่าง' : 'Vacant') : (language === 'th' ? 'ห้องมีคนเช่า' : 'Occupied')}
                       </span>
                     </td>
                     <td className="p-3 font-semibold text-nike-ink dark:text-white">
@@ -429,7 +431,7 @@ export const MaintenanceManagement: React.FC = () => {
                       <div className="line-clamp-2 font-medium text-slate-800 dark:text-slate-200">{task.description}</div>
                       {task.reporterName && (
                         <div className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5">
-                          ผู้แจ้ง: {task.reporterName} {task.reporterPhone ? `(${task.reporterPhone})` : ''}
+                          {language === 'th' ? 'ผู้แจ้ง: ' : 'Reporter: '}{task.reporterName} {task.reporterPhone ? `(${task.reporterPhone})` : ''}
                         </div>
                       )}
                     </td>
@@ -479,9 +481,9 @@ export const MaintenanceManagement: React.FC = () => {
                         }}
                         className="p-1 rounded-lg text-xs font-semibold bg-nike-soft-cloud dark:bg-nike-dark-surface border border-nike-hairline text-nike-ink dark:text-white focus:outline-none cursor-pointer"
                       >
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
+                        <option value="Pending">{t('status.pending')}</option>
+                        <option value="In Progress">{t('status.inProgress')}</option>
+                        <option value="Completed">{t('status.completed')}</option>
                       </select>
                     </td>
                   </tr>
@@ -579,21 +581,27 @@ export const MaintenanceManagement: React.FC = () => {
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card rounded-2xl p-6 space-y-4 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-nike-hairline dark:border-nike-dark-card">
             <div>
-              <h3 className="text-base font-bold text-nike-ink dark:text-white">ประวัติงานซ่อมและค่าใช้จ่ายรายห้อง</h3>
-              <p className="text-xs text-nike-mute dark:text-nike-stone mt-0.5">ตรวจสอบประวัติการซ่อมบำรุง อะไหล่ที่เบิกใช้ และสรุปค่าใช้จ่ายแยกรายห้อง</p>
+              <h3 className="text-base font-bold text-nike-ink dark:text-white">
+                {language === 'th' ? 'ประวัติงานซ่อมและค่าใช้จ่ายรายห้อง' : 'Per-Unit Maintenance & Expense Logs'}
+              </h3>
+              <p className="text-xs text-nike-mute dark:text-nike-stone mt-0.5">
+                {language === 'th' ? 'ตรวจสอบประวัติการซ่อมบำรุง อะไหล่ที่เบิกใช้ และสรุปค่าใช้จ่ายแยกรายห้อง' : 'Review unit repair history, spare parts dispatched, and per-unit expense breakdowns.'}
+              </p>
             </div>
 
             {/* ROOM FILTER DROPDOWN */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-nike-mute">เลือกห้องพัก:</span>
+              <span className="text-xs font-semibold text-nike-mute">
+                {language === 'th' ? 'เลือกห้องพัก:' : 'Select Unit:'}
+              </span>
               <select
                 value={selectedRoomForLogs}
                 onChange={(e) => setSelectedRoomForLogs(e.target.value)}
                 className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
               >
-                <option value="All">ทุกห้องพัก (All Units)</option>
+                <option value="All">{language === 'th' ? 'ทุกห้องพัก (All Units)' : 'All Units'}</option>
                 {rooms.map(r => (
-                  <option key={r.id} value={r.roomNumber}>ห้อง {r.roomNumber} ({r.roomType})</option>
+                  <option key={r.id} value={r.roomNumber}>{t('common.unit')} {r.roomNumber} ({r.roomType})</option>
                 ))}
               </select>
             </div>
@@ -603,14 +611,14 @@ export const MaintenanceManagement: React.FC = () => {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-nike-hairline dark:border-nike-dark-card text-nike-mute dark:text-nike-stone font-semibold">
-                  <th className="p-3">วันที่ซ่อม</th>
-                  <th className="p-3">ห้องพัก</th>
-                  <th className="p-3">รหัสงาน / หมวดหมู่</th>
-                  <th className="p-3">รายละเอียดงานที่ทำ</th>
-                  <th className="p-3">อะไหล่ที่ใช้ & ราคา</th>
-                  <th className="p-3">ช่างผู้ดูแล</th>
-                  <th className="p-3 text-right">ค่าใช้จ่ายรวม</th>
-                  <th className="p-3 text-center">การจัดการ</th>
+                  <th className="p-3">{language === 'th' ? 'วันที่ซ่อม' : 'Date'}</th>
+                  <th className="p-3">{language === 'th' ? 'ห้องพัก' : 'Unit'}</th>
+                  <th className="p-3">{language === 'th' ? 'รหัสงาน / หมวดหมู่' : 'Task / Category'}</th>
+                  <th className="p-3">{language === 'th' ? 'รายละเอียดงานที่ทำ' : 'Work Log Details'}</th>
+                  <th className="p-3">{language === 'th' ? 'อะไหล่ที่ใช้ & ราคา' : 'Parts Used & Cost'}</th>
+                  <th className="p-3">{language === 'th' ? 'ช่างผู้ดูแล' : 'Technician'}</th>
+                  <th className="p-3 text-right">{language === 'th' ? 'ค่าใช้จ่ายรวม' : 'Total Expense'}</th>
+                  <th className="p-3 text-center">{language === 'th' ? 'การจัดการ' : 'Actions'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-nike-hairline/60 dark:divide-nike-dark-card/60">
@@ -619,7 +627,7 @@ export const MaintenanceManagement: React.FC = () => {
                   .map(log => (
                   <tr key={log.id} className="hover:bg-nike-soft-cloud/50 dark:hover:bg-nike-dark-card/30">
                     <td className="p-3 text-nike-mute dark:text-nike-stone whitespace-nowrap">{log.date}</td>
-                    <td className="p-3 font-bold text-nike-ink dark:text-white whitespace-nowrap">ห้อง {log.roomNumber}</td>
+                    <td className="p-3 font-bold text-nike-ink dark:text-white whitespace-nowrap">{t('common.unit')} {log.roomNumber}</td>
                     <td className="p-3">
                       <span className="font-semibold text-nike-ink dark:text-white block">{log.category}</span>
                       <span className="text-[11px] text-nike-stone font-mono">{log.taskNo}</span>

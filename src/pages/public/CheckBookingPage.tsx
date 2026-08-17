@@ -4,17 +4,17 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { Booking, Room } from '../../types';
 import { trackBookings, getUserBookings, cancelBooking, getRooms } from '../../services/api';
-import { formatCurrency } from '../../utils/formatters';
+import { formatCurrency, getTranslatedRoomName } from '../../utils/formatters';
 import {
   Search, CalendarCheck, Clock, CheckCircle2, XCircle, Ban,
   Phone, Mail, ArrowRight, RefreshCw, AlertCircle, BedDouble,
-  CreditCard, DoorOpen, ExternalLink
+  CreditCard, DoorOpen, ExternalLink, Home, Check, X
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const CheckBookingPage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const location = useLocation();
   const [query, setQuery] = useState('');
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -120,7 +120,13 @@ export const CheckBookingPage: React.FC = () => {
       if (found) return found;
     }
     if (booking.roomNumber) {
-      return rooms.find(r => r.roomNumber === booking.roomNumber);
+      const cleanNum = booking.roomNumber.trim();
+      return rooms.find(r => 
+        r.roomNumber === cleanNum ||
+        r.roomNumber === `A${cleanNum}` ||
+        r.roomNumber === `B${cleanNum}` ||
+        r.roomNumber.replace(/^[AB]/i, '') === cleanNum.replace(/^[AB]/i, '')
+      );
     }
     return undefined;
   };
@@ -135,7 +141,7 @@ export const CheckBookingPage: React.FC = () => {
         </h1>
         <p className="text-sm text-nike-mute dark:text-nike-stone max-w-lg mx-auto leading-relaxed">
           {isAuthenticated 
-            ? 'รายการห้องพักที่คุณได้ส่งคำขอจองไว้ สามารถติดตามสถานะการอนุมัติและชำระเงินมัดจำได้ที่นี่'
+            ? (language === 'th' ? 'รายการห้องพักที่คุณได้ส่งคำขอจองไว้ สามารถติดตามสถานะการอนุมัติและชำระเงินมัดจำได้ที่นี่' : 'Your rental booking applications. Track approval status and deposit payments here.')
             : t('track.subtitle')}
         </p>
       </div>
@@ -156,7 +162,7 @@ export const CheckBookingPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white font-semibold px-8 py-3 rounded-full text-sm transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 shrink-0"
+            className="w-full sm:w-auto bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white font-semibold px-8 py-3 rounded-full text-sm transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
             {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             <span>{t('track.button')}</span>
@@ -175,19 +181,21 @@ export const CheckBookingPage: React.FC = () => {
             <DoorOpen className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-nike-ink dark:text-white">
-            {isAuthenticated ? 'คุณยังไม่มีประวัติการจองห้องพัก' : t('track.noResults')}
+            {isAuthenticated 
+              ? (language === 'th' ? 'คุณยังไม่มีประวัติการจองห้องพัก' : 'No Booking Applications Found') 
+              : t('track.noResults')}
           </h3>
           <p className="text-sm text-nike-mute dark:text-nike-stone max-w-md mx-auto">
             {isAuthenticated 
-              ? 'คุณสามารถเลือกดูห้องพักว่างที่ท่านสนใจ และกดส่งคำขอจองพร้อมระบุวันที่ต้องการเข้าพักได้ทันที'
+              ? (language === 'th' ? 'คุณสามารถเลือกดูห้องพักว่างที่ท่านสนใจ และกดส่งคำขอจองพร้อมระบุวันที่ต้องการเข้าพักได้ทันที' : 'Browse available rooms and submit a booking application with your desired move-in date.')
               : t('track.noResultsDesc')}
           </p>
           <div className="pt-2">
             <Link
               to="/rooms"
-              className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-full shadow-md transition-all active:scale-95"
+              className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-full shadow-md transition-all active:scale-95 cursor-pointer"
             >
-              ดูห้องพักทั้งหมดและเริ่มจอง
+              {language === 'th' ? 'ดูห้องพักทั้งหมดและเริ่มจอง' : 'Browse All Rooms & Book'}
             </Link>
           </div>
         </div>
@@ -217,11 +225,11 @@ export const CheckBookingPage: React.FC = () => {
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="bg-blue-600 text-white text-[11px] font-extrabold px-3 py-0.5 rounded-full">
-                          ห้อง {booking.roomNumber || matchedRoom?.roomNumber || 'TBD'}
+                          {t('common.unit')} {booking.roomNumber || matchedRoom?.roomNumber || 'TBD'}
                         </span>
                         {matchedRoom?.floor && (
                           <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">
-                            ชั้น {matchedRoom.floor}
+                            {t('common.floor')} {matchedRoom.floor}
                           </span>
                         )}
                         {matchedRoom?.roomType && (
@@ -231,7 +239,7 @@ export const CheckBookingPage: React.FC = () => {
                         )}
                       </div>
                       <h3 className="text-xl sm:text-2xl font-bold text-nike-ink dark:text-white">
-                        {matchedRoom?.roomName || `ยูนิตห้องพัก ${booking.roomNumber}`}
+                        {matchedRoom ? getTranslatedRoomName(matchedRoom.roomName, matchedRoom.roomNumber, language) : `${t('common.unit')} ${booking.roomNumber}`}
                       </h3>
                       <span className="text-xs text-nike-mute dark:text-nike-stone font-mono block">
                         Ref: {booking.bookingNo || booking.id}
@@ -248,46 +256,81 @@ export const CheckBookingPage: React.FC = () => {
                 <div className="py-2">
                   <div className="grid grid-cols-3 gap-2 text-center text-xs font-medium">
                     
-                    {/* STEP 1 */}
+                    {/* STEP 1: Application Submitted */}
                     <div className="space-y-1.5">
                       <div className="w-7 h-7 rounded-full bg-nike-ink dark:bg-white text-white dark:text-nike-ink font-bold flex items-center justify-center mx-auto text-xs">
-                        ✓
+                        <Check className="w-4 h-4" />
                       </div>
                       <span className="text-nike-ink dark:text-white font-semibold block">{t('track.step1.title')}</span>
                       <span className="text-[11px] text-nike-mute block">{t('track.step1.desc')}</span>
                     </div>
 
-                    {/* STEP 2 */}
+                    {/* STEP 2: Admin Review Status */}
                     <div className="space-y-1.5">
                       <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
-                        booking.status === 'Approved' ? 'bg-nike-ink dark:bg-white text-white dark:text-nike-ink' :
-                        booking.status === 'Pending' ? 'bg-amber-500 text-white animate-pulse' :
-                        'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
+                        booking.status === 'Approved' || booking.status === 'Completed'
+                          ? 'bg-nike-ink dark:bg-white text-white dark:text-nike-ink'
+                          : booking.status === 'Pending'
+                            ? 'bg-amber-500 text-white animate-pulse'
+                            : booking.status === 'Rejected'
+                              ? 'bg-rose-600 text-white'
+                              : 'bg-neutral-400 text-white'
                       }`}>
-                        {booking.status === 'Approved' ? '✓' : '2'}
+                        {booking.status === 'Approved' || booking.status === 'Completed' ? <Check className="w-4 h-4" /> :
+                         booking.status === 'Rejected' ? <X className="w-4 h-4" /> :
+                         booking.status === 'Cancelled' ? <X className="w-4 h-4" /> : '2'}
                       </div>
-                      <span className={`block font-semibold ${booking.status === 'Pending' ? 'text-amber-500 font-bold' : 'text-nike-ink dark:text-white'}`}>
-                        {t('track.step2.title')}
+                      <span className={`block font-semibold ${
+                        booking.status === 'Pending' ? 'text-amber-500 font-bold' :
+                        booking.status === 'Rejected' ? 'text-rose-600 font-bold' :
+                        booking.status === 'Cancelled' ? 'text-neutral-500 font-bold' :
+                        'text-nike-ink dark:text-white font-bold'
+                      }`}>
+                        {booking.status === 'Approved' || booking.status === 'Completed'
+                          ? (language === 'th' ? 'อนุมัติการจองแล้ว' : 'Booking Approved')
+                          : booking.status === 'Pending'
+                            ? (language === 'th' ? 'รอการพิจารณา' : 'Pending Approval')
+                            : booking.status === 'Rejected'
+                              ? (language === 'th' ? 'ไม่อนุมัติการจอง' : 'Application Rejected')
+                              : (language === 'th' ? 'ยกเลิกการจอง' : 'Booking Cancelled')}
                       </span>
                       <span className="text-[11px] text-nike-mute block">
-                        {booking.status === 'Pending' ? t('track.step2.descPending') : t('track.step2.descDone')}
+                        {booking.status === 'Approved' || booking.status === 'Completed'
+                          ? (language === 'th' ? 'ผู้ดูแลอนุมัติคำขอแล้ว' : 'Approved by Management')
+                          : booking.status === 'Pending'
+                            ? (language === 'th' ? 'รอผู้ดูแลระบบตรวจสอบ' : 'Awaiting Admin Verification')
+                            : booking.status === 'Rejected'
+                              ? (language === 'th' ? 'คำขอไม่ผ่านการอนุมัติ' : 'Did Not Pass Approval')
+                              : (language === 'th' ? 'รายการจองถูกยกเลิก' : 'Application Terminated')}
                       </span>
                     </div>
 
-                    {/* STEP 3 */}
+                    {/* STEP 3: Deposit & Unit Access */}
                     <div className="space-y-1.5">
                       <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
-                        booking.status === 'Approved' ? 'bg-nike-success text-white' :
-                        booking.status === 'Rejected' || booking.status === 'Cancelled' ? 'bg-nike-sale text-white' :
-                        'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
+                        booking.status === 'Approved' || booking.status === 'Completed'
+                          ? 'bg-nike-success text-white'
+                          : booking.status === 'Rejected' || booking.status === 'Cancelled'
+                            ? 'bg-neutral-300 dark:bg-neutral-800 text-neutral-400'
+                            : 'bg-neutral-300 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
                       }`}>
-                        {booking.status === 'Approved' ? '✓' : '3'}
+                        {booking.status === 'Approved' || booking.status === 'Completed' ? <Check className="w-4 h-4" /> : '3'}
                       </div>
-                      <span className={`block font-semibold ${booking.status === 'Approved' ? 'text-nike-success font-bold' : 'text-nike-mute'}`}>
-                        {t('track.step3.title')}
+                      <span className={`block font-semibold ${
+                        booking.status === 'Approved' || booking.status === 'Completed'
+                          ? 'text-nike-success font-bold'
+                          : 'text-nike-mute'
+                      }`}>
+                        {booking.status === 'Approved' || booking.status === 'Completed'
+                          ? (language === 'th' ? 'ชำระมัดจำ & เข้าพัก' : 'Deposit & Check-in')
+                          : (language === 'th' ? 'อนุมัติ & ชำระมัดจำ' : 'Approval & Deposit')}
                       </span>
                       <span className="text-[11px] text-nike-mute block">
-                        {booking.status === 'Approved' ? t('track.step3.descApproved') : t('track.step3.descPending')}
+                        {booking.status === 'Approved' || booking.status === 'Completed'
+                          ? (language === 'th' ? 'พร้อมเข้าใช้งานห้องพัก' : 'Ready for Move-in')
+                          : booking.status === 'Pending'
+                            ? (language === 'th' ? 'จะปลดล็อคหลังอนุมัติ' : 'Unlocks After Approval')
+                            : (language === 'th' ? 'สิ้นสุดกระบวนการ' : 'Process Terminated')}
                       </span>
                     </div>
 
@@ -299,7 +342,7 @@ export const CheckBookingPage: React.FC = () => {
                   <div>
                     <span className="text-nike-mute dark:text-nike-stone text-xs font-medium block">{t('track.field.unit')}</span>
                     <span className="font-bold text-sm text-nike-ink dark:text-white">
-                      ห้อง {booking.roomNumber || matchedRoom?.roomNumber || 'TBD'}
+                      {t('common.unit')} {booking.roomNumber || matchedRoom?.roomNumber || 'TBD'}
                     </span>
                   </div>
                   <div>
@@ -330,33 +373,56 @@ export const CheckBookingPage: React.FC = () => {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    {/* DIRECT PAYMENT / SLIP UPLOAD BUTTON */}
-                    <Link
-                      to={`/payment/${booking.id}`}
-                      className="px-4 py-2 rounded-full text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5"
-                    >
-                      <CreditCard className="w-3.5 h-3.5" /> ชำระเงินมัดจำ / แนบสลิป
-                    </Link>
-
-                    {/* VIEW ROOM DETAILS */}
-                    {(booking.roomId || matchedRoom?.id) && (
-                      <Link
-                        to={`/rooms/${booking.roomId || matchedRoom?.id}`}
-                        className="px-4 py-2 rounded-full text-xs font-semibold bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5"
-                      >
-                        <DoorOpen className="w-3.5 h-3.5" /> {t('track.viewRoomBtn')}
-                      </Link>
+                    {/* APPROVED / COMPLETED: Show Deposit Payment and My Unit buttons */}
+                    {(booking.status === 'Approved' || booking.status === 'Completed') && (
+                      <>
+                        <Link
+                          to={`/payment/${booking.id}`}
+                          className="px-4 py-2 rounded-full text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          {language === 'th' ? 'ชำระเงินมัดจำ / แนบสลิป' : 'Pay Deposit / Attach Slip'}
+                        </Link>
+                        <Link
+                          to="/my-apartment"
+                          className="px-4 py-2 rounded-full text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Home className="w-3.5 h-3.5" />
+                          {t('nav.myApartment')}
+                        </Link>
+                      </>
                     )}
 
-                    {/* CANCEL BUTTON */}
+                    {/* PENDING: Show Cancel Application button */}
                     {booking.status === 'Pending' && (
                       <button
                         onClick={() => handleCancel(booking.id)}
                         disabled={cancellingId === booking.id}
-                        className="px-4 py-2 rounded-full text-xs font-semibold text-nike-sale hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition-all active:scale-95"
+                        className="px-4 py-2 rounded-full text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                       >
-                        {cancellingId === booking.id ? t('track.cancelling') : t('track.cancelBtn')}
+                        {cancellingId === booking.id ? t('track.cancelling') : (language === 'th' ? 'ยกเลิกคำขอจอง' : 'Cancel Application')}
                       </button>
+                    )}
+
+                    {/* REJECTED / CANCELLED: Show Browse Other Rooms button */}
+                    {(booking.status === 'Rejected' || booking.status === 'Cancelled') && (
+                      <Link
+                        to="/rooms"
+                        className="px-4 py-2 rounded-full text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Search className="w-3.5 h-3.5" />
+                        {language === 'th' ? 'เลือกดูห้องพักอื่น' : 'Browse Other Rooms'}
+                      </Link>
+                    )}
+
+                    {/* VIEW ROOM DETAILS (AVAILABLE FOR ALL) */}
+                    {(booking.roomId || matchedRoom?.id) && (
+                      <Link
+                        to={`/rooms/${booking.roomId || matchedRoom?.id}`}
+                        className="px-4 py-2 rounded-full text-xs font-semibold bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <DoorOpen className="w-3.5 h-3.5" /> {t('track.viewRoomBtn')}
+                      </Link>
                     )}
                   </div>
                 </div>

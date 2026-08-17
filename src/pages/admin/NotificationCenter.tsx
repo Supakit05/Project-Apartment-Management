@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Bell, CheckCheck, FileText, Wrench, Clock, CheckCircle2 } from 'lucide-react';
 import { AppNotification } from '../../types';
 import { getNotifications, markNotificationsRead } from '../../services/api';
+import { useLanguage } from '../../context/LanguageContext';
 
 const removeEmojis = (text: string): string => {
   if (!text) return '';
@@ -12,6 +13,7 @@ const removeEmojis = (text: string): string => {
 };
 
 export const NotificationCenter: React.FC = () => {
+  const { t } = useLanguage();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   const fetchNotifs = async () => {
@@ -72,10 +74,10 @@ export const NotificationCenter: React.FC = () => {
         <div>
           <h1 className="text-[28px] font-bold text-nike-ink dark:text-white flex items-center gap-2.5">
             <Bell className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-            System Notifications ({unreadCount} Unread)
+            {t('notif.title')} ({unreadCount} {t('notif.unread')})
           </h1>
           <p className="text-[14px] text-nike-mute dark:text-nike-stone mt-0.5">
-            Live alerts for new rental applications, maintenance work orders, and scheduled reminders
+            {t('notif.sub')}
           </p>
         </div>
 
@@ -84,7 +86,7 @@ export const NotificationCenter: React.FC = () => {
             onClick={handleMarkAllRead}
             className="bg-blue-600 text-white text-[13px] font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-1.5 shadow-xs"
           >
-            <CheckCheck className="w-4 h-4" /> Mark All as Read
+            <CheckCheck className="w-4 h-4" /> {t('notif.markAllRead')}
           </button>
         )}
       </div>
@@ -94,8 +96,8 @@ export const NotificationCenter: React.FC = () => {
         {notifications.length === 0 ? (
           <div className="text-center py-12 space-y-2">
             <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto opacity-70" />
-            <p className="text-[14px] font-semibold text-nike-ink dark:text-white">All caught up!</p>
-            <p className="text-xs text-nike-mute">No system notifications at this time.</p>
+            <p className="text-[14px] font-semibold text-nike-ink dark:text-white">{t('notif.emptyTitle')}</p>
+            <p className="text-xs text-nike-mute">{t('notif.emptyDesc')}</p>
           </div>
         ) : (
           notifications.map(n => {

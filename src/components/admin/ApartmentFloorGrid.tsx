@@ -3,6 +3,7 @@ import { Room, MaintenanceLog } from '../../types';
 import { formatCurrency, formatSuppliesSummary } from '../../utils/formatters';
 import { UserCheck, Wrench, Home, X } from 'lucide-react';
 import { getMaintenanceLogs } from '../../services/api';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ApartmentFloorGridProps {
   rooms: Room[];
@@ -11,12 +12,27 @@ interface ApartmentFloorGridProps {
 }
 
 export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, onSelectRoom }) => {
+  const { t, language } = useLanguage();
+  const [selectedBuilding, setSelectedBuilding] = useState<'all' | 'bld-1' | 'bld-2'>('all');
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [roomLogs, setRoomLogs] = useState<MaintenanceLog[]>([]);
   const [activeTab, setActiveTab] = useState<'info' | 'logs'>('info');
 
-  const floor1Rooms = rooms.filter(r => r.floor === 1 || (r.roomNumber || '').startsWith('1')).sort((a, b) => (a.roomNumber || '').localeCompare(b.roomNumber || ''));
-  const floor2Rooms = rooms.filter(r => r.floor === 2 || (r.roomNumber || '').startsWith('2')).sort((a, b) => (a.roomNumber || '').localeCompare(b.roomNumber || ''));
+  // --- EASY TO EDIT BUILDING & FLOOR LOGIC ---
+  // 1. Group by Building
+  const buildingARooms = rooms.filter(r => r.buildingId === 'bld-1' || r.roomNumber.startsWith('A') || !r.roomNumber.startsWith('B'));
+  const buildingBRooms = rooms.filter(r => r.buildingId === 'bld-2' || r.roomNumber.startsWith('B'));
+
+  // 2. Select active rooms list based on selected building tab
+  const displayRooms = selectedBuilding === 'bld-1' 
+    ? buildingARooms 
+    : selectedBuilding === 'bld-2' 
+      ? buildingBRooms 
+      : rooms;
+
+  // 3. Separate active rooms into Floor 1 & Floor 2
+  const floor1Rooms = displayRooms.filter(r => r.floor === 1).sort((a, b) => (a.roomNumber || '').localeCompare(b.roomNumber || ''));
+  const floor2Rooms = displayRooms.filter(r => r.floor === 2).sort((a, b) => (a.roomNumber || '').localeCompare(b.roomNumber || ''));
 
   const handleRoomClick = async (room: Room) => {
     setSelectedRoom(room);
@@ -36,25 +52,25 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
         return {
           bg: 'bg-emerald-500/15 text-emerald-600 dark:text-white border-emerald-500/40 font-semibold',
           dot: 'bg-emerald-500',
-          text: 'Available'
+          text: t('common.available')
         };
       case 'Occupied':
         return {
           bg: 'bg-blue-500/15 text-blue-600 dark:text-white border-blue-500/40 font-semibold',
           dot: 'bg-blue-500',
-          text: 'Occupied'
+          text: t('common.occupied')
         };
       case 'Reserved':
         return {
           bg: 'bg-amber-500/15 text-amber-600 dark:text-white border-amber-500/40 font-semibold',
           dot: 'bg-amber-500',
-          text: 'Reserved'
+          text: t('common.reserved')
         };
       case 'Maintenance':
         return {
           bg: 'bg-rose-500/15 text-rose-600 dark:text-white border-rose-500/40 font-semibold',
           dot: 'bg-rose-500',
-          text: 'Maintenance'
+          text: t('common.maintenance')
         };
       default:
         return {
@@ -67,23 +83,23 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
 
   const renderFloorGrid = (floorTitle: string, floorRooms: Room[]) => (
     <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-nike-hairline dark:border-nike-dark-card pb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-nike-hairline dark:border-nike-dark-card pb-2 gap-2">
         <h3 className="text-lg font-semibold text-nike-ink dark:text-white flex items-center gap-2">
           <Home className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          {floorTitle} ({floorRooms.length} units)
+          {floorTitle} ({floorRooms.length} {t('common.unit')})
         </h3>
         <div className="flex flex-wrap gap-2 text-xs">
           <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-slate-800 dark:text-white font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Available
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> {t('common.available')}
           </span>
           <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 text-slate-800 dark:text-white font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span> Occupied
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span> {t('common.occupied')}
           </span>
           <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 text-slate-800 dark:text-white font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Reserved
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> {t('common.reserved')}
           </span>
           <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/30 text-slate-800 dark:text-white font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Maintenance
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> {t('common.maintenance')}
           </span>
         </div>
       </div>
@@ -91,6 +107,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
         {floorRooms.map((room) => {
           const badge = getStatusBadge(room.status);
+          const isBld2 = room.buildingId === 'bld-2' || room.roomNumber.startsWith('B');
           return (
             <button
               key={room.id}
@@ -99,7 +116,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
             >
               <div className="flex items-center justify-between w-full mb-2">
                 <span className="text-xl font-bold tracking-tight text-nike-ink dark:text-white">
-                  Unit {room.roomNumber}
+                  {t('common.unit')} {room.roomNumber}
                 </span>
                 <span className={`px-2 py-0.5 text-[11px] font-medium rounded-full border flex items-center gap-1.5 ${badge.bg}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`}></span>
@@ -108,8 +125,15 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
               </div>
 
               <div className="space-y-1">
-                <div className="text-xs font-medium text-slate-500 dark:text-slate-300 truncate">
-                  {room.roomType}
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-300 truncate">
+                    {room.roomType}
+                  </span>
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                    isBld2 ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                  }`}>
+                    {isBld2 ? (language === 'th' ? 'ตึก B' : 'Bldg B') : (language === 'th' ? 'ตึก A' : 'Bldg A')}
+                  </span>
                 </div>
 
                 {room.currentTenantName ? (
@@ -119,7 +143,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
                   </div>
                 ) : (
                   <div className="text-xs text-slate-400 dark:text-slate-400 italic">
-                    (No Tenant)
+                    ({language === 'th' ? 'ไม่มีผู้เช่า' : 'No Tenant'})
                   </div>
                 )}
               </div>
@@ -128,7 +152,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
                 <span className="font-semibold text-nike-ink dark:text-white">
                   {formatCurrency(room.price)}
                 </span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400">/month</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">/{t('common.month')}</span>
               </div>
             </button>
           );
@@ -138,12 +162,61 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+
+      {/* --- BUILDING SELECTOR TABS --- */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-100 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-700 dark:text-slate-200 px-2">
+            {language === 'th' ? 'เลือกอาคาร:' : 'Select Building:'}
+          </span>
+          <button
+            onClick={() => setSelectedBuilding('all')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+              selectedBuilding === 'all'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            {language === 'th' ? `ทุกอาคาร (${rooms.length} ห้อง)` : `All Buildings (${rooms.length} Units)`}
+          </button>
+          <button
+            onClick={() => setSelectedBuilding('bld-1')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+              selectedBuilding === 'bld-1'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-bold shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            {language === 'th' ? `อาคาร A (${buildingARooms.length} ห้อง)` : `Building A (${buildingARooms.length} Units)`}
+          </button>
+          <button
+            onClick={() => setSelectedBuilding('bld-2')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+              selectedBuilding === 'bld-2'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-bold shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            {language === 'th' ? `อาคาร B (${buildingBRooms.length} ห้อง)` : `Building B (${buildingBRooms.length} Units)`}
+          </button>
+        </div>
+
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 px-2">
+          {language === 'th' ? 'กำลังแสดง: ' : 'Showing: '}
+          {selectedBuilding === 'bld-1'
+            ? (language === 'th' ? 'อาคาร A' : 'Building A')
+            : selectedBuilding === 'bld-2'
+              ? (language === 'th' ? 'อาคาร B' : 'Building B')
+              : (language === 'th' ? 'ทุกอาคาร' : 'All Buildings')}
+        </span>
+      </div>
+
       {/* Floor 1 Grid */}
-      {renderFloorGrid('Floor 1 (Units 101 - 112)', floor1Rooms)}
+      {renderFloorGrid('Floor 1', floor1Rooms)}
 
       {/* Floor 2 Grid */}
-      {renderFloorGrid('Floor 2 (Units 201 - 212)', floor2Rooms)}
+      {renderFloorGrid('Floor 2', floor2Rooms)}
 
       {/* Quick Room Details Modal */}
       {selectedRoom && (
@@ -152,10 +225,10 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
             <div className="flex items-center justify-between border-b border-nike-hairline dark:border-nike-dark-card pb-4">
               <div>
                 <span className="text-xs font-semibold tracking-wider text-nike-mute dark:text-nike-stone uppercase">
-                  Unit Details
+                  {t('common.unit')} Details
                 </span>
                 <h3 className="text-2xl font-bold text-nike-ink dark:text-white flex items-center gap-2">
-                  Unit {selectedRoom.roomNumber} ({selectedRoom.roomName})
+                  {t('common.unit')} {selectedRoom.roomNumber} ({selectedRoom.roomName})
                 </h3>
               </div>
               <button

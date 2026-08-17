@@ -8,7 +8,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const UtilityReceiptManagement: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [bills, setBills] = useState<UtilityBill[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [leases, setLeases] = useState<Lease[]>([]);
@@ -123,10 +123,10 @@ export const UtilityReceiptManagement: React.FC = () => {
         <div>
           <h1 className="text-[28px] font-bold text-nike-ink dark:text-white flex items-center gap-2.5">
             <FileText className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-            ระบบออกบิลค่าน้ำไฟ & ใบเสร็จ (Utility Bills Management)
+            {t('util.title')}
           </h1>
           <p className="text-[14px] text-nike-mute dark:text-nike-stone mt-0.5">
-            บันทึกมิเตอร์น้ำไฟ คำนวณยอดชำระประจำเดือน กรองดูตามงวดเดือน และพิมพ์ใบเสร็จ
+            {t('util.sub')}
           </p>
         </div>
 
@@ -134,28 +134,28 @@ export const UtilityReceiptManagement: React.FC = () => {
           onClick={handleOpenNewBillModal}
           className="px-4 py-2.5 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center gap-2 shadow-sm"
         >
-          <Plus className="w-4 h-4" /> + ออกบิล/ใบเสร็จใหม่
+          <Plus className="w-4 h-4" /> {t('util.newBill')}
         </button>
       </div>
 
       {/* METRICS SUMMARY */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">ชำระแล้ว (Paid Receipts)</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">{t('util.paid')}</span>
           <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 block mt-1">
-            {bills.filter(b => b.status === 'Paid').length} บิล
+            {bills.filter(b => b.status === 'Paid').length} {language === 'th' ? 'บิล' : 'bills'}
           </span>
         </div>
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">ค้างชำระ (Pending Payments)</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">{t('util.pending')}</span>
           <span className="text-3xl font-bold text-amber-600 dark:text-amber-400 block mt-1">
-            {bills.filter(b => b.status === 'Pending').length} บิล
+            {bills.filter(b => b.status === 'Pending').length} {language === 'th' ? 'บิล' : 'bills'}
           </span>
         </div>
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl">
-          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">อัตราค่าน้ำค่าน้ำไฟมาตรฐาน</span>
+          <span className="text-xs text-nike-mute dark:text-nike-stone font-medium">{language === 'th' ? 'อัตราค่าน้ำไฟมาตรฐาน' : 'Standard Utility Rates'}</span>
           <span className="text-sm font-bold text-nike-ink dark:text-white block mt-1">
-            ค่าน้ำ: 18 บาท/หน่วย | ค่าไฟ: 7 บาท/หน่วย
+            {t('util.rates')}
           </span>
         </div>
       </div>
@@ -165,7 +165,7 @@ export const UtilityReceiptManagement: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h3 className="text-lg font-bold text-nike-ink dark:text-white flex items-center gap-2">
             <FileText className="w-5 h-5 text-emerald-600" />
-            รายการบิลและใบเสร็จ
+            {language === 'th' ? 'รายการบิลและใบเสร็จ' : 'Bills & Receipts Directory'}
           </h3>
 
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
@@ -175,10 +175,10 @@ export const UtilityReceiptManagement: React.FC = () => {
               onChange={(e) => setMonthFilter(e.target.value)}
               className="px-3 py-1.5 text-xs rounded-xl bg-nike-soft-cloud dark:bg-nike-dark-surface border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white font-semibold cursor-pointer focus:outline-none"
             >
-              <option value="All">ทุกงวดเดือน (All Months)</option>
-              <option value="August 2026">สิงหาคม 2026 (August 2026)</option>
-              <option value="July 2026">กรกฎาคม 2026 (July 2026)</option>
-              <option value="June 2026">มิถุนายน 2026 (June 2026)</option>
+              <option value="All">{language === 'th' ? 'ทุกงวดเดือน (All Months)' : 'All Months'}</option>
+              <option value="August 2026">{language === 'th' ? 'สิงหาคม 2026' : 'August 2026'}</option>
+              <option value="July 2026">{language === 'th' ? 'กรกฎาคม 2026' : 'July 2026'}</option>
+              <option value="June 2026">{language === 'th' ? 'มิถุนายน 2026' : 'June 2026'}</option>
               {availableMonths.map(m => (
                 <option key={m} value={m}>{m}</option>
               ))}
@@ -189,19 +189,19 @@ export const UtilityReceiptManagement: React.FC = () => {
                 onClick={() => setStatusFilter('All')}
                 className={`px-3 py-1 rounded-lg font-medium transition-all ${statusFilter === 'All' ? 'bg-nike-canvas dark:bg-nike-dark-elevated text-nike-ink dark:text-white shadow-xs' : 'text-nike-mute'}`}
               >
-                ทั้งหมด
+                {t('common.all')}
               </button>
               <button
                 onClick={() => setStatusFilter('Pending')}
                 className={`px-3 py-1 rounded-lg font-medium transition-all ${statusFilter === 'Pending' ? 'bg-nike-canvas dark:bg-nike-dark-elevated text-amber-600 dark:text-amber-400 shadow-xs' : 'text-nike-mute'}`}
               >
-                ค้างชำระ
+                {t('status.unpaid')}
               </button>
               <button
                 onClick={() => setStatusFilter('Paid')}
                 className={`px-3 py-1 rounded-lg font-medium transition-all ${statusFilter === 'Paid' ? 'bg-nike-canvas dark:bg-nike-dark-elevated text-emerald-600 dark:text-emerald-400 shadow-xs' : 'text-nike-mute'}`}
               >
-                ชำระแล้ว
+                {t('status.paid')}
               </button>
             </div>
 
@@ -209,7 +209,7 @@ export const UtilityReceiptManagement: React.FC = () => {
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-nike-mute" />
               <input
                 type="text"
-                placeholder="ค้นหาเลขห้อง/บิล..."
+                placeholder={language === 'th' ? 'ค้นหาเลขห้อง/บิล...' : 'Search unit or bill no...'}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-nike-soft-cloud dark:bg-nike-dark-surface border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white focus:outline-none"
@@ -238,7 +238,7 @@ export const UtilityReceiptManagement: React.FC = () => {
                 return (
                   <tr key={bill.id} className="hover:bg-nike-soft-cloud/50 dark:hover:bg-nike-dark-card/30">
                     <td className="p-3">
-                      <span className="font-bold text-nike-ink dark:text-white text-sm block">Unit {bill.roomNumber}</span>
+                      <span className="font-bold text-nike-ink dark:text-white text-sm block">{t('common.unit')} {bill.roomNumber}</span>
                       <span className="text-[11px] text-nike-stone">{bill.invoiceNo}</span>
                     </td>
                     <td className="p-3 text-nike-mute dark:text-nike-stone">
@@ -264,7 +264,7 @@ export const UtilityReceiptManagement: React.FC = () => {
                             : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
                         }`}
                       >
-                        {bill.status}
+                        {bill.status === 'Paid' ? t('status.paid') : t('status.unpaid')}
                       </button>
                     </td>
                     <td className="p-3 text-right">

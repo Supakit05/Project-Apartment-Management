@@ -13,6 +13,7 @@ export const Home: React.FC = () => {
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
+  const [buildingFilter, setBuildingFilter] = useState('all');
   const [floorFilter, setFloorFilter] = useState('all');
   const [roomTypeFilter, setRoomTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('Available'); // default to Available for guests
@@ -34,6 +35,7 @@ export const Home: React.FC = () => {
 
   const handleReset = () => {
     setSearchQuery('');
+    setBuildingFilter('all');
     setFloorFilter('all');
     setRoomTypeFilter('all');
     setStatusFilter('all');
@@ -49,6 +51,12 @@ export const Home: React.FC = () => {
       if (!matchNum && !matchName && !matchType) return false;
     }
 
+    if (buildingFilter !== 'all') {
+      const isBld2 = room.buildingId === 'bld-2' || room.roomNumber.startsWith('B');
+      if (buildingFilter === 'bld-2' && !isBld2) return false;
+      if (buildingFilter === 'bld-1' && isBld2) return false;
+    }
+
     if (floorFilter !== 'all' && room.floor.toString() !== floorFilter) return false;
     if (roomTypeFilter !== 'all' && room.roomType !== roomTypeFilter) return false;
     if (statusFilter !== 'all' && room.status !== statusFilter) return false;
@@ -61,7 +69,7 @@ export const Home: React.FC = () => {
   });
 
   const availableCount = rooms.filter(r => r.status === 'Available').length;
-  const isFiltered = searchQuery || floorFilter !== 'all' || roomTypeFilter !== 'all' || statusFilter !== 'all' || priceFilter !== 'all';
+  const isFiltered = searchQuery || buildingFilter !== 'all' || floorFilter !== 'all' || roomTypeFilter !== 'all' || statusFilter !== 'all' || priceFilter !== 'all';
 
   return (
     <div className="pb-24 space-y-12 sm:space-y-16">
@@ -137,10 +145,10 @@ export const Home: React.FC = () => {
           </div>
 
           {/* FILTER INPUTS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
             
             {/* Search Pill Input */}
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
               <label className="text-[11px] font-bold text-nike-ink dark:text-white block">{t('filter.title')}</label>
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3.5 top-3 text-nike-mute dark:text-nike-stone" />
@@ -152,6 +160,20 @@ export const Home: React.FC = () => {
                   className="w-full pl-10 pr-4 py-2.5 text-xs font-semibold bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card rounded-full text-nike-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
                 />
               </div>
+            </div>
+
+            {/* Building Filter */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-nike-ink dark:text-white block">{t('filter.building')}</label>
+              <select
+                value={buildingFilter}
+                onChange={(e) => setBuildingFilter(e.target.value)}
+                className="w-full px-4 py-2.5 text-xs font-bold bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-blue-600 dark:text-blue-400 rounded-full focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all cursor-pointer"
+              >
+                <option value="all">{t('filter.allBuildings')}</option>
+                <option value="bld-1">{t('filter.buildingA')}</option>
+                <option value="bld-2">{t('filter.buildingB')}</option>
+              </select>
             </div>
 
             {/* Floor Filter */}

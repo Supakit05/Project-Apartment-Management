@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Sun, Moon, Shield, Menu, X, Building2, LogOut, User, LogIn,
-  CalendarCheck, ChevronDown, Settings, AlertTriangle, Globe, Wrench
+  CalendarCheck, ChevronDown, Settings, AlertTriangle, Globe, Wrench, Home
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -25,6 +25,7 @@ export const Navbar: React.FC = () => {
     { name: t('nav.home'), path: '/' },
     { name: t('nav.units'), path: '/rooms' },
     { name: t('nav.checkBooking'), path: '/check-booking' },
+    ...(isAuthenticated ? [{ name: t('nav.myApartment'), path: '/my-apartment' }] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -172,6 +173,15 @@ export const Navbar: React.FC = () => {
                       >
                         <CalendarCheck className="w-3.5 h-3.5 text-nike-mute shrink-0" />
                         <span className="truncate">{t('nav.myBookings')}</span>
+                      </Link>
+
+                      <Link
+                        to="/my-apartment"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 hover:bg-nike-soft-cloud dark:hover:bg-neutral-800 transition-colors rounded-lg mx-1"
+                      >
+                        <Home className="w-3.5 h-3.5 text-nike-mute shrink-0" />
+                        <span className="truncate">{t('nav.myApartment')}</span>
                       </Link>
 
                       <Link

@@ -1,13 +1,19 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Room } from '../../types';
-import { formatCurrency } from '../../utils/formatters';
+import {
+  formatCurrency,
+  getTranslatedRoomType,
+  getTranslatedBedType,
+  getTranslatedRoomName,
+  getTranslatedRoomDescription
+} from '../../utils/formatters';
 import { useLanguage } from '../../context/LanguageContext';
 import { BedDouble, Maximize2, ArrowUpRight } from 'lucide-react';
 
 export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const isAvailable = room.status === 'Available';
 
   const getStatusText = (status: string) => {
@@ -18,6 +24,11 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
       default: return status;
     }
   };
+
+  const displayRoomName = getTranslatedRoomName(room.roomName, room.roomNumber, language);
+  const displayRoomType = getTranslatedRoomType(room.roomType, language);
+  const displayBedType = getTranslatedBedType(room.bedType, language);
+  const displayDescription = getTranslatedRoomDescription(room.description, room.floor, language);
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Only navigate if user didn't click directly on an anchor/button element
@@ -65,19 +76,26 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
       {/* CARD CONTENT */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div>
-          {/* CATEGORY & NAME */}
+          {/* CATEGORY & BUILDING BADGE */}
           <div className="flex items-center justify-between gap-2 mb-1">
             <span className="text-[11px] font-semibold text-nike-mute dark:text-nike-stone">
-              {room.roomType}
+              {displayRoomType}
+            </span>
+            <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+              room.buildingId === 'bld-2' || room.roomNumber.startsWith('B')
+                ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+            }`}>
+              {room.buildingId === 'bld-2' || room.roomNumber.startsWith('B') ? 'อาคารเสริม B' : 'อาคาร A'}
             </span>
           </div>
 
           <h3 className="font-bold text-lg text-nike-ink dark:text-white line-clamp-1 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors">
-            {room.roomName}
+            {displayRoomName}
           </h3>
 
           <p className="text-xs font-normal text-nike-mute dark:text-nike-stone line-clamp-2 mt-1.5 leading-relaxed">
-            {room.description}
+            {displayDescription}
           </p>
 
           {/* KEY METRICS */}
@@ -86,7 +104,7 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
               <Maximize2 className="w-3.5 h-3.5 text-nike-ink dark:text-white" /> {room.sizeSqm} {t('room.sqm')}
             </span>
             <span className="flex items-center gap-1.5">
-              <BedDouble className="w-3.5 h-3.5 text-nike-ink dark:text-white" /> {room.bedType}
+              <BedDouble className="w-3.5 h-3.5 text-nike-ink dark:text-white" /> {displayBedType}
             </span>
           </div>
         </div>

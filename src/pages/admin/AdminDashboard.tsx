@@ -142,7 +142,7 @@ export const AdminDashboard: React.FC = () => {
             <span className="text-xs text-nike-stone font-medium">units ready</span>
           </div>
           <span className="text-[12px] text-emerald-600 font-medium block">
-            {Math.round((availableCount / (totalUnits || 1)) * 100)}% Available
+            {Math.round((availableCount / (totalUnits || 1)) * 100)}% {t('common.available')}
           </span>
         </div>
 
@@ -156,7 +156,7 @@ export const AdminDashboard: React.FC = () => {
             <span className="text-xs text-nike-stone font-medium">active tenants</span>
           </div>
           <span className="text-[12px] text-blue-600 dark:text-blue-400 font-medium block">
-            {occupancyRate}% Occupied
+            {occupancyRate}% {t('common.occupied')}
           </span>
         </div>
 
@@ -194,7 +194,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="flex items-center justify-between border-b border-nike-hairline dark:border-nike-dark-card pb-3">
           <div>
             <h2 className="text-xl font-bold text-nike-ink dark:text-white">
-              24-Unit Floor Grid (12 rooms × 2 floors)
+              Apartment Floor Grid (Building & Floor Interactive Plan)
             </h2>
             <p className="text-xs text-nike-mute dark:text-nike-stone">
               Click on a unit to view tenant info, meter readings, and maintenance history

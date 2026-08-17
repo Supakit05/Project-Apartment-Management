@@ -23,6 +23,7 @@ import { PaymentPage } from './pages/public/PaymentPage';
 import { CheckBookingPage } from './pages/public/CheckBookingPage';
 import { ProfilePage } from './pages/public/ProfilePage';
 import { ResidentMaintenancePage } from './pages/public/ResidentMaintenancePage';
+import { MyApartmentPage } from './pages/public/MyApartmentPage';
 
 
 
@@ -52,9 +53,9 @@ const ProtectedAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children
 // Admin Layout Wrapper
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-nike-dark-surface text-slate-900 dark:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-nike-dark-surface text-slate-900 dark:text-white relative">
       <AdminSidebar />
-      <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-y-auto w-full max-w-full">
+      <main className="md:ml-64 p-4 sm:p-6 md:p-10 min-h-screen">
         {children}
       </main>
     </div>
@@ -104,6 +105,7 @@ export const AppContent: React.FC = () => {
         <Route path="/check-booking" element={<PublicLayout><CheckBookingPage /></PublicLayout>} />
         <Route path="/track-booking" element={<PublicLayout><CheckBookingPage /></PublicLayout>} />
         <Route path="/my-bookings" element={<PublicLayout><CheckBookingPage /></PublicLayout>} />
+        <Route path="/my-apartment" element={<PublicLayout><MyApartmentPage /></PublicLayout>} />
         <Route path="/my-maintenance" element={<PublicLayout><ResidentMaintenancePage /></PublicLayout>} />
         <Route path="/resident/maintenance" element={<PublicLayout><ResidentMaintenancePage /></PublicLayout>} />
         <Route path="/profile" element={<PublicLayout><ProfilePage /></PublicLayout>} />

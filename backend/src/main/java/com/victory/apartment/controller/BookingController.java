@@ -81,7 +81,7 @@ public class BookingController {
                 if (overlaps) {
                     throw new org.springframework.web.server.ResponseStatusException(
                         org.springframework.http.HttpStatus.CONFLICT,
-                        "ห้องพักยูนิตนี้มีคำขอจองอยู่ระหว่างรออนุมัติหรือได้รับการอนุมัติแล้วในช่วงวันดังกล่าว กรุณาเลือกห้องอื่น หรือรอให้ผู้ดูแลยกเลิกรายการเดิมก่อน"
+                        "ห้องพักนี้มีคำขอจองอยู่ระหว่างรออนุมัติหรือได้รับการอนุมัติแล้วในช่วงวันดังกล่าว กรุณาเลือกห้องอื่น หรือรอให้ผู้ดูแลยกเลิกรายการเดิมก่อน"
                     );
                 }
 

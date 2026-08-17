@@ -175,58 +175,61 @@ export const AdminSidebar: React.FC = () => {
       )}
 
       {/* DESKTOP SIDEBAR */}
-      <aside className="hidden md:flex w-64 bg-nike-ink text-white shrink-0 flex-col min-h-screen border-r border-neutral-800 sticky top-0 h-screen overflow-y-auto">
-        <div className="p-6 space-y-5">
+      <aside className="hidden md:flex w-64 bg-nike-ink text-white flex-col fixed left-0 top-0 bottom-0 h-screen border-r border-neutral-800 z-30 overflow-y-auto">
+        <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
           
-          {/* HEADER LOGO */}
-          <div className="pb-4 border-b border-neutral-800 flex items-center gap-3">
-            <div className="w-9 h-9 bg-white text-nike-ink font-black text-sm flex items-center justify-center rounded-xl shadow-xs tracking-tighter">
-              AS
+          {/* TOP NAV CONTENT */}
+          <div className="space-y-5">
+            {/* HEADER LOGO */}
+            <div className="pb-4 border-b border-neutral-800 flex items-center gap-3">
+              <div className="w-9 h-9 bg-white text-nike-ink font-black text-sm flex items-center justify-center rounded-xl shadow-xs tracking-tighter">
+                AS
+              </div>
+              <div>
+                <h2 className="text-[14px] font-extrabold text-white uppercase tracking-tight leading-tight">
+                  Apartment System
+                </h2>
+                <span className="text-[10px] text-nike-stone uppercase tracking-wider font-semibold leading-none">
+                  Admin Control
+                </span>
+              </div>
             </div>
-            <div>
-              <h2 className="text-[14px] font-extrabold text-white uppercase tracking-tight leading-tight">
-                Apartment System
-              </h2>
-              <span className="text-[10px] text-nike-stone uppercase tracking-wider font-semibold leading-none">
-                Admin Control
-              </span>
-            </div>
+
+            {/* NAV ITEMS */}
+            <nav className="space-y-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center justify-between px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all ${
+                      active
+                        ? 'bg-white text-nike-ink shadow-sm'
+                        : 'text-neutral-400 hover:text-white hover:bg-neutral-800/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-4 h-4" />
+                      <span>{item.name}</span>
+                    </div>
+
+                    {Boolean(item.badge && item.badge > 0) && (
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        active ? 'bg-nike-ink text-white' : 'bg-nike-sale text-white'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
 
-          {/* NAV ITEMS */}
-          <nav className="space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center justify-between px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all ${
-                    active
-                      ? 'bg-white text-nike-ink shadow-sm'
-                      : 'text-neutral-400 hover:text-white hover:bg-neutral-800/60'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </div>
-
-                  {Boolean(item.badge && item.badge > 0) && (
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      active ? 'bg-nike-ink text-white' : 'bg-nike-sale text-white'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* UTILITY CONTROLS (PLACED DIRECTLY UNDER NAVIGATION) */}
-          <div className="pt-4 border-t border-neutral-800 space-y-2.5">
+          {/* UTILITY CONTROLS (PINNED TO BOTTOM) */}
+          <div className="pt-4 border-t border-neutral-800 space-y-2.5 mt-auto">
             <button
               onClick={toggleLanguage}
               className="flex items-center justify-between w-full bg-neutral-800/80 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full transition-colors active:scale-95"

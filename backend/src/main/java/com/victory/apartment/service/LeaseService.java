@@ -75,7 +75,7 @@ public class LeaseService {
             Lease conflicting = (Lease) conflict.get("conflictingLease");
             result.put("success", false);
             result.put("message", String.format(
-                "ยูนิต %s มีการจองแล้วกับผู้เช่า \"%s\" (%s ถึง %s)",
+                "ห้อง %s มีการจองแล้วกับผู้เช่า \"%s\" (%s ถึง %s)",
                 leaseData.getRoomNumber(), conflicting.getTenantName(),
                 conflicting.getCheckInDate(), conflicting.getCheckOutDate()
             ));

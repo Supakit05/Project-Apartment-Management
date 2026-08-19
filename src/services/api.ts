@@ -108,8 +108,11 @@ export const saveBuilding = async (buildingData: Partial<Building>): Promise<Bui
 
 export const deleteBuilding = async (id: string): Promise<void> => {
   try {
-    await fetch(`${API_BASE}/buildings/${id}`, { method: 'DELETE' });
-  } catch {
+    const res = await fetch(`${API_BASE}/buildings/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete building on server');
+  } catch (err) {
+    console.warn('Backend delete failed, removing locally:', err);
+  } finally {
     const list = getStored<Building[]>('apartment_buildings', MOCK_BUILDINGS);
     const filtered = list.filter(b => b.id !== id);
     setStored('apartment_buildings', filtered);
@@ -406,6 +409,27 @@ export const addNotification = async (notif: Partial<AppNotification>): Promise<
 
 export const markNotificationsRead = async (): Promise<void> => {
   await fetch(`${API_BASE}/notifications/mark-read`, { method: 'PUT' });
+};
+
+export const markNotificationAsRead = async (id: string): Promise<AppNotification | void> => {
+  try {
+    return await fetchJson<AppNotification>(`${API_BASE}/notifications/${id}/read`, {
+      method: 'PUT',
+    });
+  } catch (err) {
+    console.warn('Backend mark-read failed, updating locally:', err);
+    const list = getStored<AppNotification[]>('apartment_notifications', []);
+    const updated = list.map(n => n.id === id ? { ...n, isRead: true } : n);
+    setStored('apartment_notifications', updated);
+  }
+};
+
+export const deleteNotification = async (id: string): Promise<void> => {
+  try {
+    await fetch(`${API_BASE}/notifications/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    console.warn('Backend delete notification failed:', err);
+  }
 };
 
 // ----------------------------------------------------

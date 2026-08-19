@@ -40,6 +40,36 @@ public class RoomController {
             room.setId("rm-" + UUID.randomUUID().toString().substring(0, 8));
         }
         if (room.getCreatedAt() == null) room.setCreatedAt(LocalDateTime.now());
+        if (room.getStatus() == null || room.getStatus().isEmpty()) room.setStatus("Available");
+        if (room.getPrice() == null) room.setPrice(5000.0);
+        if (room.getCapacity() == null) room.setCapacity(2);
+        if (room.getSizeSqm() == null) room.setSizeSqm(28.0);
+        if (room.getAmenities() == null) room.setAmenities("[]");
+        if (room.getGallery() == null) room.setGallery("[]");
+        if (room.getPrevWaterMeter() == null) room.setPrevWaterMeter(0.0);
+        if (room.getCurrWaterMeter() == null) room.setCurrWaterMeter(0.0);
+        if (room.getPrevElectricMeter() == null) room.setPrevElectricMeter(0.0);
+        if (room.getCurrElectricMeter() == null) room.setCurrElectricMeter(0.0);
+
+        if (room.getFloor() == null) {
+            int floorVal = 1;
+            if (room.getRoomNumber() != null) {
+                String clean = room.getRoomNumber().replaceAll("^[^0-9]+", "");
+                if (!clean.isEmpty()) {
+                    if (clean.length() >= 3) {
+                        try {
+                            floorVal = Integer.parseInt(clean.substring(0, clean.length() - 2));
+                        } catch (Exception e) {
+                            floorVal = Character.getNumericValue(clean.charAt(0));
+                        }
+                    } else {
+                        floorVal = Character.getNumericValue(clean.charAt(0));
+                    }
+                }
+            }
+            room.setFloor(Math.max(1, floorVal));
+        }
+
         logService.log("Room Created", "Created unit " + room.getRoomNumber());
         return repo.save(room);
     }

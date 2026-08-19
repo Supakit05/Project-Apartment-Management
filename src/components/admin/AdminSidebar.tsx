@@ -31,8 +31,17 @@ export const AdminSidebar: React.FC = () => {
     };
     fetchCounts();
     const interval = setInterval(fetchCounts, 10000);
-    return () => clearInterval(interval);
-  }, []);
+
+    const handleUpdate = () => fetchCounts();
+    window.addEventListener('notification-updated', handleUpdate);
+    window.addEventListener('bookings-updated', handleUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('notification-updated', handleUpdate);
+      window.removeEventListener('bookings-updated', handleUpdate);
+    };
+  }, [location.pathname]);
 
   const navItems = [
     { name: t('admin.nav.dashboard'), path: '/admin/dashboard', icon: LayoutDashboard },

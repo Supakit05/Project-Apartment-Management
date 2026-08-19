@@ -52,4 +52,21 @@ public class GeneralController {
         notifRepo.saveAll(all);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/notifications/{id}/read")
+    public ResponseEntity<AppNotification> markOneRead(@PathVariable String id) {
+        return notifRepo.findById(id).map(notif -> {
+            notif.setIsRead(true);
+            return ResponseEntity.ok(notifRepo.save(notif));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/notifications/{id}")
+    public ResponseEntity<Void> deleteNotification(@PathVariable String id) {
+        if (notifRepo.existsById(id)) {
+            notifRepo.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

@@ -22,6 +22,7 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>(room?.buildingId || defaultBuildingId || '');
   const [roomNumber, setRoomNumber] = useState(room?.roomNumber || '');
+  const [floor, setFloor] = useState<number>(room?.floor || 1);
   const [roomType, setRoomType] = useState<RoomType>(room?.roomType || 'Standard Studio');
   const [price, setPrice] = useState(room?.price || 5500);
   const [capacity, setCapacity] = useState(room?.capacity || 2);
@@ -39,6 +40,20 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
       }
     });
   }, []);
+
+  const handleRoomNumberChange = (val: string) => {
+    setRoomNumber(val);
+    if (!room) {
+      const clean = val.replace(/^[^0-9]+/g, '');
+      if (clean.length >= 3) {
+        const parsedFloor = parseInt(clean.substring(0, clean.length - 2), 10);
+        if (!isNaN(parsedFloor) && parsedFloor > 0) setFloor(parsedFloor);
+      } else if (clean.length > 0) {
+        const parsedFloor = parseInt(clean[0], 10);
+        if (!isNaN(parsedFloor) && parsedFloor > 0) setFloor(parsedFloor);
+      }
+    }
+  };
 
   const parsedAmenities = typeof room?.amenities === 'string'
     ? JSON.parse(room.amenities || '[]')
@@ -58,6 +73,7 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
     onSave({
       id: room?.id,
       roomNumber,
+      floor: Number(floor) || 1,
       roomName: `ห้อง ${roomNumber} (${bld?.name || ''})`,
       roomType,
       buildingId: selectedBuildingId,
@@ -91,7 +107,7 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
 
         <form onSubmit={handleSubmit} className="space-y-5 text-[14px]">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">ตึก / อาคาร (Building)</label>
               <select
@@ -106,7 +122,11 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
             </div>
             <div>
               <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">เลขห้อง (Room Number)</label>
-              <input type="text" required value={roomNumber} onChange={e => setRoomNumber(e.target.value)} className={inputClass} placeholder="เช่น 101, 202" />
+              <input type="text" required value={roomNumber} onChange={e => handleRoomNumberChange(e.target.value)} className={inputClass} placeholder="เช่น 101, 202, A301" />
+            </div>
+            <div>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">ชั้น (Floor)</label>
+              <input type="number" required min="1" value={floor} onChange={e => setFloor(Number(e.target.value))} className={inputClass} />
             </div>
           </div>
 

@@ -12,6 +12,7 @@ import java.util.Map;
 @Component
 public class DataSeeder {
 
+    private final BuildingRepository buildingRepo;
     private final RoomRepository roomRepo;
     private final TenantRepository tenantRepo;
     private final LeaseRepository leaseRepo;
@@ -25,12 +26,14 @@ public class DataSeeder {
     private final AppUserRepository userRepo;
 
     public DataSeeder(
+            BuildingRepository buildingRepo,
             RoomRepository roomRepo, TenantRepository tenantRepo,
             LeaseRepository leaseRepo, UtilityBillRepository billRepo,
             MaintenanceTaskRepository taskRepo, SupplyItemRepository supplyRepo,
             MaintenanceLogRepository logRepo, ScheduledReminderRepository reminderRepo,
             AppNotificationRepository notifRepo, ActivityLogRepository activityRepo,
             AppUserRepository userRepo) {
+        this.buildingRepo = buildingRepo;
         this.roomRepo = roomRepo;
         this.tenantRepo = tenantRepo;
         this.leaseRepo = leaseRepo;
@@ -46,6 +49,7 @@ public class DataSeeder {
 
     @PostConstruct
     public void seed() {
+        seedBuildings();
         seedUsers();
 
         // If rooms already exist, update image paths to the new 3-image sets
@@ -491,4 +495,34 @@ public class DataSeeder {
         a.setCreatedAt(LocalDateTime.of(2026, 8, 8, 8, 0));
         activityRepo.save(a);
     }
+
+    private void seedBuildings() {
+        if (buildingRepo.count() == 0) {
+            Building b1 = new Building(
+                "bld-1",
+                "อาคาร A (Victory Tower A)",
+                "A",
+                2,
+                24,
+                "อาคารหลัก 2 ชั้น ห้องพักตกแต่งพร้อมอยู่ สิ่งอำนวยความสะดวกครบครัน",
+                "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+                "123/1 ถนนสุขุมวิท กรุงเทพฯ",
+                LocalDateTime.of(2026, 1, 1, 0, 0)
+            );
+            Building b2 = new Building(
+                "bld-2",
+                "อาคาร B (Victory Residence B)",
+                "B",
+                2,
+                12,
+                "อาคารเสริม 2 ชั้น บรรยากาศเงียบสงบ เหมาะกับการอยู่อาศัย",
+                "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80",
+                "123/2 ถนนสุขุมวิท กรุงเทพฯ",
+                LocalDateTime.of(2026, 2, 15, 0, 0)
+            );
+            buildingRepo.save(b1);
+            buildingRepo.save(b2);
+        }
+    }
 }
+

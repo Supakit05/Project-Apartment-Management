@@ -7,6 +7,23 @@ import { ReceiptModal } from '../../components/admin/ReceiptModal';
 import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
+const MONTH_NAMES = [
+  { value: 'January', th: 'มกราคม (Jan)', en: 'January' },
+  { value: 'February', th: 'กุมภาพันธ์ (Feb)', en: 'February' },
+  { value: 'March', th: 'มีนาคม (Mar)', en: 'March' },
+  { value: 'April', th: 'เมษายน (Apr)', en: 'April' },
+  { value: 'May', th: 'พฤษภาคม (May)', en: 'May' },
+  { value: 'June', th: 'มิถุนายน (Jun)', en: 'June' },
+  { value: 'July', th: 'กรกฎาคม (Jul)', en: 'July' },
+  { value: 'August', th: 'สิงหาคม (Aug)', en: 'August' },
+  { value: 'September', th: 'กันยายน (Sep)', en: 'September' },
+  { value: 'October', th: 'ตุลาคม (Oct)', en: 'October' },
+  { value: 'November', th: 'พฤศจิกายน (Nov)', en: 'November' },
+  { value: 'December', th: 'ธันวาคม (Dec)', en: 'December' },
+];
+
+const YEAR_OPTIONS = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
+
 export const UtilityReceiptManagement: React.FC = () => {
   const { t, language } = useLanguage();
   const [bills, setBills] = useState<UtilityBill[]>([]);
@@ -21,14 +38,31 @@ export const UtilityReceiptManagement: React.FC = () => {
 
   const [billFormData, setBillFormData] = useState<Partial<UtilityBill>>({
     billingMonth: 'August 2026',
-    waterRate: 18,
-    electricRate: 7,
+    waterRate: 9,
+    electricRate: 4,
     commonFee: 300,
     prevWaterMeter: 0,
     currWaterMeter: 0,
     prevElectricMeter: 0,
     currElectricMeter: 0,
   });
+
+  const currentMonthPart = (billFormData.billingMonth || 'August 2026').split(' ')[0] || 'August';
+  const currentYearPart = (billFormData.billingMonth || 'August 2026').split(' ')[1] || '2026';
+
+  const handleMonthChange = (newMonth: string) => {
+    setBillFormData(prev => ({
+      ...prev,
+      billingMonth: `${newMonth} ${currentYearPart}`,
+    }));
+  };
+
+  const handleYearChange = (newYear: string) => {
+    setBillFormData(prev => ({
+      ...prev,
+      billingMonth: `${currentMonthPart} ${newYear}`,
+    }));
+  };
 
   const fetchData = async () => {
     try {
@@ -59,8 +93,8 @@ export const UtilityReceiptManagement: React.FC = () => {
       currWaterMeter: (targetRoom?.currWaterMeter || targetRoom?.prevWaterMeter || 100) + 8,
       prevElectricMeter: targetRoom?.currElectricMeter || targetRoom?.prevElectricMeter || 400,
       currElectricMeter: (targetRoom?.currElectricMeter || targetRoom?.prevElectricMeter || 400) + 90,
-      waterRate: 18,
-      electricRate: 7,
+      waterRate: 9,
+      electricRate: 4,
       commonFee: 300,
     });
     setShowBillModal(true);
@@ -102,8 +136,8 @@ export const UtilityReceiptManagement: React.FC = () => {
 
   const waterUnitsPreview = Math.max(0, (billFormData.currWaterMeter || 0) - (billFormData.prevWaterMeter || 0));
   const electricUnitsPreview = Math.max(0, (billFormData.currElectricMeter || 0) - (billFormData.prevElectricMeter || 0));
-  const waterAmtPreview = waterUnitsPreview * (billFormData.waterRate || 18);
-  const electricAmtPreview = electricUnitsPreview * (billFormData.electricRate || 7);
+  const waterAmtPreview = waterUnitsPreview * (billFormData.waterRate || 9);
+  const electricAmtPreview = electricUnitsPreview * (billFormData.electricRate || 4);
   const totalAmtPreview = (billFormData.rentAmount || 0) + waterAmtPreview + electricAmtPreview + (billFormData.commonFee || 0);
 
   const availableMonths = Array.from(new Set(['August 2026', 'July 2026', 'June 2026', ...bills.map(b => b.billingMonth)])).filter((m): m is string => Boolean(m));
@@ -293,37 +327,66 @@ export const UtilityReceiptManagement: React.FC = () => {
 
             <div className="space-y-3 text-xs">
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-nike-mute dark:text-nike-stone mb-1 font-medium">Unit *</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-1">
+                  <label className="block text-nike-mute dark:text-nike-stone mb-1 font-medium">
+                    {language === 'th' ? 'ห้องพัก (Unit) *' : 'Unit *'}
+                  </label>
                   <select
                     required
                     value={billFormData.roomId}
                     onChange={(e) => handleRoomSelectInBill(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none transition-all"
+                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none transition-all cursor-pointer font-medium"
                   >
                     {rooms.map(r => (
                       <option key={r.id} value={r.id}>
-                        Unit {r.roomNumber} ({r.currentTenantName || 'No Tenant'})
+                        {t('common.unit')} {r.roomNumber} ({r.currentTenantName || (language === 'th' ? 'ไม่มีผู้เช่า' : 'No Tenant')})
                       </option>
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-nike-mute dark:text-nike-stone mb-1 font-medium">Billing Month *</label>
-                  <input
-                    type="text"
+
+                <div className="sm:col-span-1">
+                  <label className="block text-nike-mute dark:text-nike-stone mb-1 font-medium">
+                    {language === 'th' ? 'ประจำเดือน (Month) *' : 'Billing Month *'}
+                  </label>
+                  <select
                     required
-                    value={billFormData.billingMonth || ''}
-                    onChange={(e) => setBillFormData({ ...billFormData, billingMonth: e.target.value })}
-                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none transition-all"
-                    placeholder="August 2026"
-                  />
+                    value={currentMonthPart}
+                    onChange={(e) => handleMonthChange(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none transition-all cursor-pointer font-semibold"
+                  >
+                    {MONTH_NAMES.map(m => (
+                      <option key={m.value} value={m.value}>
+                        {language === 'th' ? m.th : m.en}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="sm:col-span-1">
+                  <label className="block text-nike-mute dark:text-nike-stone mb-1 font-medium">
+                    {language === 'th' ? 'ประจำปี (Year) *' : 'Billing Year *'}
+                  </label>
+                  <select
+                    required
+                    value={currentYearPart}
+                    onChange={(e) => handleYearChange(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none transition-all cursor-pointer font-semibold"
+                  >
+                    {YEAR_OPTIONS.map(yr => (
+                      <option key={yr} value={yr.toString()}>
+                        {language === 'th' ? `${yr + 543} (${yr})` : yr.toString()}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-nike-mute dark:text-nike-stone mb-1 font-medium">Tenant Name</label>
+                <label className="block text-nike-mute dark:text-nike-stone mb-1 font-medium">
+                  {language === 'th' ? 'ชื่อผู้เช่า (Tenant Name)' : 'Tenant Name'}
+                </label>
                 <input
                   type="text"
                   readOnly
@@ -334,34 +397,52 @@ export const UtilityReceiptManagement: React.FC = () => {
 
               {/* WATER METER ENTRY */}
               <div className="p-3 bg-blue-500/10 dark:bg-blue-500/10 border border-blue-500/20 rounded-xl space-y-2">
-                <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
-                  <Droplets className="w-4 h-4" /> Water Meter Reading
-                </span>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                    <Droplets className="w-4 h-4" /> {language === 'th' ? 'จดมิเตอร์น้ำประปา' : 'Water Meter Reading'}
+                  </span>
+                  <span className="text-[10px] text-blue-700 dark:text-blue-300 font-semibold bg-blue-500/15 px-2 py-0.5 rounded-md">
+                    {language === 'th' ? 'อัตราค่าน้ำ: 9 ฿/หน่วย' : 'Rate: ฿9/unit'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
                   <div>
-                    <span className="text-[11px] text-nike-stone block">Previous Reading</span>
+                    <span className="text-[11px] text-nike-stone block">{language === 'th' ? 'เลขครั้งก่อน' : 'Prev Reading'}</span>
                     <input
                       type="number"
                       required
                       value={billFormData.prevWaterMeter || 0}
                       onChange={(e) => setBillFormData({ ...billFormData, prevWaterMeter: Number(e.target.value) })}
-                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
+                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-xs"
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] text-nike-stone block">Current Reading</span>
+                    <span className="text-[11px] text-nike-stone block">{language === 'th' ? 'เลขครั้งนี้' : 'Curr Reading'}</span>
                     <input
                       type="number"
                       required
                       value={billFormData.currWaterMeter || 0}
                       onChange={(e) => setBillFormData({ ...billFormData, currWaterMeter: Number(e.target.value) })}
-                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-bold"
+                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-bold text-xs"
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] text-nike-stone block">Usage (Units × Rate)</span>
+                    <span className="text-[11px] text-nike-stone block">{language === 'th' ? 'อัตรา (฿/หน่วย)' : 'Rate (฿/unit)'}</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="1"
+                      max="50"
+                      required
+                      value={billFormData.waterRate ?? 9}
+                      onChange={(e) => setBillFormData({ ...billFormData, waterRate: Number(e.target.value) })}
+                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-bold text-xs text-blue-600"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-nike-stone block">{language === 'th' ? 'รวมค่าน้ำ' : 'Usage × Rate'}</span>
                     <span className="text-xs font-bold text-blue-600 block mt-2">
-                      {waterUnitsPreview} units = {formatCurrency(waterAmtPreview)}
+                      {waterUnitsPreview} {language === 'th' ? 'หน่วย' : 'units'} = {formatCurrency(waterAmtPreview)}
                     </span>
                   </div>
                 </div>
@@ -369,34 +450,52 @@ export const UtilityReceiptManagement: React.FC = () => {
 
               {/* ELECTRIC METER ENTRY */}
               <div className="p-3 bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-2">
-                <span className="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                  <Zap className="w-4 h-4" /> Electric Meter Reading
-                </span>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                    <Zap className="w-4 h-4" /> {language === 'th' ? 'จดมิเตอร์ไฟฟ้า' : 'Electric Meter Reading'}
+                  </span>
+                  <span className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold bg-amber-500/15 px-2 py-0.5 rounded-md">
+                    {language === 'th' ? 'อัตราค่าไฟ: 4 ฿/หน่วย' : 'Rate: ฿4/unit'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
                   <div>
-                    <span className="text-[11px] text-nike-stone block">Previous Reading</span>
+                    <span className="text-[11px] text-nike-stone block">{language === 'th' ? 'เลขครั้งก่อน' : 'Prev Reading'}</span>
                     <input
                       type="number"
                       required
                       value={billFormData.prevElectricMeter || 0}
                       onChange={(e) => setBillFormData({ ...billFormData, prevElectricMeter: Number(e.target.value) })}
-                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
+                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-xs"
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] text-nike-stone block">Current Reading</span>
+                    <span className="text-[11px] text-nike-stone block">{language === 'th' ? 'เลขครั้งนี้' : 'Curr Reading'}</span>
                     <input
                       type="number"
                       required
                       value={billFormData.currElectricMeter || 0}
                       onChange={(e) => setBillFormData({ ...billFormData, currElectricMeter: Number(e.target.value) })}
-                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-bold"
+                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-bold text-xs"
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] text-nike-stone block">Usage (Units × Rate)</span>
+                    <span className="text-[11px] text-nike-stone block">{language === 'th' ? 'อัตรา (฿/หน่วย)' : 'Rate (฿/unit)'}</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="1"
+                      max="10"
+                      required
+                      value={billFormData.electricRate ?? 4}
+                      onChange={(e) => setBillFormData({ ...billFormData, electricRate: Number(e.target.value) })}
+                      className="w-full p-2 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-bold text-xs text-amber-600"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-nike-stone block">{language === 'th' ? 'รวมค่าไฟ' : 'Usage × Rate'}</span>
                     <span className="text-xs font-bold text-amber-600 block mt-2">
-                      {electricUnitsPreview} units = {formatCurrency(electricAmtPreview)}
+                      {electricUnitsPreview} {language === 'th' ? 'หน่วย' : 'units'} = {formatCurrency(electricAmtPreview)}
                     </span>
                   </div>
                 </div>
@@ -405,23 +504,23 @@ export const UtilityReceiptManagement: React.FC = () => {
               {/* TOTAL CALCULATION PREVIEW */}
               <div className="p-4 bg-nike-soft-cloud dark:bg-nike-dark-surface rounded-xl border border-nike-hairline dark:border-nike-dark-card space-y-1 text-xs">
                 <div className="flex justify-between text-nike-mute">
-                  <span>Room Rent:</span>
+                  <span>{language === 'th' ? 'ค่าเช่าห้อง:' : 'Room Rent:'}</span>
                   <span className="font-semibold text-nike-ink dark:text-white">{formatCurrency(billFormData.rentAmount || 0)}</span>
                 </div>
                 <div className="flex justify-between text-nike-mute">
-                  <span>Water ({waterUnitsPreview} units @ 18):</span>
+                  <span>{language === 'th' ? `ค่าน้ำประปา (${waterUnitsPreview} หน่วย @ ${billFormData.waterRate ?? 9}):` : `Water (${waterUnitsPreview} units @ ${billFormData.waterRate ?? 9}):`}</span>
                   <span className="font-semibold text-blue-600">{formatCurrency(waterAmtPreview)}</span>
                 </div>
                 <div className="flex justify-between text-nike-mute">
-                  <span>Electricity ({electricUnitsPreview} units @ 7):</span>
+                  <span>{language === 'th' ? `ค่าไฟฟ้า (${electricUnitsPreview} หน่วย @ ${billFormData.electricRate ?? 4}):` : `Electricity (${electricUnitsPreview} units @ ${billFormData.electricRate ?? 4}):`}</span>
                   <span className="font-semibold text-amber-600">{formatCurrency(electricAmtPreview)}</span>
                 </div>
                 <div className="flex justify-between text-nike-mute">
-                  <span>Common Fee:</span>
+                  <span>{language === 'th' ? 'ค่าส่วนกลาง:' : 'Common Fee:'}</span>
                   <span className="font-semibold text-nike-ink dark:text-white">{formatCurrency(billFormData.commonFee || 300)}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-nike-hairline dark:border-nike-dark-card font-bold text-sm text-nike-ink dark:text-white">
-                  <span>Grand Total:</span>
+                  <span>{language === 'th' ? 'ยอดรวมสุทธิ:' : 'Grand Total:'}</span>
                   <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(totalAmtPreview)}</span>
                 </div>
               </div>
@@ -432,15 +531,15 @@ export const UtilityReceiptManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowBillModal(false)}
-                className="px-4 py-2 text-xs font-medium rounded-xl bg-nike-soft-cloud dark:bg-nike-dark-card text-nike-ink dark:text-white"
+                className="px-4 py-2 text-xs font-medium rounded-xl bg-nike-soft-cloud dark:bg-nike-dark-card text-nike-ink dark:text-white cursor-pointer"
               >
-                Cancel
+                {language === 'th' ? 'ยกเลิก' : 'Cancel'}
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
+                className="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer shadow-xs"
               >
-                Save & Generate Bill
+                {language === 'th' ? 'บันทึกและสร้างบิล' : 'Save & Generate Bill'}
               </button>
             </div>
           </form>

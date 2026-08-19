@@ -42,8 +42,8 @@ public class UtilityBillController {
         // Auto-calculate amounts
         double waterUnits = Math.max(0, (bill.getCurrWaterMeter() != null ? bill.getCurrWaterMeter() : 0) - (bill.getPrevWaterMeter() != null ? bill.getPrevWaterMeter() : 0));
         double electricUnits = Math.max(0, (bill.getCurrElectricMeter() != null ? bill.getCurrElectricMeter() : 0) - (bill.getPrevElectricMeter() != null ? bill.getPrevElectricMeter() : 0));
-        double waterRate = bill.getWaterRate() != null ? bill.getWaterRate() : 18;
-        double electricRate = bill.getElectricRate() != null ? bill.getElectricRate() : 7;
+        double waterRate = bill.getWaterRate() != null ? bill.getWaterRate() : 9.0;
+        double electricRate = bill.getElectricRate() != null ? bill.getElectricRate() : 4.0;
 
         bill.setWaterAmount(waterUnits * waterRate);
         bill.setElectricAmount(electricUnits * electricRate);

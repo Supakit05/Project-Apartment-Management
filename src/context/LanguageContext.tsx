@@ -231,7 +231,7 @@ const translations: Record<string, Record<Language, string>> = {
   'util.newBill': { th: '+ ออกบิล/ใบเสร็จใหม่', en: '+ New Utility Bill' },
   'util.paid': { th: 'ชำระแล้ว (Paid Receipts)', en: 'Paid Receipts' },
   'util.pending': { th: 'ค้างชำระ (Pending Payments)', en: 'Pending Payments' },
-  'util.rates': { th: 'อัตราค่าน้ำ: 18 บาท/หน่วย | ค่าไฟ: 7 บาท/หน่วย', en: 'Water: ฿18/unit | Electric: ฿7/unit' },
+  'util.rates': { th: 'อัตราค่าน้ำ: 9 บาท/หน่วย | ค่าไฟ: 4 บาท/หน่วย', en: 'Water: ฿9/unit | Electric: ฿4/unit' },
   'util.invoiceNo': { th: 'Invoice No / Unit', en: 'Invoice No / Unit' },
   'util.month': { th: 'Billing Month', en: 'Billing Month' },
   'util.water': { th: 'Water (Units / Amt)', en: 'Water (Units / Amt)' },

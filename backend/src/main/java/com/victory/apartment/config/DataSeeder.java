@@ -342,9 +342,9 @@ public class DataSeeder {
         b1.setId("bill-101"); b1.setInvoiceNo("INV-202608-101"); b1.setLeaseId("ls-101");
         b1.setRoomId("rm-A101"); b1.setRoomNumber("A101"); b1.setTenantName("Somchai Jaidee");
         b1.setBillingMonth("August 2026"); b1.setRentAmount(5500.0);
-        b1.setPrevWaterMeter(125.0); b1.setCurrWaterMeter(133.0); b1.setWaterRate(18.0); b1.setWaterAmount(144.0);
-        b1.setPrevElectricMeter(470.0); b1.setCurrElectricMeter(550.0); b1.setElectricRate(7.0); b1.setElectricAmount(560.0);
-        b1.setCommonFee(300.0); b1.setTotalAmount(6504.0); b1.setStatus("Paid"); b1.setPaymentDate("2026-08-05");
+        b1.setPrevWaterMeter(125.0); b1.setCurrWaterMeter(133.0); b1.setWaterRate(9.0); b1.setWaterAmount(8.0 * 9.0); // 72.0
+        b1.setPrevElectricMeter(470.0); b1.setCurrElectricMeter(550.0); b1.setElectricRate(4.0); b1.setElectricAmount(80.0 * 4.0); // 320.0
+        b1.setCommonFee(300.0); b1.setTotalAmount(5500.0 + 72.0 + 320.0 + 300.0); b1.setStatus("Paid"); b1.setPaymentDate("2026-08-05");
         b1.setCreatedAt(LocalDateTime.of(2026, 8, 1, 8, 0));
         billRepo.save(b1);
 
@@ -352,9 +352,9 @@ public class DataSeeder {
         b2.setId("bill-102"); b2.setInvoiceNo("INV-202608-102"); b2.setLeaseId("ls-102");
         b2.setRoomId("rm-A102"); b2.setRoomNumber("A102"); b2.setTenantName("Malee Rattanaporn");
         b2.setBillingMonth("August 2026"); b2.setRentAmount(5500.0);
-        b2.setPrevWaterMeter(130.0); b2.setCurrWaterMeter(138.0); b2.setWaterRate(18.0); b2.setWaterAmount(144.0);
-        b2.setPrevElectricMeter(490.0); b2.setCurrElectricMeter(580.0); b2.setElectricRate(7.0); b2.setElectricAmount(630.0);
-        b2.setCommonFee(300.0); b2.setTotalAmount(6574.0); b2.setStatus("Pending");
+        b2.setPrevWaterMeter(130.0); b2.setCurrWaterMeter(138.0); b2.setWaterRate(9.0); b2.setWaterAmount(8.0 * 9.0); // 72.0
+        b2.setPrevElectricMeter(490.0); b2.setCurrElectricMeter(580.0); b2.setElectricRate(4.0); b2.setElectricAmount(90.0 * 4.0); // 360.0
+        b2.setCommonFee(300.0); b2.setTotalAmount(5500.0 + 72.0 + 360.0 + 300.0); b2.setStatus("Pending");
         b2.setCreatedAt(LocalDateTime.of(2026, 8, 1, 8, 0));
         billRepo.save(b2);
 
@@ -362,11 +362,31 @@ public class DataSeeder {
         b3.setId("bill-201"); b3.setInvoiceNo("INV-202608-201"); b3.setLeaseId("ls-201");
         b3.setRoomId("rm-A201"); b3.setRoomNumber("A201"); b3.setTenantName("Wichai Sirisuk");
         b3.setBillingMonth("August 2026"); b3.setRentAmount(6200.0);
-        b3.setPrevWaterMeter(140.0); b3.setCurrWaterMeter(152.0); b3.setWaterRate(18.0); b3.setWaterAmount(216.0);
-        b3.setPrevElectricMeter(510.0); b3.setCurrElectricMeter(620.0); b3.setElectricRate(7.0); b3.setElectricAmount(770.0);
-        b3.setCommonFee(300.0); b3.setTotalAmount(7486.0); b3.setStatus("Paid"); b3.setPaymentDate("2026-08-04");
+        b3.setPrevWaterMeter(140.0); b3.setCurrWaterMeter(152.0); b3.setWaterRate(9.0); b3.setWaterAmount(12.0 * 9.0); // 108.0
+        b3.setPrevElectricMeter(510.0); b3.setCurrElectricMeter(620.0); b3.setElectricRate(4.0); b3.setElectricAmount(110.0 * 4.0); // 440.0
+        b3.setCommonFee(300.0); b3.setTotalAmount(6200.0 + 108.0 + 440.0 + 300.0); b3.setStatus("Paid"); b3.setPaymentDate("2026-08-04");
         b3.setCreatedAt(LocalDateTime.of(2026, 8, 1, 8, 0));
         billRepo.save(b3);
+
+        UtilityBill b4 = new UtilityBill();
+        b4.setId("bill-b204"); b4.setInvoiceNo("INV-202608-B204"); b4.setLeaseId("ls-b204");
+        b4.setRoomId("rm-B204"); b4.setRoomNumber("B204"); b4.setTenantName("Supakit Pitisan");
+        b4.setBillingMonth("August 2026"); b4.setRentAmount(6500.0);
+        b4.setPrevWaterMeter(110.0); b4.setCurrWaterMeter(118.0); b4.setWaterRate(9.0); b4.setWaterAmount(8.0 * 9.0); // 72.0
+        b4.setPrevElectricMeter(320.0); b4.setCurrElectricMeter(410.0); b4.setElectricRate(4.0); b4.setElectricAmount(90.0 * 4.0); // 360.0
+        b4.setCommonFee(300.0); b4.setTotalAmount(6500.0 + 72.0 + 360.0 + 300.0); b4.setStatus("Paid"); b4.setPaymentDate("2026-08-03");
+        b4.setCreatedAt(LocalDateTime.of(2026, 8, 1, 8, 0));
+        billRepo.save(b4);
+
+        UtilityBill b5 = new UtilityBill();
+        b5.setId("bill-a204"); b5.setInvoiceNo("INV-202608-A204"); b5.setLeaseId("ls-204");
+        b5.setRoomId("rm-A204"); b5.setRoomNumber("A204"); b5.setTenantName("Anan Suksawat");
+        b5.setBillingMonth("August 2026"); b5.setRentAmount(6500.0);
+        b5.setPrevWaterMeter(105.0); b5.setCurrWaterMeter(114.0); b5.setWaterRate(9.0); b5.setWaterAmount(9.0 * 9.0); // 81.0
+        b5.setPrevElectricMeter(310.0); b5.setCurrElectricMeter(395.0); b5.setElectricRate(4.0); b5.setElectricAmount(85.0 * 4.0); // 340.0
+        b5.setCommonFee(300.0); b5.setTotalAmount(6500.0 + 81.0 + 340.0 + 300.0); b5.setStatus("Paid"); b5.setPaymentDate("2026-08-04");
+        b5.setCreatedAt(LocalDateTime.of(2026, 8, 1, 8, 0));
+        billRepo.save(b5);
     }
 
     private void seedSupplies() {

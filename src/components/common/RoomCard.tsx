@@ -5,15 +5,17 @@ import {
   formatCurrency,
   getTranslatedRoomType,
   getTranslatedBedType,
-  getTranslatedRoomName,
   getTranslatedRoomDescription
 } from '../../utils/formatters';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import { BedDouble, Maximize2, ArrowUpRight } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const isAvailable = room.status === 'Available';
 
   const getStatusText = (status: string) => {
@@ -25,17 +27,26 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
     }
   };
 
-  const displayRoomName = getTranslatedRoomName(room.roomName, room.roomNumber, language);
+  const displayRoomTitle = language === 'th' ? `ห้อง ${room.roomNumber}` : `Unit ${room.roomNumber}`;
   const displayRoomType = getTranslatedRoomType(room.roomType, language);
   const displayBedType = getTranslatedBedType(room.bedType, language);
   const displayDescription = getTranslatedRoomDescription(room.description, room.floor, language);
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only navigate if user didn't click directly on an anchor/button element
     if ((e.target as HTMLElement).closest('button, a')) {
       return;
     }
     navigate(`/rooms/${room.id}`);
+  };
+
+  const handleBookClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      toast.info(language === 'th' ? 'กรุณาเข้าสู่ระบบก่อนทำการจองห้องพัก' : 'Please sign in before booking a unit');
+      navigate('/login');
+      return;
+    }
+    navigate(`/booking/${room.id}`);
   };
 
   return (
@@ -48,14 +59,16 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
       <div className="relative h-56 overflow-hidden bg-nike-soft-cloud dark:bg-nike-dark-card flex items-center justify-center">
         <img
           src={room.coverImage || '/rooms/room_standard.png'}
-          alt={room.roomName}
+          alt={displayRoomTitle}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         
         {/* TOP LEFT: UNIT PILL */}
         <div className="absolute top-3 left-3">
           <span className="bg-nike-ink/90 dark:bg-white/90 backdrop-blur-md text-white dark:text-nike-ink text-[11px] font-bold px-3 py-1 rounded-full shadow-xs">
-            {t('common.floor')} {room.floor} · {t('common.unit')} {room.roomNumber}
+            {t('common.floor')} {room.floor} · {displayRoomTitle}
           </span>
         </div>
 
@@ -77,8 +90,8 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div>
           {/* CATEGORY & BUILDING BADGE */}
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <span className="text-[11px] font-semibold text-nike-mute dark:text-nike-stone">
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <span className="text-[11px] font-bold text-slate-900 dark:text-slate-200">
               {displayRoomType}
             </span>
             <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
@@ -90,8 +103,8 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
             </span>
           </div>
 
-          <h3 className="font-bold text-lg text-nike-ink dark:text-white line-clamp-1 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors">
-            {displayRoomName}
+          <h3 className="font-extrabold text-xl text-nike-ink dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            {displayRoomTitle}
           </h3>
 
           <p className="text-xs font-normal text-nike-mute dark:text-nike-stone line-clamp-2 mt-1.5 leading-relaxed">
@@ -129,13 +142,13 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
               {t('room.detailsBtn')} <ArrowUpRight className="w-3 h-3" />
             </Link>
             {isAvailable && (
-              <Link
-                to={`/booking/${room.id}`}
-                onClick={(e) => e.stopPropagation()}
-                className="px-4 py-2 text-xs font-bold rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 shadow-sm whitespace-nowrap"
+              <button
+                type="button"
+                onClick={handleBookClick}
+                className="px-4 py-2 text-xs font-bold rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 shadow-sm whitespace-nowrap cursor-pointer"
               >
                 {t('room.bookBtn')}
-              </Link>
+              </button>
             )}
           </div>
         </div>

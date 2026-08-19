@@ -106,7 +106,7 @@ export const UtilityReceiptManagement: React.FC = () => {
   const electricAmtPreview = electricUnitsPreview * (billFormData.electricRate || 7);
   const totalAmtPreview = (billFormData.rentAmount || 0) + waterAmtPreview + electricAmtPreview + (billFormData.commonFee || 0);
 
-  const availableMonths = Array.from(new Set(bills.map(b => b.billingMonth))).filter(Boolean);
+  const availableMonths = Array.from(new Set(['August 2026', 'July 2026', 'June 2026', ...bills.map(b => b.billingMonth)])).filter((m): m is string => Boolean(m));
 
   const filteredBills = bills.filter(b => {
     const matchesSearch = (b.roomNumber || '').includes(search) || (b.tenantName || '').toLowerCase().includes(search.toLowerCase()) || (b.invoiceNo || '').includes(search);
@@ -176,9 +176,6 @@ export const UtilityReceiptManagement: React.FC = () => {
               className="px-3 py-1.5 text-xs rounded-xl bg-nike-soft-cloud dark:bg-nike-dark-surface border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white font-semibold cursor-pointer focus:outline-none"
             >
               <option value="All">{language === 'th' ? 'ทุกงวดเดือน (All Months)' : 'All Months'}</option>
-              <option value="August 2026">{language === 'th' ? 'สิงหาคม 2026' : 'August 2026'}</option>
-              <option value="July 2026">{language === 'th' ? 'กรกฎาคม 2026' : 'July 2026'}</option>
-              <option value="June 2026">{language === 'th' ? 'มิถุนายน 2026' : 'June 2026'}</option>
               {availableMonths.map(m => (
                 <option key={m} value={m}>{m}</option>
               ))}

@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Room } from '../../types';
 import { getRoomById } from '../../services/api';
 import {
   formatCurrency,
   getTranslatedRoomType,
   getTranslatedBedType,
-  getTranslatedRoomName,
   getTranslatedRoomDescription
 } from '../../utils/formatters';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import { Check, CalendarCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const RoomDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string>('');
@@ -52,6 +55,7 @@ export const RoomDetail: React.FC = () => {
     );
   }
 
+  const displayRoomTitle = language === 'th' ? `ห้อง ${room.roomNumber}` : `Unit ${room.roomNumber}`;
   const amenitiesList: string[] = typeof room.amenities === 'string'
     ? JSON.parse(room.amenities || '[]')
     : (Array.isArray(room.amenities) ? room.amenities : []);
@@ -72,6 +76,15 @@ export const RoomDetail: React.FC = () => {
     }
   };
 
+  const handleBookClick = () => {
+    if (!isAuthenticated) {
+      toast.info(language === 'th' ? 'กรุณาเข้าสู่ระบบก่อนทำการจองห้องพัก' : 'Please sign in before booking a unit');
+      navigate('/login');
+      return;
+    }
+    navigate(`/booking/${room.id}`);
+  };
+
   return (
     <div className="max-w-[1440px] mx-auto px-6 lg:px-10 py-10 space-y-10">
 
@@ -81,7 +94,7 @@ export const RoomDetail: React.FC = () => {
         <span>/</span>
         <Link to="/rooms" className="hover:text-nike-ink dark:hover:text-white transition-colors">{t('nav.units')}</Link>
         <span>/</span>
-        <span className="text-nike-ink dark:text-white font-bold">{room.roomName}</span>
+        <span className="text-nike-ink dark:text-white font-bold">{displayRoomTitle}</span>
       </div>
 
       {/* PDP 2-COLUMN LAYOUT */}
@@ -93,14 +106,14 @@ export const RoomDetail: React.FC = () => {
           <div className="relative w-full h-[420px] sm:h-[500px] rounded-3xl overflow-hidden bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card flex items-center justify-center">
             <img
               src={selectedImage || room.coverImage || '/rooms/room_standard.png'}
-              alt={room.roomName}
+              alt={displayRoomTitle}
               className="w-full h-full object-cover transition-all duration-500"
             />
             
             {/* FLOATING STATUS PILL */}
             <div className="absolute top-4 left-4">
               <span className="bg-nike-ink/90 dark:bg-white/90 backdrop-blur-md text-white dark:text-nike-ink text-xs font-bold px-4 py-1.5 rounded-full shadow-xs">
-                {t('common.floor')} {room.floor} · {t('common.unit')} {room.roomNumber}
+                {t('common.floor')} {room.floor} · {displayRoomTitle}
               </span>
             </div>
 
@@ -156,8 +169,8 @@ export const RoomDetail: React.FC = () => {
                 {getTranslatedRoomType(room.roomType, language)} · {t('common.floor')} {room.floor}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-nike-ink dark:text-white">
-              {getTranslatedRoomName(room.roomName, room.roomNumber, language)}
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-nike-ink dark:text-white">
+              {displayRoomTitle}
             </h1>
             
             {/* PRICE DISPLAY */}
@@ -205,12 +218,13 @@ export const RoomDetail: React.FC = () => {
           {/* PRIMARY BOOKING CTA */}
           <div className="pt-2 space-y-3">
             {isAvailable ? (
-              <Link
-                to={`/booking/${room.id}`}
-                className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-full text-sm transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2"
+              <button
+                type="button"
+                onClick={handleBookClick}
+                className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-full text-sm transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2 cursor-pointer"
               >
                 <CalendarCheck className="w-4 h-4" /> {t('room.applyNow')}
-              </Link>
+              </button>
             ) : (
               <div className="w-full text-center bg-nike-soft-cloud dark:bg-nike-dark-elevated text-nike-mute font-bold py-4 rounded-full text-xs border border-nike-hairline dark:border-neutral-700">
                 {getStatusText(room.status)}

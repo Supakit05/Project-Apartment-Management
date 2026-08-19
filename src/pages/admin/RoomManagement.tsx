@@ -309,6 +309,7 @@ export const RoomManagement: React.FC = () => {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSave={handleSaveModal}
+        defaultBuildingId={buildingFilter !== 'All' ? buildingFilter : undefined}
       />
 
     </div>

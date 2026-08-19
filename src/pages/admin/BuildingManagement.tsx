@@ -29,7 +29,7 @@ export const BuildingManagement: React.FC = () => {
       setBuildings(bData);
       setRooms(rData);
     } catch (err) {
-      toast.error('ไม่สามารถโหลดข้อมูลอาคารได้');
+      toast.error(language === 'th' ? 'ไม่สามารถโหลดข้อมูลอาคารได้' : 'Failed to load building data');
     } finally {
       setLoading(false);
     }
@@ -54,13 +54,14 @@ export const BuildingManagement: React.FC = () => {
   };
 
   const handleDeleteBuilding = async (id: string, name: string) => {
-    if (confirm(`คุณต้องการลบ "${name}" ใช่หรือไม่?`)) {
+    const confirmMsg = language === 'th' ? `คุณต้องการลบ "${name}" ใช่หรือไม่?` : `Are you sure you want to delete "${name}"?`;
+    if (confirm(confirmMsg)) {
       try {
         await deleteBuilding(id);
-        toast.success(`ลบ ${name} เรียบร้อยแล้ว`);
+        toast.success(language === 'th' ? `ลบ ${name} เรียบร้อยแล้ว` : `Deleted ${name} successfully`);
         loadData();
       } catch {
-        toast.error('เกิดข้อผิดพลาดในการลบอาคาร');
+        toast.error(language === 'th' ? 'เกิดข้อผิดพลาดในการลบอาคาร' : 'Failed to delete building');
       }
     }
   };
@@ -68,17 +69,21 @@ export const BuildingManagement: React.FC = () => {
   const handleSubmitBuilding = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingBuilding?.name || !editingBuilding?.code) {
-      toast.error('กรุณากรอกชื่ออาคารและรหัสอาคาร');
+      toast.error(language === 'th' ? 'กรุณากรอกชื่ออาคารและรหัสอาคาร' : 'Please enter building name and building code');
       return;
     }
 
     try {
       await saveBuilding(editingBuilding);
-      toast.success(editingBuilding.id ? 'แก้ไขข้อมูลอาคารเรียบร้อย' : 'เพิ่มอาคารใหม่เรียบร้อย');
+      toast.success(
+        editingBuilding.id
+          ? (language === 'th' ? 'แก้ไขข้อมูลอาคารเรียบร้อย' : 'Building updated successfully')
+          : (language === 'th' ? 'เพิ่มอาคารใหม่เรียบร้อย' : 'New building added successfully')
+      );
       setIsModalOpen(false);
       loadData();
     } catch {
-      toast.error('ไม่สามารถบันทึกข้อมูลอาคารได้');
+      toast.error(language === 'th' ? 'ไม่สามารถบันทึกข้อมูลอาคารได้' : 'Failed to save building data');
     }
   };
 
@@ -205,7 +210,11 @@ export const BuildingManagement: React.FC = () => {
                   </div>
                   <div className="absolute bottom-4 left-4 right-4 text-white">
                     <h3 className="text-xl font-bold text-white drop-shadow-xs">{bName}</h3>
-                    <p className="text-xs text-white opacity-90 line-clamp-1 mt-0.5">{building.address || (language === 'th' ? 'ไม่มีที่อยู่ระบุ' : 'No address specified')}</p>
+                    <p className="text-xs text-white opacity-90 line-clamp-1 mt-0.5">
+                      {building.address 
+                        ? (language === 'en' ? building.address.replace('ถนนสุขุมวิท กรุงเทพฯ', 'Sukhumvit Rd, Bangkok') : building.address)
+                        : (language === 'th' ? 'ไม่มีที่อยู่ระบุ' : 'No address specified')}
+                    </p>
                   </div>
                 </div>
 
@@ -270,7 +279,9 @@ export const BuildingManagement: React.FC = () => {
             <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-indigo-600" />
-                {editingBuilding.id ? 'แก้ไขข้อมูลอาคาร' : 'เพิ่มตึกใหม่'}
+                {editingBuilding.id 
+                  ? (language === 'th' ? 'แก้ไขข้อมูลอาคาร' : 'Edit Building') 
+                  : (language === 'th' ? 'เพิ่มตึกใหม่' : 'Add New Building')}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -284,12 +295,12 @@ export const BuildingManagement: React.FC = () => {
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
                   <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    ชื่ออาคาร <span className="text-red-500">*</span>
+                    {language === 'th' ? 'ชื่ออาคาร' : 'Building Name'} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="เช่น อาคาร A (Victory Tower A)"
+                    placeholder={language === 'th' ? 'เช่น อาคาร A (Victory Tower A)' : 'e.g. Building A (Victory Tower A)'}
                     value={editingBuilding.name || ''}
                     onChange={(e) => setEditingBuilding({ ...editingBuilding, name: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
@@ -297,12 +308,12 @@ export const BuildingManagement: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    รหัสอาคาร <span className="text-red-500">*</span>
+                    {language === 'th' ? 'รหัสอาคาร' : 'Code'} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="เช่น A, B"
+                    placeholder={language === 'th' ? 'เช่น A, B' : 'e.g. A, B'}
                     value={editingBuilding.code || ''}
                     onChange={(e) => setEditingBuilding({ ...editingBuilding, code: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
@@ -312,7 +323,9 @@ export const BuildingManagement: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">จำนวนชั้น</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    {language === 'th' ? 'จำนวนชั้น' : 'Floors'}
+                  </label>
                   <input
                     type="number"
                     min="1"
@@ -322,7 +335,9 @@ export const BuildingManagement: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">จำนวนห้องรวม</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    {language === 'th' ? 'จำนวนห้องรวม' : 'Total Units'}
+                  </label>
                   <input
                     type="number"
                     min="1"
@@ -334,10 +349,12 @@ export const BuildingManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">ที่อยู่อาคาร / ทำเล</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  {language === 'th' ? 'ที่อยู่อาคาร / ทำเล' : 'Building Address / Location'}
+                </label>
                 <input
                   type="text"
-                  placeholder="เช่น 123/1 ถนนสุขุมวิท กรุงเทพฯ"
+                  placeholder={language === 'th' ? 'เช่น 123/1 ถนนสุขุมวิท กรุงเทพฯ' : 'e.g. 123/1 Sukhumvit Rd, Bangkok'}
                   value={editingBuilding.address || ''}
                   onChange={(e) => setEditingBuilding({ ...editingBuilding, address: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
@@ -345,7 +362,9 @@ export const BuildingManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">URL รูปภาพหน้าปก</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  {language === 'th' ? 'URL รูปภาพหน้าปก' : 'Cover Image URL'}
+                </label>
                 <input
                   type="url"
                   placeholder="https://..."
@@ -356,10 +375,12 @@ export const BuildingManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">คำอธิบายตึก</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  {language === 'th' ? 'คำอธิบายตึก' : 'Description'}
+                </label>
                 <textarea
                   rows={3}
-                  placeholder="รายละเอียดเพิ่มเติมของอาคาร เช่น สิ่งอำนวยความสะดวก..."
+                  placeholder={language === 'th' ? 'รายละเอียดเพิ่มเติมของอาคาร เช่น สิ่งอำนวยความสะดวก...' : 'Additional details, building amenities...'}
                   value={editingBuilding.description || ''}
                   onChange={(e) => setEditingBuilding({ ...editingBuilding, description: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white resize-none"
@@ -372,13 +393,13 @@ export const BuildingManagement: React.FC = () => {
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl"
                 >
-                  ยกเลิก
+                  {language === 'th' ? 'ยกเลิก' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium shadow-sm"
                 >
-                  บันทึกข้อมูล
+                  {language === 'th' ? 'บันทึกข้อมูล' : 'Save'}
                 </button>
               </div>
             </form>

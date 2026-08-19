@@ -213,10 +213,10 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
       </div>
 
       {/* Floor 1 Grid */}
-      {renderFloorGrid('Floor 1', floor1Rooms)}
+      {renderFloorGrid(language === 'th' ? 'ชั้น 1' : 'Floor 1', floor1Rooms)}
 
       {/* Floor 2 Grid */}
-      {renderFloorGrid('Floor 2', floor2Rooms)}
+      {renderFloorGrid(language === 'th' ? 'ชั้น 2' : 'Floor 2', floor2Rooms)}
 
       {/* Quick Room Details Modal */}
       {selectedRoom && (
@@ -228,7 +228,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
                   {t('common.unit')} Details
                 </span>
                 <h3 className="text-2xl font-bold text-nike-ink dark:text-white flex items-center gap-2">
-                  {t('common.unit')} {selectedRoom.roomNumber} ({selectedRoom.roomName})
+                  {t('common.unit')} {selectedRoom.roomNumber}
                 </h3>
               </div>
               <button
@@ -249,7 +249,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
                     : 'border-transparent text-nike-mute'
                 }`}
               >
-                Tenant & Pricing Info
+                {language === 'th' ? 'ข้อมูลผู้เช่า & ค่าเช่า' : 'Tenant & Pricing Info'}
               </button>
               <button
                 onClick={() => setActiveTab('logs')}
@@ -260,7 +260,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
                 }`}
               >
                 <Wrench className="w-4 h-4" />
-                Maintenance History ({roomLogs.length})
+                {language === 'th' ? `ประวัติงานซ่อมบำรุง (${roomLogs.length})` : `Maintenance History (${roomLogs.length})`}
               </button>
             </div>
 
@@ -268,43 +268,43 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
               <div className="space-y-4 text-sm">
                 <div className="grid grid-cols-2 gap-4 bg-nike-soft-cloud dark:bg-nike-dark-surface p-4 rounded-xl">
                   <div>
-                    <span className="text-xs text-nike-mute dark:text-nike-stone block">Current Status</span>
+                    <span className="text-xs text-nike-mute dark:text-nike-stone block">{language === 'th' ? 'สถานะปัจจุบัน' : 'Current Status'}</span>
                     <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusBadge(selectedRoom.status).bg}`}>
                       {getStatusBadge(selectedRoom.status).text}
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs text-nike-mute dark:text-nike-stone block">Monthly Rent</span>
+                    <span className="text-xs text-nike-mute dark:text-nike-stone block">{language === 'th' ? 'ค่าเช่ารายเดือน' : 'Monthly Rent'}</span>
                     <span className="text-base font-bold text-nike-ink dark:text-white block mt-0.5">
-                      {formatCurrency(selectedRoom.price)} / month
+                      {formatCurrency(selectedRoom.price)} /{t('common.month')}
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs text-nike-mute dark:text-nike-stone block">Room Type</span>
+                    <span className="text-xs text-nike-mute dark:text-nike-stone block">{language === 'th' ? 'ประเภทห้อง' : 'Room Type'}</span>
                     <span className="font-medium text-nike-ink dark:text-white block mt-0.5">
                       {selectedRoom.roomType} ({selectedRoom.sizeSqm} m²)
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs text-nike-mute dark:text-nike-stone block">Current Tenant</span>
+                    <span className="text-xs text-nike-mute dark:text-nike-stone block">{language === 'th' ? 'ผู้เช่าปัจจุบัน' : 'Current Tenant'}</span>
                     <span className="font-semibold text-blue-600 dark:text-blue-400 block mt-0.5">
-                      {selectedRoom.currentTenantName || 'No Active Tenant'}
+                      {selectedRoom.currentTenantName || (language === 'th' ? 'ไม่มีผู้เช่า' : 'No Active Tenant')}
                     </span>
                   </div>
                 </div>
 
                 <div className="border border-nike-hairline dark:border-nike-dark-card p-4 rounded-xl space-y-2">
                   <h4 className="font-semibold text-nike-ink dark:text-white text-xs uppercase tracking-wider">
-                    Latest Meter Readings
+                    {language === 'th' ? 'เลขมิเตอร์ล่าสุด' : 'Latest Meter Readings'}
                   </h4>
                   <div className="grid grid-cols-2 gap-4 text-xs">
                     <div>
-                      <span className="text-nike-mute dark:text-nike-stone block">Water Meter:</span>
-                      <span className="font-medium text-nike-ink dark:text-white">{selectedRoom.currWaterMeter || selectedRoom.prevWaterMeter || '-'} units</span>
+                      <span className="text-nike-mute dark:text-nike-stone block">{language === 'th' ? 'มิเตอร์น้ำ:' : 'Water Meter:'}</span>
+                      <span className="font-medium text-nike-ink dark:text-white">{selectedRoom.currWaterMeter || selectedRoom.prevWaterMeter || '-'} {t('common.unit')}</span>
                     </div>
                     <div>
-                      <span className="text-nike-mute dark:text-nike-stone block">Electric Meter:</span>
-                      <span className="font-medium text-nike-ink dark:text-white">{selectedRoom.currElectricMeter || selectedRoom.prevElectricMeter || '-'} units</span>
+                      <span className="text-nike-mute dark:text-nike-stone block">{language === 'th' ? 'มิเตอร์ไฟ:' : 'Electric Meter:'}</span>
+                      <span className="font-medium text-nike-ink dark:text-white">{selectedRoom.currElectricMeter || selectedRoom.prevElectricMeter || '-'} {t('common.unit')}</span>
                     </div>
                   </div>
                 </div>
@@ -313,7 +313,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
               <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                 {roomLogs.length === 0 ? (
                   <p className="text-xs text-nike-mute dark:text-nike-stone py-4 text-center">
-                    No maintenance records for this unit.
+                    {language === 'th' ? 'ไม่มีประวัติงานซ่อมสำหรับห้องนี้' : 'No maintenance records for this unit.'}
                   </p>
                 ) : (
                   roomLogs.map((log) => (
@@ -324,8 +324,8 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
                       </div>
                       <p className="text-nike-mute dark:text-nike-stone">{log.description}</p>
                       <div className="flex justify-between text-[11px] pt-1 text-nike-stone">
-                        <span>Supplies: {formatSuppliesSummary(log.suppliesSummary)}</span>
-                        <span className="font-semibold text-nike-ink dark:text-white">Total: {formatCurrency(log.totalCost)}</span>
+                        <span>{language === 'th' ? 'อะไหล่: ' : 'Supplies: '}{formatSuppliesSummary(log.suppliesSummary)}</span>
+                        <span className="font-semibold text-nike-ink dark:text-white">{language === 'th' ? 'รวม: ' : 'Total: '}{formatCurrency(log.totalCost)}</span>
                       </div>
                     </div>
                   ))
@@ -338,7 +338,7 @@ export const ApartmentFloorGrid: React.FC<ApartmentFloorGridProps> = ({ rooms, o
                 onClick={() => setSelectedRoom(null)}
                 className="px-4 py-2 text-xs font-medium rounded-lg bg-nike-soft-cloud dark:bg-nike-dark-card hover:bg-nike-hairline text-nike-ink dark:text-white"
               >
-                Close
+                {language === 'th' ? 'ปิด' : 'Close'}
               </button>
             </div>
           </div>

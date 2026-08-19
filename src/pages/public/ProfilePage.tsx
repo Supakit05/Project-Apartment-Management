@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 export const ProfilePage: React.FC = () => {
   const { user, isAuthenticated, updateProfile } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [fullname, setFullname] = useState(user?.fullname || '');
   const [phone, setPhone] = useState(user?.phone || '');
@@ -25,7 +25,7 @@ export const ProfilePage: React.FC = () => {
         <h2 className="text-2xl font-bold text-nike-ink dark:text-white">
           {t('profile.title')}
         </h2>
-        <p className="text-xs text-nike-mute">กรุณาเข้าสู่ระบบก่อนดูข้อมูลโปรไฟล์</p>
+        <p className="text-xs text-nike-mute">{language === 'th' ? 'กรุณาเข้าสู่ระบบก่อนดูข้อมูลโปรไฟล์' : 'Please sign in to view your profile'}</p>
         <Link
           to="/login"
           className="inline-block bg-nike-ink text-white dark:bg-white dark:text-nike-ink font-bold px-6 py-3 rounded-full text-xs uppercase tracking-wider shadow-sm"
@@ -39,7 +39,7 @@ export const ProfilePage: React.FC = () => {
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullname.trim()) {
-      toast.error('กรุณากรอกชื่อ-นามสกุล');
+      toast.error(language === 'th' ? 'กรุณากรอกชื่อ-นามสกุล' : 'Please enter your full name');
       return;
     }
     setSaving(true);
@@ -102,7 +102,8 @@ export const ProfilePage: React.FC = () => {
                 required
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
+                placeholder={language === 'th' ? 'ชื่อ-นามสกุล' : 'Full Name'}
+                className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
           </div>
@@ -133,8 +134,8 @@ export const ProfilePage: React.FC = () => {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="081-234-5678"
-                  className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
+                  placeholder={language === 'th' ? 'เบอร์โทรศัพท์' : 'Phone Number'}
+                  className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
                 />
               </div>
             </div>

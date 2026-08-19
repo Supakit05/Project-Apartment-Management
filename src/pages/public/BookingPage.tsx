@@ -12,7 +12,7 @@ export const BookingPage: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -29,7 +29,7 @@ export const BookingPage: React.FC = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      toast.info('หากต้องการจอง/เช่าห้อง กรุณาเข้าสู่ระบบก่อน', { duration: 5000 });
+      toast.info(language === 'th' ? 'หากต้องการจอง/เช่าห้อง กรุณาเข้าสู่ระบบก่อน' : 'Please sign in to submit a rental booking request', { duration: 5000 });
       navigate('/login');
       return;
     }
@@ -45,7 +45,7 @@ export const BookingPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.guestName || !formData.guestPhone || !formData.guestEmail) {
-      toast.error('Please fill in all required contact information');
+      toast.error(language === 'th' ? 'กรุณากรอกข้อมูลการติดต่อให้ครบถ้วน' : 'Please fill in all required contact information');
       return;
     }
 
@@ -64,11 +64,11 @@ export const BookingPage: React.FC = () => {
         specialRequests: formData.specialRequests,
       });
 
-      toast.success(`Booking request submitted! Reference: ${res.bookingNo}`);
+      toast.success(language === 'th' ? `ส่งคำขอจองห้องเรียบร้อยแล้ว! รหัสอ้างอิง: ${res.bookingNo}` : `Booking request submitted! Reference: ${res.bookingNo}`);
       navigate('/payment/' + res.id);
 
     } catch (err: any) {
-      const msg = err.message || 'Unable to submit booking request';
+      const msg = err.message || (language === 'th' ? 'ไม่สามารถส่งคำขอจองห้องได้' : 'Unable to submit booking request');
       toast.error(msg, { duration: 6000 });
     } finally {
       setSubmitting(false);
@@ -76,13 +76,13 @@ export const BookingPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-24 text-nike-mute font-medium">Loading unit booking...</div>;
+    return <div className="text-center py-24 text-nike-mute font-medium">{language === 'th' ? 'กำลังโหลดข้อมูลห้อง...' : 'Loading unit booking...'}</div>;
   }
 
   if (!room) {
     return (
       <div className="text-center py-24 space-y-4">
-        <h2 className="text-2xl font-bold text-nike-ink dark:text-white">Unit Not Found</h2>
+        <h2 className="text-2xl font-bold text-nike-ink dark:text-white">{language === 'th' ? 'ไม่พบห้องพัก' : 'Unit Not Found'}</h2>
         <Link to="/rooms" className="text-xs font-bold text-nike-ink dark:text-white underline">
           {t('room.backToUnits')}
         </Link>
@@ -106,7 +106,7 @@ export const BookingPage: React.FC = () => {
               {t('common.floor')} {room.floor} · {t('common.unit')} {room.roomNumber}
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-nike-ink dark:text-white">
-              {room.roomName}
+              {language === 'th' ? `ห้อง ${room.roomNumber} (${room.roomType})` : `Unit ${room.roomNumber} (${room.roomType})`}
             </h1>
           </div>
           <div className="text-left sm:text-right">
@@ -144,7 +144,7 @@ export const BookingPage: React.FC = () => {
               required
               value={formData.guestName}
               onChange={(e) => setFormData({ ...formData, guestName: e.target.value })}
-              placeholder="e.g. John Doe"
+              placeholder={language === 'th' ? 'ชื่อ-นามสกุล' : 'Full Name'}
               className="w-full px-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
             />
           </div>
@@ -157,7 +157,7 @@ export const BookingPage: React.FC = () => {
                 required
                 value={formData.guestPhone}
                 onChange={(e) => setFormData({ ...formData, guestPhone: e.target.value })}
-                placeholder="081-234-5678"
+                placeholder={language === 'th' ? 'เบอร์โทรศัพท์' : 'Phone Number'}
                 className="w-full px-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
@@ -168,7 +168,7 @@ export const BookingPage: React.FC = () => {
                 required
                 value={formData.guestEmail}
                 onChange={(e) => setFormData({ ...formData, guestEmail: e.target.value })}
-                placeholder="john.doe@example.com"
+                placeholder={language === 'th' ? 'อีเมล' : 'Email Address'}
                 className="w-full px-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>

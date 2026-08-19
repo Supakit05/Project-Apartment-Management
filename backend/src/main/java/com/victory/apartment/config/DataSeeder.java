@@ -128,7 +128,7 @@ public class DataSeeder {
                     room.setFloor(floor);
                     room.setRoomName(String.format("Unit %s (%s)", roomNum, type));
                     room.setRoomType(type);
-                    room.setDescription(String.format("อาคารเสริม B ชั้น %d %s ตกแต่งสไตล์โมเดิร์น บรรยากาศสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน", floor, type));
+                    room.setDescription(String.format("อาคาร B ชั้น %d %s ตกแต่งสไตล์โมเดิร์น บรรยากาศสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน", floor, type));
                     room.setCapacity(2);
                     room.setPrice(rent);
                     room.setStatus("Available");

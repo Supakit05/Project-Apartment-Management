@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { getUserBookings } from '../../services/api';
 import { toast } from 'sonner';
 
 export const Navbar: React.FC = () => {
@@ -19,7 +20,25 @@ export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [hasApprovedBooking, setHasApprovedBooking] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      if (user.role === 'admin') {
+        setHasApprovedBooking(true);
+      } else {
+        getUserBookings(user.email)
+          .then(bookings => {
+            const hasApproved = bookings.some(b => b.status === 'Approved' || b.status === 'Completed');
+            setHasApprovedBooking(hasApproved);
+          })
+          .catch(() => setHasApprovedBooking(false));
+      }
+    } else {
+      setHasApprovedBooking(false);
+    }
+  }, [isAuthenticated, user?.email, user?.role]);
 
   const navLinks = [
     { name: t('nav.home'), path: '/' },
@@ -184,14 +203,16 @@ export const Navbar: React.FC = () => {
                         <span className="truncate">{t('nav.myApartment')}</span>
                       </Link>
 
-                      <Link
-                        to="/my-maintenance"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-1.5 hover:bg-nike-soft-cloud dark:hover:bg-neutral-800 transition-colors rounded-lg mx-1 text-rose-600 dark:text-rose-400"
-                      >
-                        <Wrench className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">{t('nav.myMaintenance')}</span>
-                      </Link>
+                      {hasApprovedBooking && (
+                        <Link
+                          to="/my-maintenance"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-1.5 hover:bg-nike-soft-cloud dark:hover:bg-neutral-800 transition-colors rounded-lg mx-1 text-rose-600 dark:text-rose-400"
+                        >
+                          <Wrench className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate">{t('nav.myMaintenance')}</span>
+                        </Link>
+                      )}
 
                       {user?.role === 'admin' && (
                         <Link
@@ -305,13 +326,15 @@ export const Navbar: React.FC = () => {
                       >
                         {t('nav.myBookings')}
                       </Link>
-                      <Link
-                        to="/my-maintenance"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-center py-2 text-xs font-semibold bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 rounded-xl border border-rose-200 dark:border-rose-900"
-                      >
-                        {t('nav.myMaintenance')}
-                      </Link>
+                      {hasApprovedBooking && (
+                        <Link
+                          to="/my-maintenance"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="text-center py-2 text-xs font-semibold bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 rounded-xl border border-rose-200 dark:border-rose-900"
+                        >
+                          {t('nav.myMaintenance')}
+                        </Link>
+                      )}
                     </div>
                   </div>
 

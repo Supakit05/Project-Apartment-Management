@@ -15,7 +15,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'sonner';
 
 export const AdminDashboard: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [leases, setLeases] = useState<Lease[]>([]);
   const [bills, setBills] = useState<UtilityBill[]>([]);
@@ -112,8 +112,8 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* METRIC CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* METRIC CARDS - ALL 5 CARDS IN A SINGLE ROW ON DESKTOP */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
 
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl space-y-2 shadow-xs">
           <div className="flex items-center justify-between text-nike-mute">
@@ -122,7 +122,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-[32px] font-bold text-nike-ink dark:text-white">{totalUnits}</span>
-            <span className="text-xs text-nike-stone font-medium">units</span>
+            <span className="text-xs text-nike-stone font-medium">{language === 'th' ? 'ห้อง' : 'units'}</span>
           </div>
           <div className="w-full bg-nike-soft-cloud dark:bg-nike-dark-card h-2 rounded-full overflow-hidden">
             <div className="bg-blue-600 h-full transition-all" style={{ width: `${occupancyRate}%` }}></div>
@@ -139,7 +139,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-[32px] font-bold text-emerald-600 dark:text-emerald-400">{availableCount}</span>
-            <span className="text-xs text-nike-stone font-medium">units ready</span>
+            <span className="text-xs text-nike-stone font-medium">{language === 'th' ? 'ห้องว่าง' : 'units ready'}</span>
           </div>
           <span className="text-[12px] text-emerald-600 font-medium block">
             {Math.round((availableCount / (totalUnits || 1)) * 100)}% {t('common.available')}
@@ -153,7 +153,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-[32px] font-bold text-blue-600 dark:text-blue-400">{occupiedCount}</span>
-            <span className="text-xs text-nike-stone font-medium">active tenants</span>
+            <span className="text-xs text-nike-stone font-medium">{language === 'th' ? 'ผู้เช่าพักอยู่' : 'active tenants'}</span>
           </div>
           <span className="text-[12px] text-blue-600 dark:text-blue-400 font-medium block">
             {occupancyRate}% {t('common.occupied')}
@@ -165,25 +165,25 @@ export const AdminDashboard: React.FC = () => {
             <span className="text-[12px] font-semibold uppercase tracking-wider">{t('dashboard.estimatedRevenue')}</span>
             <DollarSign className="w-5 h-5" />
           </div>
-          <span className="text-[26px] font-bold text-nike-ink dark:text-white block">
+          <span className="text-[24px] font-bold text-nike-ink dark:text-white block truncate">
             {formatCurrency(totalMonthlyRent)}
           </span>
           <span className="text-[12px] text-purple-600 dark:text-purple-400 font-medium block">
-            {pendingBills.length} pending bills ({formatCurrency(pendingBills.reduce((s, b) => s + b.totalAmount, 0))})
+            {pendingBills.length} {language === 'th' ? 'ใบแจ้งหนี้ค้างชำระ' : 'pending bills'}
           </span>
         </div>
 
         <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card p-5 rounded-2xl space-y-2 shadow-xs">
           <div className="flex items-center justify-between text-rose-600">
-            <span className="text-[12px] font-semibold uppercase tracking-wider">Active Maintenance</span>
+            <span className="text-[12px] font-semibold uppercase tracking-wider">{language === 'th' ? 'งานซ่อมค้างอยู่' : 'Active Maintenance'}</span>
             <Wrench className="w-5 h-5" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-[32px] font-bold text-rose-600 dark:text-rose-400">{activeTasks.length}</span>
-            <span className="text-xs text-nike-stone">tasks pending</span>
+            <span className="text-xs text-nike-stone">{language === 'th' ? 'รายการ' : 'tasks pending'}</span>
           </div>
           <span className="text-[12px] text-nike-stone block">
-            {maintenanceCount} units under maintenance
+            {language === 'th' ? `ห้องกำลังซ่อม ${maintenanceCount} ห้อง` : `${maintenanceCount} units under maintenance`}
           </span>
         </div>
 
@@ -228,25 +228,46 @@ export const AdminDashboard: React.FC = () => {
 
           <div className="space-y-3">
             {reminders.length === 0 ? (
-              <p className="text-xs text-nike-mute dark:text-nike-stone py-4 text-center">No scheduled reminders</p>
+              <p className="text-xs text-nike-mute dark:text-nike-stone py-4 text-center">{language === 'th' ? 'ไม่มีรายการแจ้งเตือนตามรอบเวลา' : 'No scheduled reminders'}</p>
             ) : (
-              reminders.map((rem) => (
-                <div key={rem.id} className="p-3.5 bg-nike-soft-cloud dark:bg-nike-dark-surface rounded-xl border border-nike-hairline dark:border-nike-dark-card flex items-start justify-between gap-3 text-xs">
-                  <div className="space-y-1">
-                    <span className="font-semibold text-nike-ink dark:text-white block">
-                      {rem.title}
-                    </span>
-                    <span className="text-nike-stone block">
-                      Target: <strong className="text-nike-ink dark:text-white">{rem.roomNumber || 'Building Common'}</strong> | Cycle: {rem.frequency}
-                    </span>
+              reminders.map((rem) => {
+                const dueDays = (() => {
+                  if (!rem.nextDueDate) return null;
+                  const due = new Date(rem.nextDueDate);
+                  const now = new Date();
+                  due.setHours(0, 0, 0, 0);
+                  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                  const diffTime = due.getTime() - today.getTime();
+                  const diff = Math.round(diffTime / (1000 * 60 * 60 * 24));
+                  if (diff < 0) return { label: language === 'th' ? `เกิน ${Math.abs(diff)} วัน` : `${Math.abs(diff)}d overdue`, cls: 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300' };
+                  if (diff === 0) return { label: language === 'th' ? 'ครบกำหนดวันนี้' : 'Due today', cls: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 animate-pulse' };
+                  if (diff <= 7) return { label: language === 'th' ? `อีก ${diff} วัน` : `In ${diff}d`, cls: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400' };
+                  return { label: language === 'th' ? `อีก ${diff} วัน` : `In ${diff}d`, cls: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400' };
+                })();
+
+                return (
+                  <div key={rem.id} className="p-3.5 bg-nike-soft-cloud dark:bg-nike-dark-surface rounded-xl border border-nike-hairline dark:border-nike-dark-card flex items-start justify-between gap-3 text-xs">
+                    <div className="space-y-1">
+                      <span className="font-semibold text-nike-ink dark:text-white block">
+                        {rem.title}
+                      </span>
+                      <span className="text-nike-stone block text-[11px]">
+                        {language === 'th' ? 'เป้าหมาย: ' : 'Target: '}<strong className="text-nike-ink dark:text-white">{rem.roomNumber || (language === 'th' ? 'พื้นที่ส่วนกลาง' : 'Building Common')}</strong> | {language === 'th' ? 'รอบ: ' : 'Cycle: '}{rem.frequency}
+                      </span>
+                    </div>
+                    <div className="text-right flex-shrink-0 space-y-1">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 block font-mono">
+                        {rem.nextDueDate}
+                      </span>
+                      {dueDays && (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold block ${dueDays.cls}`}>
+                          {dueDays.label}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 block">
-                      Due: {rem.nextDueDate}
-                    </span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

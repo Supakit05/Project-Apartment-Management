@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Room, RoomType, RoomStatus, Building } from '../../types';
 import { getBuildings } from '../../services/api';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface RoomModalProps {
   room?: Room | null;
@@ -19,6 +20,7 @@ const ALL_AMENITIES = [
 export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onSave, defaultBuildingId }) => {
   if (!isOpen) return null;
 
+  const { t, language } = useLanguage();
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>(room?.buildingId || defaultBuildingId || '');
   const [roomNumber, setRoomNumber] = useState(room?.roomNumber || '');
@@ -74,7 +76,7 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
       id: room?.id,
       roomNumber,
       floor: Number(floor) || 1,
-      roomName: `ห้อง ${roomNumber} (${bld?.name || ''})`,
+      roomName: `Unit ${roomNumber} (${bld?.name || ''})`,
       roomType,
       buildingId: selectedBuildingId,
       buildingName: bld?.name || bld?.code || 'A',
@@ -98,7 +100,9 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
 
         <div className="flex items-center justify-between border-b border-nike-hairline-soft dark:border-nike-dark-card pb-3">
           <h3 className="text-[18px] font-bold text-nike-ink dark:text-white">
-            {room ? `แก้ไขข้อมูลห้อง ${room.roomNumber}` : 'เพิ่มห้องพักใหม่ (Add New Room)'}
+            {room 
+              ? (language === 'th' ? `แก้ไขข้อมูลห้อง ${room.roomNumber}` : `Edit Unit ${room.roomNumber}`)
+              : (language === 'th' ? 'เพิ่มห้องพักใหม่' : 'Add New Unit')}
           </h3>
           <button onClick={onClose} className="text-nike-mute hover:text-nike-ink dark:hover:text-white">
             <X className="w-5 h-5" />
@@ -109,30 +113,47 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">ตึก / อาคาร (Building)</label>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+                {language === 'th' ? 'ตึก / อาคาร' : 'Building / Tower'}
+              </label>
               <select
                 value={selectedBuildingId}
                 onChange={e => setSelectedBuildingId(e.target.value)}
                 className={inputClass + " appearance-none cursor-pointer font-bold"}
               >
                 {buildings.map(b => (
-                  <option key={b.id} value={b.id}>{b.name} (รหัส {b.code})</option>
+                  <option key={b.id} value={b.id}>
+                    {language === 'en' ? (b.name.includes('อาคาร A') ? 'Building A (Victory Tower A)' : b.name.includes('อาคาร B') ? 'Building B (Victory Residence B)' : b.name) : b.name} ({language === 'th' ? 'รหัส' : 'Code'} {b.code})
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">เลขห้อง (Room Number)</label>
-              <input type="text" required value={roomNumber} onChange={e => handleRoomNumberChange(e.target.value)} className={inputClass} placeholder="เช่น 101, 202, A301" />
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+                {language === 'th' ? 'เลขห้อง' : 'Unit Number'}
+              </label>
+              <input 
+                type="text" 
+                required 
+                value={roomNumber} 
+                onChange={e => handleRoomNumberChange(e.target.value)} 
+                className={inputClass} 
+                placeholder={language === 'th' ? 'เช่น 101, 202, A301' : 'e.g. 101, 202, A301'} 
+              />
             </div>
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">ชั้น (Floor)</label>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+                {language === 'th' ? 'ชั้น' : 'Floor'}
+              </label>
               <input type="number" required min="1" value={floor} onChange={e => setFloor(Number(e.target.value))} className={inputClass} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">ประเภทห้อง (Room Type)</label>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+                {language === 'th' ? 'ประเภทห้อง' : 'Unit Type'}
+              </label>
               <select value={roomType} onChange={e => setRoomType(e.target.value as RoomType)} className={inputClass + " appearance-none cursor-pointer"}>
                 <option value="Studio (Single Bed)">Studio (Single Bed)</option>
                 <option value="Studio (Double Bed)">Studio (Double Bed)</option>
@@ -145,48 +166,64 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
               </select>
             </div>
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">สถานะห้อง (Status)</label>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+                {language === 'th' ? 'สถานะห้อง' : 'Unit Status'}
+              </label>
               <select value={status} onChange={e => setStatus(e.target.value as RoomStatus)} className={inputClass + " appearance-none cursor-pointer font-bold"}>
-                <option value="Available">ว่าง (Available)</option>
-                <option value="Reserved">จองแล้ว (Reserved)</option>
-                <option value="Occupied">มีคนเช่า (Occupied)</option>
-                <option value="Maintenance">ซ่อมบำรุง (Maintenance)</option>
+                <option value="Available">{t('common.available')}</option>
+                <option value="Reserved">{t('common.reserved')}</option>
+                <option value="Occupied">{t('common.occupied')}</option>
+                <option value="Maintenance">{t('common.maintenance')}</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Monthly Rent (THB)</label>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+                {language === 'th' ? 'ค่าเช่ารายเดือน (บาท)' : 'Monthly Rent (THB)'}
+              </label>
               <input type="number" required min="0" value={price} onChange={e => setPrice(Number(e.target.value))} className={inputClass} />
             </div>
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Capacity (Guests)</label>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+                {language === 'th' ? 'จำนวนผู้เข้าพัก' : 'Capacity (Guests)'}
+              </label>
               <input type="number" required min="1" value={capacity} onChange={e => setCapacity(Number(e.target.value))} className={inputClass} />
             </div>
             <div>
-              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Size (m²)</label>
+              <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+                {language === 'th' ? 'ขนาด (ตร.ม.)' : 'Size (sqm)'}
+              </label>
               <input type="number" required min="1" value={sizeSqm} onChange={e => setSizeSqm(Number(e.target.value))} className={inputClass} />
             </div>
           </div>
 
           <div>
-            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Bed Type</label>
+            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+              {language === 'th' ? 'ประเภทเตียง' : 'Bed Type'}
+            </label>
             <input type="text" required value={bedType} onChange={e => setBedType(e.target.value)} className={inputClass} placeholder="e.g. King Bed" />
           </div>
 
           <div>
-            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Cover Image URL</label>
+            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+              {language === 'th' ? 'URL รูปภาพหน้าปก' : 'Cover Image URL'}
+            </label>
             <input type="text" required value={coverImage} onChange={e => setCoverImage(e.target.value)} className={inputClass} />
           </div>
 
           <div>
-            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Description</label>
+            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+              {language === 'th' ? 'รายละเอียดเพิ่มเติม' : 'Description'}
+            </label>
             <textarea rows={3} value={description} onChange={e => setDescription(e.target.value)} className={inputClass} />
           </div>
 
           <div>
-            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">Amenities</label>
+            <label className="block font-medium mb-1.5 text-nike-ink dark:text-white">
+              {language === 'th' ? 'สิ่งอำนวยความสะดวก' : 'Amenities'}
+            </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {ALL_AMENITIES.map(item => (
                 <label key={item} className="flex items-center gap-2 p-2 bg-nike-soft-cloud dark:bg-nike-dark-card text-[13px] font-medium text-nike-ink dark:text-white cursor-pointer rounded-xl px-3 border border-nike-hairline">
@@ -199,10 +236,10 @@ export const RoomModal: React.FC<RoomModalProps> = ({ room, isOpen, onClose, onS
 
           <div className="flex gap-3 pt-4 border-t border-nike-hairline-soft dark:border-nike-dark-card">
             <button type="button" onClick={onClose} className="flex-1 border border-nike-hairline text-nike-mute font-medium py-3 rounded-xl hover:text-nike-ink transition-colors">
-              Cancel
+              {language === 'th' ? 'ยกเลิก' : 'Cancel'}
             </button>
             <button type="submit" className="flex-1 bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-700 transition-colors">
-              Save Unit
+              {language === 'th' ? 'บันทึกข้อมูลห้อง' : 'Save Unit'}
             </button>
           </div>
 

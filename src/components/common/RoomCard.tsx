@@ -99,7 +99,9 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
                 ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
                 : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
             }`}>
-              {room.buildingId === 'bld-2' || room.roomNumber.startsWith('B') ? 'อาคารเสริม B' : 'อาคาร A'}
+              {room.buildingId === 'bld-2' || room.roomNumber.startsWith('B')
+                ? (language === 'th' ? 'อาคาร B' : 'Bldg B')
+                : (language === 'th' ? 'อาคาร A' : 'Bldg A')}
             </span>
           </div>
 

@@ -7,7 +7,7 @@ import { Lock, Mail, LogIn } from 'lucide-react';
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export const Login: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin or user@example.com"
+                placeholder={language === 'th' ? 'อีเมล' : 'Email Address'}
                 className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
@@ -72,7 +72,7 @@ export const Login: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={language === 'th' ? 'รหัสผ่าน' : 'Password'}
                 className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
@@ -81,9 +81,9 @@ export const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white font-bold py-3.5 rounded-full transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 text-xs uppercase tracking-wider mt-2"
+            className="w-full bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white font-bold py-3.5 rounded-full transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 text-xs uppercase tracking-wider mt-2 cursor-pointer"
           >
-            {loading ? 'Authenticating...' : (
+            {loading ? (language === 'th' ? 'กำลังเข้าสู่ระบบ...' : 'Authenticating...') : (
               <>
                 <LogIn className="w-4 h-4" /> {t('nav.signIn')}
               </>

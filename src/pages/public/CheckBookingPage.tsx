@@ -67,18 +67,19 @@ export const CheckBookingPage: React.FC = () => {
   };
 
   const handleCancel = async (bookingId: string) => {
-    if (!window.confirm('คุณต้องการยกเลิกคำขอจองห้องพักนี้ใช่หรือไม่?')) return;
+    const confirmMsg = language === 'th' ? 'คุณต้องการยกเลิกคำขอจองห้องพักนี้ใช่หรือไม่?' : 'Are you sure you want to cancel this booking request?';
+    if (!window.confirm(confirmMsg)) return;
     setCancellingId(bookingId);
     try {
       const res = await cancelBooking(bookingId);
       if (res) {
-        toast.success('ยกเลิกคำขอจองเรียบร้อยแล้ว');
+        toast.success(language === 'th' ? 'ยกเลิกคำขอจองเรียบร้อยแล้ว' : 'Booking request cancelled successfully');
         setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'Cancelled' } : b));
       } else {
-        toast.error('ไม่สามารถยกเลิกคำขอจองได้');
+        toast.error(language === 'th' ? 'ไม่สามารถยกเลิกคำขอจองได้' : 'Failed to cancel booking request');
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาดในการยกเลิกคำขอจอง');
+      toast.error(language === 'th' ? 'เกิดข้อผิดพลาดในการยกเลิกคำขอจอง' : 'Error cancelling booking request');
     } finally {
       setCancellingId(null);
     }
@@ -141,7 +142,7 @@ export const CheckBookingPage: React.FC = () => {
         </h1>
         <p className="text-sm text-nike-mute dark:text-nike-stone max-w-lg mx-auto leading-relaxed">
           {isAuthenticated 
-            ? (language === 'th' ? 'รายการห้องพักที่คุณได้ส่งคำขอจองไว้ สามารถติดตามสถานะการอนุมัติและชำระเงินมัดจำได้ที่นี่' : 'Your rental booking applications. Track approval status and deposit payments here.')
+            ? (language === 'th' ? 'รายการห้องพักที่คุณได้ส่งคำขอจองไว้ สามารถติดตามสถานะการอนุมัติได้ที่นี่' : 'Your rental booking applications. Track your approval status here.')
             : t('track.subtitle')}
         </p>
       </div>
@@ -305,7 +306,7 @@ export const CheckBookingPage: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* STEP 3: Deposit & Unit Access */}
+                    {/* STEP 3: Approval & Unit Access */}
                     <div className="space-y-1.5">
                       <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center mx-auto text-xs ${
                         booking.status === 'Approved' || booking.status === 'Completed'
@@ -322,8 +323,8 @@ export const CheckBookingPage: React.FC = () => {
                           : 'text-nike-mute'
                       }`}>
                         {booking.status === 'Approved' || booking.status === 'Completed'
-                          ? (language === 'th' ? 'ชำระมัดจำ & เข้าพัก' : 'Deposit & Check-in')
-                          : (language === 'th' ? 'อนุมัติ & ชำระมัดจำ' : 'Approval & Deposit')}
+                          ? (language === 'th' ? 'อนุมัติ / พร้อมเข้าพัก' : 'Approved & Move-in')
+                          : (language === 'th' ? 'อนุมัติห้องพัก' : 'Room Approval')}
                       </span>
                       <span className="text-[11px] text-nike-mute block">
                         {booking.status === 'Approved' || booking.status === 'Completed'
@@ -373,24 +374,15 @@ export const CheckBookingPage: React.FC = () => {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    {/* APPROVED / COMPLETED: Show Deposit Payment and My Unit buttons */}
+                    {/* APPROVED / COMPLETED: Show My Unit button */}
                     {(booking.status === 'Approved' || booking.status === 'Completed') && (
-                      <>
-                        <Link
-                          to={`/payment/${booking.id}`}
-                          className="px-4 py-2 rounded-full text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <CreditCard className="w-3.5 h-3.5" />
-                          {language === 'th' ? 'ชำระเงินมัดจำ / แนบสลิป' : 'Pay Deposit / Attach Slip'}
-                        </Link>
-                        <Link
-                          to="/my-apartment"
-                          className="px-4 py-2 rounded-full text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <Home className="w-3.5 h-3.5" />
-                          {t('nav.myApartment')}
-                        </Link>
-                      </>
+                      <Link
+                        to="/my-apartment"
+                        className="px-4 py-2 rounded-full text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Home className="w-3.5 h-3.5" />
+                        {t('nav.myApartment')}
+                      </Link>
                     )}
 
                     {/* PENDING: Show Cancel Application button */}

@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 export const Register: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -19,7 +19,7 @@ export const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error(language === 'th' ? 'รหัสผ่านทั้งสองช่องไม่ตรงกัน' : 'Passwords do not match');
       return;
     }
 
@@ -28,7 +28,7 @@ export const Register: React.FC = () => {
     setLoading(false);
 
     if (res.success) {
-      toast.success('Account created successfully!');
+      toast.success(language === 'th' ? 'สร้างบัญชีผู้ใช้สำเร็จเรียบร้อยแล้ว!' : 'Account created successfully!');
       navigate('/rooms');
     }
   };
@@ -60,7 +60,7 @@ export const Register: React.FC = () => {
                 required
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
-                placeholder="John Doe"
+                placeholder={language === 'th' ? 'ชื่อ-นามสกุล' : 'Full Name'}
                 className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
@@ -77,7 +77,7 @@ export const Register: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@example.com"
+                placeholder={language === 'th' ? 'อีเมล' : 'Email Address'}
                 className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
@@ -93,7 +93,7 @@ export const Register: React.FC = () => {
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="081-234-5678"
+                placeholder={language === 'th' ? 'เบอร์โทรศัพท์' : 'Phone Number'}
                 className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
@@ -110,7 +110,7 @@ export const Register: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a password"
+                placeholder={language === 'th' ? 'รหัสผ่าน' : 'Password'}
                 className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
@@ -127,7 +127,7 @@ export const Register: React.FC = () => {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm password"
+                placeholder={language === 'th' ? 'ยืนยันรหัสผ่าน' : 'Confirm Password'}
                 className="w-full pl-11 pr-4 py-3 text-xs font-semibold rounded-full bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white placeholder-nike-mute dark:placeholder-nike-stone focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all"
               />
             </div>
@@ -136,10 +136,10 @@ export const Register: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white font-bold py-3.5 rounded-full transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 text-xs uppercase tracking-wider mt-2"
+            className="w-full bg-nike-ink hover:bg-neutral-800 dark:bg-white dark:text-nike-ink dark:hover:bg-neutral-200 text-white font-bold py-3.5 rounded-full transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 text-xs uppercase tracking-wider mt-2 cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
-            {loading ? 'Creating Account...' : t('nav.signUp')}
+            {loading ? (language === 'th' ? 'กำลังสร้างบัญชี...' : 'Creating Account...') : t('nav.signUp')}
           </button>
         </form>
 

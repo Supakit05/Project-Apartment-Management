@@ -248,7 +248,7 @@ export const MyApartmentPage: React.FC = () => {
       <div className="bg-nike-canvas dark:bg-nike-dark-elevated border border-nike-hairline dark:border-nike-dark-card rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-nike-hairline dark:border-nike-dark-card pb-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20 shadow-2xs">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800 shadow-2xs">
               <Receipt className="w-5 h-5" />
             </div>
             <div>
@@ -262,7 +262,7 @@ export const MyApartmentPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40 self-start sm:self-auto">
+          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/60 self-start sm:self-auto">
             {language === 'th' ? `ประวัติบิลทั้งหมด (${bills.length} รายการ)` : `Total Records (${bills.length})`}
           </span>
         </div>
@@ -290,15 +290,15 @@ export const MyApartmentPage: React.FC = () => {
               return (
                 <div
                   key={bill.id}
-                  className="p-5 rounded-2xl border border-nike-hairline dark:border-nike-dark-card bg-nike-soft-cloud/30 dark:bg-nike-dark-surface/50 hover:shadow-xs transition-all space-y-4"
+                  className="p-5 rounded-2xl border border-nike-hairline dark:border-nike-dark-card bg-nike-soft-cloud/40 dark:bg-nike-dark-surface/50 hover:shadow-xs transition-all space-y-4"
                 >
                   {/* BILL HEADER ROW */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/70 dark:border-slate-800 pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-nike-hairline dark:border-nike-dark-card pb-3">
                     <div className="flex items-center gap-2.5">
                       <span className="font-extrabold text-slate-900 dark:text-white text-base">
                         {bill.billingMonth}
                       </span>
-                      <span className="text-xs text-slate-500 font-mono font-semibold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                      <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-semibold bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
                         #{invoiceDisplay}
                       </span>
                     </div>
@@ -326,12 +326,12 @@ export const MyApartmentPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* ITEMIZED BREAKDOWN GRID */}
+                  {/* ITEMIZED BREAKDOWN GRID - UNIFIED TONAL SYSTEM */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                     {/* 1. ROOM RENT */}
-                    <div className="p-4 rounded-xl bg-white dark:bg-nike-dark-card/60 border border-slate-200/80 dark:border-slate-800 space-y-2">
+                    <div className="p-4 rounded-2xl bg-white dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card/80 space-y-2.5 transition-all shadow-2xs">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                           <Home className="w-3.5 h-3.5" />
                         </div>
                         <span className="text-slate-600 dark:text-slate-300 font-bold">
@@ -339,27 +339,27 @@ export const MyApartmentPage: React.FC = () => {
                         </span>
                       </div>
                       <div>
-                        <span className="text-lg font-extrabold text-slate-900 dark:text-white block">
+                        <span className="text-xl font-extrabold text-slate-900 dark:text-white block tracking-tight">
                           {formatCurrency(bill.rentAmount || 0)}
                         </span>
-                        <span className="text-[11px] text-slate-400 block mt-0.5">
+                        <span className="text-[11px] text-slate-400 dark:text-slate-400 block mt-0.5">
                           {language === 'th' ? 'รอบสัญญา 1 เดือน' : '1 Month Period'}
                         </span>
                       </div>
                     </div>
 
                     {/* 2. WATER SUPPLY */}
-                    <div className="p-4 rounded-xl bg-blue-50/40 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 space-y-2">
+                    <div className="p-4 rounded-2xl bg-white dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card/80 space-y-2.5 transition-all shadow-2xs">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-blue-100/80 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                           <Droplets className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-blue-700 dark:text-blue-300 font-bold">
+                        <span className="text-slate-600 dark:text-slate-300 font-bold">
                           {language === 'th' ? 'ค่าน้ำประปา' : 'Water Supply'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-lg font-extrabold text-blue-600 dark:text-blue-400 block">
+                        <span className="text-xl font-extrabold text-slate-900 dark:text-white block tracking-tight">
                           {formatCurrency(bill.waterAmount || 0)}
                         </span>
                         <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5 font-medium">
@@ -369,17 +369,17 @@ export const MyApartmentPage: React.FC = () => {
                     </div>
 
                     {/* 3. ELECTRICITY */}
-                    <div className="p-4 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 space-y-2">
+                    <div className="p-4 rounded-2xl bg-white dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card/80 space-y-2.5 transition-all shadow-2xs">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-amber-100/80 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                           <Zap className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-amber-700 dark:text-amber-300 font-bold">
+                        <span className="text-slate-600 dark:text-slate-300 font-bold">
                           {language === 'th' ? 'ค่าไฟฟ้า' : 'Electricity Supply'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-lg font-extrabold text-amber-600 dark:text-amber-400 block">
+                        <span className="text-xl font-extrabold text-slate-900 dark:text-white block tracking-tight">
                           {formatCurrency(bill.electricAmount || 0)}
                         </span>
                         <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5 font-medium">
@@ -389,9 +389,9 @@ export const MyApartmentPage: React.FC = () => {
                     </div>
 
                     {/* 4. COMMON AREA FEE */}
-                    <div className="p-4 rounded-xl bg-white dark:bg-nike-dark-card/60 border border-slate-200/80 dark:border-slate-800 space-y-2">
+                    <div className="p-4 rounded-2xl bg-white dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card/80 space-y-2.5 transition-all shadow-2xs">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                           <Building2 className="w-3.5 h-3.5" />
                         </div>
                         <span className="text-slate-600 dark:text-slate-300 font-bold">
@@ -399,10 +399,10 @@ export const MyApartmentPage: React.FC = () => {
                         </span>
                       </div>
                       <div>
-                        <span className="text-lg font-extrabold text-slate-900 dark:text-white block">
+                        <span className="text-xl font-extrabold text-slate-900 dark:text-white block tracking-tight">
                           {formatCurrency(bill.commonFee || 300)}
                         </span>
-                        <span className="text-[11px] text-slate-400 block mt-0.5">
+                        <span className="text-[11px] text-slate-400 dark:text-slate-400 block mt-0.5">
                           {language === 'th' ? 'ค่าบำรุงรักษาอาคาร' : 'Building maintenance'}
                         </span>
                       </div>
@@ -410,12 +410,12 @@ export const MyApartmentPage: React.FC = () => {
                   </div>
 
                   {/* BILL FOOTER ROW */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200/70 dark:border-slate-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-nike-hairline dark:border-nike-dark-card">
                     <div>
                       <span className="text-xs text-slate-500 dark:text-slate-400 block font-medium">
                         {language === 'th' ? 'ยอดรวมสุทธิประจำงวด:' : 'Total Amount Due:'}
                       </span>
-                      <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                      <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                         {formatCurrency(bill.totalAmount || 0)}
                       </span>
                     </div>
@@ -424,7 +424,7 @@ export const MyApartmentPage: React.FC = () => {
                       {isPaid ? (
                         <button
                           onClick={() => setSelectedBillForReceipt(bill)}
-                          className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer active:scale-95"
+                          className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95"
                         >
                           <Printer className="w-4 h-4" />
                           {language === 'th' ? 'ดูใบเสร็จรับเงิน (Official Receipt)' : 'View Official Receipt'}

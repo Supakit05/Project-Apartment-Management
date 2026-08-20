@@ -68,9 +68,26 @@ public class BookingController {
             });
         }
 
-        // Prevent overlapping bookings for Pending and Approved requests
+        // Validate room status
         if (booking.getRoomId() != null) {
-            List<Booking> activeBookings = repo.findByRoomIdAndStatusIn(booking.getRoomId(), List.of("Pending", "Approved"));
+            roomRepo.findById(booking.getRoomId()).ifPresent(room -> {
+                if ("Occupied".equalsIgnoreCase(room.getStatus())) {
+                    throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.CONFLICT,
+                        "ห้องพักนี้มีผู้เช่าพักอาศัยอยู่แล้ว ไม่สามารถส่งคำขอจองได้"
+                    );
+                } else if ("Maintenance".equalsIgnoreCase(room.getStatus())) {
+                    throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.CONFLICT,
+                        "ห้องพักนี้อยู่ระหว่างปิดปรับปรุง/ซ่อมบำรุง ไม่สามารถจองได้"
+                    );
+                }
+            });
+        }
+
+        // Prevent overlapping bookings only for already Approved requests
+        if (booking.getRoomId() != null) {
+            List<Booking> activeBookings = repo.findByRoomIdAndStatusIn(booking.getRoomId(), List.of("Approved"));
             for (Booking existing : activeBookings) {
                 boolean overlaps = true;
                 if (booking.getCheckIn() != null && booking.getCheckOut() != null
@@ -81,10 +98,9 @@ public class BookingController {
                 if (overlaps) {
                     throw new org.springframework.web.server.ResponseStatusException(
                         org.springframework.http.HttpStatus.CONFLICT,
-                        "ห้องพักนี้มีคำขอจองอยู่ระหว่างรออนุมัติหรือได้รับการอนุมัติแล้วในช่วงวันดังกล่าว กรุณาเลือกห้องอื่น หรือรอให้ผู้ดูแลยกเลิกรายการเดิมก่อน"
+                        "ห้องพักนี้ได้รับการอนุมัติการจองแล้วในช่วงวันดังกล่าว กรุณาเลือกห้องอื่น"
                     );
                 }
-
             }
         }
 

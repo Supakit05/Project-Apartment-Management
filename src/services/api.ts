@@ -53,7 +53,7 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(error.error || error.message || res.statusText);
+    throw new Error(error.message || error.error || res.statusText);
   }
   return res.json();
 }

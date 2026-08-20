@@ -130,7 +130,7 @@ export const AdminSidebar: React.FC = () => {
           <div className="bg-nike-ink text-white p-5 border-b border-neutral-800 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-white text-nike-ink font-black text-xs flex items-center justify-center rounded-xl">
-                AM
+                AS
               </div>
               <span className="font-extrabold text-sm uppercase tracking-tight">Admin Menu</span>
             </div>

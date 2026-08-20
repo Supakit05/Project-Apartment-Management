@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Sun, Moon, Shield, Menu, X, Building2, LogOut, User, LogIn,
-  CalendarCheck, ChevronDown, Settings, AlertTriangle, Globe, Wrench, Home
+  CalendarCheck, ChevronDown, Settings, AlertTriangle, Wrench, Home
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -15,7 +15,7 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { language, toggleLanguage, t } = useLanguage();
+  const { t } = useLanguage();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -64,7 +64,6 @@ export const Navbar: React.FC = () => {
     logout();
     setShowLogoutConfirm(false);
     setProfileDropdownOpen(false);
-    toast.success(t('logout.success'));
     navigate('/login');
   };
 
@@ -109,16 +108,6 @@ export const Navbar: React.FC = () => {
 
           {/* RIGHT CONTROLS */}
           <div className="hidden md:flex items-center gap-3">
-
-            {/* LANGUAGE SWITCHER */}
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-nike-soft-cloud hover:bg-neutral-200 dark:bg-nike-dark-elevated dark:hover:bg-neutral-800 text-nike-ink dark:text-white text-xs font-bold transition-all active:scale-95 border border-nike-hairline dark:border-nike-dark-card"
-              title={language === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}
-            >
-              <Globe className="w-3.5 h-3.5 text-blue-500" />
-              <span>{language === 'th' ? 'TH' : 'EN'}</span>
-            </button>
 
             {/* THEME TOGGLE BUTTON */}
             <button
@@ -207,9 +196,9 @@ export const Navbar: React.FC = () => {
                         <Link
                           to="/my-maintenance"
                           onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-2 px-3 py-1.5 hover:bg-nike-soft-cloud dark:hover:bg-neutral-800 transition-colors rounded-lg mx-1 text-rose-600 dark:text-rose-400"
+                          className="flex items-center gap-2 px-3 py-1.5 hover:bg-nike-soft-cloud dark:hover:bg-neutral-800 transition-colors rounded-lg mx-1"
                         >
-                          <Wrench className="w-3.5 h-3.5 shrink-0" />
+                          <Wrench className="w-3.5 h-3.5 text-nike-mute shrink-0" />
                           <span className="truncate">{t('nav.myMaintenance')}</span>
                         </Link>
                       )}
@@ -255,15 +244,6 @@ export const Navbar: React.FC = () => {
 
           {/* MOBILE MENU CONTROLS */}
           <div className="flex items-center gap-2 md:hidden">
-
-            <button
-              onClick={toggleLanguage}
-              className="px-2.5 py-1.5 rounded-full bg-nike-soft-cloud dark:bg-nike-dark-elevated text-[11px] font-bold text-nike-ink dark:text-white active:scale-95 transition-all flex items-center gap-1 border border-nike-hairline dark:border-nike-dark-card"
-              title="Toggle Language"
-            >
-              <Globe className="w-3.5 h-3.5 text-blue-500" />
-              <span>{language.toUpperCase()}</span>
-            </button>
 
             <button
               onClick={toggleTheme}
@@ -330,7 +310,7 @@ export const Navbar: React.FC = () => {
                         <Link
                           to="/my-maintenance"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="text-center py-2 text-xs font-semibold bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 rounded-xl border border-rose-200 dark:border-rose-900"
+                          className="text-center py-2 text-xs font-semibold bg-white dark:bg-nike-dark-card rounded-xl border border-nike-hairline dark:border-neutral-700 text-nike-ink dark:text-white"
                         >
                           {t('nav.myMaintenance')}
                         </Link>

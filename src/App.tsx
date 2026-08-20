@@ -79,15 +79,21 @@ export const AppContent: React.FC = () => {
     <Router>
       <Toaster
         position="top-right"
-        richColors
-        closeButton
+        theme="dark"
+        duration={2500}
+        visibleToasts={1}
         toastOptions={{
+          duration: 2500,
           style: {
+            background: '#09090b',
+            color: '#ffffff',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
             borderRadius: '16px',
             padding: '14px 18px',
             fontSize: '13px',
             fontWeight: '600',
-            boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.15)',
+            boxShadow: '0 12px 32px -4px rgba(0, 0, 0, 0.4), 0 4px 12px -2px rgba(0, 0, 0, 0.3)',
+            cursor: 'grab',
           },
         }}
       />

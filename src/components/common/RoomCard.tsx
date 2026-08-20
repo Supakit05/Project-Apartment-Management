@@ -23,6 +23,7 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
       case 'Available': return t('common.available');
       case 'Reserved': return t('common.reserved');
       case 'Occupied': return t('common.occupied');
+      case 'Maintenance': return t('common.maintenance');
       default: return status;
     }
   };
@@ -143,7 +144,7 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
             >
               {t('room.detailsBtn')} <ArrowUpRight className="w-3 h-3" />
             </Link>
-            {isAvailable && (
+            {isAvailable ? (
               <button
                 type="button"
                 onClick={handleBookClick}
@@ -151,6 +152,12 @@ export const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
               >
                 {t('room.bookBtn')}
               </button>
+            ) : (
+              <span
+                className="px-3.5 py-2 text-xs font-semibold rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 select-none whitespace-nowrap border border-neutral-200/60 dark:border-neutral-700"
+              >
+                {room.status === 'Reserved' ? t('room.reservedBtn') : room.status === 'Maintenance' ? t('common.maintenance') : t('room.occupiedBtn')}
+              </span>
             )}
           </div>
         </div>

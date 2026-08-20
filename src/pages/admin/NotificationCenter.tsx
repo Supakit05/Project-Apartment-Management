@@ -43,19 +43,19 @@ export const getNotificationTargetUrl = (title: string, message?: string, type?:
 const getTargetPageLabel = (targetUrl: string, language: string): string => {
   switch (targetUrl) {
     case '/admin/bookings':
-      return language === 'th' ? 'ไปยังหน้ารายการจองห้องพัก' : 'Go to Bookings';
+      return language === 'th' ? 'ไปยังหน้ารายการจองห้องพัก' : 'View to Bookings';
     case '/admin/maintenance':
-      return language === 'th' ? 'ไปยังหน้ารายการแจ้งซ่อม' : 'Go to Maintenance';
+      return language === 'th' ? 'ไปยังหน้ารายการแจ้งซ่อม' : 'View to Maintenance';
     case '/admin/utility-bills':
-      return language === 'th' ? 'ไปยังหน้ารายการบิลค่าน้ำ-ไฟ' : 'Go to Utility Bills';
+      return language === 'th' ? 'ไปยังหน้ารายการบิลค่าน้ำ-ไฟ' : 'View to Utility Bills';
     case '/admin/tenants':
-      return language === 'th' ? 'ไปยังหน้าจัดการผู้เช่า' : 'Go to Tenants';
+      return language === 'th' ? 'ไปยังหน้าจัดการผู้เช่า' : 'View to Tenants';
     case '/admin/rooms':
-      return language === 'th' ? 'ไปยังหน้าจัดการห้องพัก' : 'Go to Units';
+      return language === 'th' ? 'ไปยังหน้าจัดการห้องพัก' : 'View to Units';
     case '/admin/buildings':
-      return language === 'th' ? 'ไปยังหน้าจัดการอาคาร' : 'Go to Buildings';
+      return language === 'th' ? 'ไปยังหน้าจัดการอาคาร' : 'View to Buildings';
     default:
-      return language === 'th' ? 'ไปยังหน้าแดชบอร์ด' : 'Go to Dashboard';
+      return language === 'th' ? 'ไปยังหน้าแดชบอร์ด' : 'View to Dashboard';
   }
 };
 

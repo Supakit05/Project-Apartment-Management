@@ -44,10 +44,10 @@ const translations: Record<string, Record<Language, string>> = {
   'logout.success': { th: 'ออกจากระบบเรียบร้อยแล้ว', en: 'Signed out successfully' },
 
   // Home Hero & Sections
-  'hero.tag': { th: '24 ห้องพักทันสมัย · ราชเทวี กรุงเทพฯ', en: '24 Modern Units · Ratchathewi, Bangkok' },
+  'hero.tag': { th: 'ห้องพักทันสมัย · ราชเทวี กรุงเทพฯ', en: 'Modern Units · Ratchathewi, Bangkok' },
   'hero.title': { th: 'POONTAN APARTMENT', en: 'POONTAN APARTMENT' },
-  'hero.sub': { th: 'ออกแบบมาเพื่อชีวิตคนเมือง 2 ชั้น 24 ห้องพัก พร้อมเฟอร์นิเจอร์ครบครัน ระเบียงส่วนตัว อินเทอร์เน็ตความเร็วสูง และระบบดูแลความปลอดภัยตลอด 24 ชม.', en: 'Engineered for urban living. 2 floors, 24 fully furnished residences featuring private balconies, high-speed fiber Wi-Fi, digital access control, and 24/7 building management.' },
-  'hero.cta': { th: 'ดูห้องพักทั้งหมด (24 ห้อง)', en: 'Explore All 24 Units' },
+  'hero.sub': { th: 'ออกแบบมาเพื่อชีวิตคนเมือง 2 ชั้น พร้อมเฟอร์นิเจอร์ครบครัน ระเบียงส่วนตัว อินเทอร์เน็ตความเร็วสูง และระบบดูแลความปลอดภัยตลอด 24 ชม.', en: 'Engineered for urban living. 2 floors of fully furnished residences featuring private balconies, high-speed fiber Wi-Fi, digital access control, and 24/7 building management.' },
+  'hero.cta': { th: 'ดูห้องพักทั้งหมด', en: 'Explore All Units' },
   'hero.filterBtn': { th: 'กรองห้องว่าง', en: 'Filter Available' },
   'hero.featuredTitle': { th: 'คอลเลกชันห้องพักไฮไลท์', en: 'Featured Residences' },
   'hero.featuredSub': { th: 'สัมผัสประสบการณ์การพักอาศัยที่เหนือระดับ พร้อมเข้าอยู่ได้ทันที', en: 'Curated living spaces engineered for modern comfort.' },

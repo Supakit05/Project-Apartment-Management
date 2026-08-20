@@ -32,10 +32,10 @@ export const Footer: React.FC = () => {
           <div className="space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">{t('nav.units')}</h4>
             <ul className="space-y-2.5 text-xs text-nike-stone font-medium">
-              <li><Link to="/rooms" className="hover:text-white transition-colors">Studio - Single Bed (26-28 sqm)</Link></li>
-              <li><Link to="/rooms" className="hover:text-white transition-colors">Studio - Double Bed (32-35 sqm)</Link></li>
-              <li><Link to="/rooms" className="hover:text-white transition-colors">1-Bedroom (42-46 sqm)</Link></li>
-              <li><Link to="/rooms" className="hover:text-white transition-colors">Corner Room (52 sqm)</Link></li>
+              <li><Link to="/rooms" className="hover:text-white transition-colors">{language === 'th' ? 'สตูดิโอ - เตียงเดี่ยว (26-28 ตร.ม.)' : 'Studio - Single Bed (26-28 sqm)'}</Link></li>
+              <li><Link to="/rooms" className="hover:text-white transition-colors">{language === 'th' ? 'สตูดิโอ - เตียงคู่ (32-35 ตร.ม.)' : 'Studio - Double Bed (32-35 sqm)'}</Link></li>
+              <li><Link to="/rooms" className="hover:text-white transition-colors">{language === 'th' ? '1 ห้องนอน (42-46 ตร.ม.)' : '1-Bedroom (42-46 sqm)'}</Link></li>
+              <li><Link to="/rooms" className="hover:text-white transition-colors">{language === 'th' ? 'ห้องมุมพิเศษ (52 ตร.ม.)' : 'Corner Room (52 sqm)'}</Link></li>
             </ul>
           </div>
 
@@ -52,7 +52,7 @@ export const Footer: React.FC = () => {
 
           {/* COL 4: CONTACT & LOCATION */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Location & Contact</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{language === 'th' ? 'ที่ตั้งและการติดต่อ' : 'Location & Contact'}</h4>
             <ul className="space-y-2.5 text-xs text-nike-stone">
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-white shrink-0 mt-0.5" />
@@ -89,9 +89,7 @@ export const Footer: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-6">
-            <span className="hover:text-white transition-colors cursor-pointer">Terms of Rental</span>
-            <span className="hover:text-white transition-colors cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-white transition-colors cursor-pointer">Building Regulations</span>
+            <span className="text-neutral-400 font-medium">ITDS323 Practical DevOps and Applications</span>
           </div>
         </div>
 

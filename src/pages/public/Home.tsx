@@ -7,7 +7,7 @@ import { getRooms } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const Home: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -91,7 +91,7 @@ export const Home: React.FC = () => {
             
             {/* Top Category Tag Pill */}
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
-              <Building2 className="w-3.5 h-3.5" /> {t('hero.tag')}
+              <Building2 className="w-3.5 h-3.5" /> {rooms.length > 0 ? `${rooms.length} ` : ''}{t('hero.tag')}
             </div>
 
             {/* Monumental Display Headline */}
@@ -109,7 +109,7 @@ export const Home: React.FC = () => {
                 to="/rooms"
                 className="bg-white text-nike-ink hover:bg-neutral-100 font-bold px-6 py-2.5 rounded-full text-xs sm:text-sm transition-all active:scale-95 shadow-lg inline-flex items-center gap-2"
               >
-                {t('hero.cta')} <ArrowRight className="w-4 h-4" />
+                {language === 'th' ? `ดูห้องพักทั้งหมด (${rooms.length > 0 ? rooms.length : 36} ห้อง)` : `Explore All ${rooms.length > 0 ? rooms.length : 36} Units`} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
@@ -130,7 +130,7 @@ export const Home: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-bold text-lg text-nike-ink dark:text-white">{t('filter.title')}</h3>
-                <p className="text-xs text-nike-mute dark:text-nike-stone">Apartment System · 2 Floors · 24 Units</p>
+                <p className="text-xs text-nike-mute dark:text-nike-stone">Apartment System · 2 Floors · {rooms.length > 0 ? rooms.length : 36} Units</p>
               </div>
             </div>
 
@@ -168,7 +168,7 @@ export const Home: React.FC = () => {
               <select
                 value={buildingFilter}
                 onChange={(e) => setBuildingFilter(e.target.value)}
-                className="w-full px-4 py-2.5 text-xs font-bold bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-blue-600 dark:text-blue-400 rounded-full focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all cursor-pointer"
+                className="w-full px-4 py-2.5 text-xs font-semibold bg-nike-soft-cloud dark:bg-nike-dark-card border border-nike-hairline dark:border-nike-dark-card text-nike-ink dark:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-nike-ink dark:focus:ring-white transition-all cursor-pointer"
               >
                 <option value="all">{t('filter.allBuildings')}</option>
                 <option value="bld-1">{t('filter.buildingA')}</option>
@@ -253,7 +253,7 @@ export const Home: React.FC = () => {
             </p>
           </div>
           <Link to="/rooms" className="text-xs font-bold text-nike-ink dark:text-white hover:underline flex items-center gap-1">
-            {t('hero.cta')} <ArrowRight className="w-3.5 h-3.5" />
+            {language === 'th' ? `ดูห้องพักทั้งหมด (${rooms.length > 0 ? rooms.length : 36} ห้อง)` : `Explore All ${rooms.length > 0 ? rooms.length : 36} Units`} <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
